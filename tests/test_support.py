@@ -53,12 +53,21 @@ class TestSupportSystem:
 
     def test_resolve_question(self, client, student, lesson_with_question):
         """ L'étudiant peut marquer sa propre question comme résolue """
+        from notifications.models import Notification
         lesson, question = lesson_with_question
-        
+
         client.force_login(student)
         url = reverse('mark_resolved', args=[question.id])
-        
+
         client.post(url)
-        
+
         question.refresh_from_db()
         assert question.status == 'RESOLVED'
+
+        # Une notif de type support doit avoir été créée pour l'étudiant
+        notif = Notification.objects.filter(
+            recipient=student,
+            category=Notification.CATEGORY_SUPPORT,
+        ).first()
+        assert notif is not None
+        assert "résolue" in notif.title.lower()

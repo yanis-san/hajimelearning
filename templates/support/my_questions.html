@@ -1,50 +1,128 @@
 {% extends 'base.html' %}
 
+{% block title %}Questions & Support{% endblock %}
+
 {% block content %}
-<div class="max-w-3xl mx-auto py-10 px-4">
+<div class="max-w-5xl mx-auto py-10 px-4 space-y-8"
+     x-data="{
+       activeCourse: '{{ courses_data.0.course.slug|default:'all' }}',
+       filter: 'all'
+     }">
 
-  <c-ui.page-header title="🎫 Mes Questions" subtitle="Support & aide pédagogique">
-    <c-ui.btn variant="outline" size="sm" href="{% url 'user_dashboard' %}">
-      ← Retour au Dashboard
-    </c-ui.btn>
-  </c-ui.page-header>
-
-  {# Onglets En cours / Résolues #}
-  <div x-data="{ tab: 'pending' }" class="space-y-6">
-
-    <div class="flex rounded-lg bg-gray-100 p-0.5 w-fit">
-      <button type="button"
-              x-on:click="tab = 'pending'"
-              :class="tab === 'pending' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'"
-              class="px-4 py-2 text-sm font-medium rounded-md transition cursor-pointer">
-        ⏳ En cours ({{ pending.count }})
-      </button>
-      <button type="button"
-              x-on:click="tab = 'resolved'"
-              :class="tab === 'resolved' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'"
-              class="px-4 py-2 text-sm font-medium rounded-md transition cursor-pointer">
-        ✅ Résolues ({{ resolved.count }})
-      </button>
+  {# ── En-tête ── #}
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">💬 Questions & Support</h1>
+      <p class="text-sm text-gray-500 mt-1">Retrouvez vos questions et celles de vos camarades par formation.</p>
     </div>
-
-    {# En cours #}
-    <div x-show="tab === 'pending'" x-transition class="space-y-3">
-      {% for q in pending %}
-        <c-support.question-card :question="q" />
-      {% empty %}
-        <c-ui.empty-state icon="💬" title="Aucune question en cours" message="Vous n'avez aucune question ouverte pour le moment." />
-      {% endfor %}
+    <div class="flex items-center gap-2">
+      {% if total_open > 0 %}
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-50 text-orange-700 text-sm font-medium">
+          ⏳ {{ total_open }} question{{ total_open|pluralize }} en attente
+        </span>
+      {% endif %}
+      <a href="{% url 'user_dashboard' %}"
+         class="text-sm text-gray-500 hover:text-orange-600 transition">
+        ← Dashboard
+      </a>
     </div>
-
-    {# Résolues #}
-    <div x-show="tab === 'resolved'" x-transition class="space-y-3">
-      {% for q in resolved %}
-        <c-support.question-card :question="q" />
-      {% empty %}
-        <c-ui.empty-state icon="✅" title="Aucune question résolue" message="Vos questions résolues apparaîtront ici." />
-      {% endfor %}
-    </div>
-
   </div>
+
+  {% if courses_data %}
+  <div class="flex gap-6 items-start">
+
+    {# ── Sidebar : liste des cours ── #}
+    <nav class="w-56 shrink-0 space-y-1 sticky top-6">
+      <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2">Mes formations</p>
+
+      {% for cd in courses_data %}
+      <button type="button"
+              x-on:click="activeCourse = '{{ cd.course.slug }}'; filter = 'all'"
+              :class="activeCourse === '{{ cd.course.slug }}' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'text-gray-600 hover:bg-gray-50 border-transparent'"
+              class="w-full text-left flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-sm transition cursor-pointer">
+        <span class="truncate font-medium">{{ cd.course.title }}</span>
+        <span class="shrink-0 text-xs px-1.5 py-0.5 rounded-full
+          {% if cd.open_count > 0 %}bg-orange-100 text-orange-600{% else %}bg-gray-100 text-gray-400{% endif %}">
+          {{ cd.total }}
+        </span>
+      </button>
+      {% endfor %}
+    </nav>
+
+    {# ── Contenu principal ── #}
+    <div class="flex-1 min-w-0 space-y-5">
+
+      {% for cd in courses_data %}
+      <div x-show="activeCourse === '{{ cd.course.slug }}'" x-transition>
+
+        {# En-tête cours #}
+        <div class="flex items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 class="text-base font-bold text-gray-800">{{ cd.course.title }}</h2>
+            <p class="text-xs text-gray-400 mt-0.5">
+              {{ cd.total }} question{{ cd.total|pluralize }} au total
+              · {{ cd.my_count }} de moi
+            </p>
+          </div>
+          <a href="{% url 'course_detail' cd.course.slug %}"
+             class="text-xs text-orange-600 hover:text-orange-700 transition">
+            Voir le cours →
+          </a>
+        </div>
+
+        {# Filtre Toutes / Mes questions #}
+        <div class="flex rounded-xl bg-gray-100 p-1 w-fit gap-1 mb-4">
+          <button type="button"
+                  x-on:click="filter = 'all'"
+                  :class="filter === 'all' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'"
+                  class="px-4 py-1.5 text-sm font-medium rounded-lg transition cursor-pointer">
+            Toutes ({{ cd.total }})
+          </button>
+          <button type="button"
+                  x-on:click="filter = 'mine'"
+                  :class="filter === 'mine' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'"
+                  class="px-4 py-1.5 text-sm font-medium rounded-lg transition cursor-pointer">
+            Mes questions ({{ cd.my_count }})
+          </button>
+        </div>
+
+        {# Liste — Toutes #}
+        <div x-show="filter === 'all'" class="space-y-3">
+          {% for question in cd.all_questions %}
+            <c-support.question-row :question="question" :current_user="request.user" />
+          {% empty %}
+            <c-ui.empty-state icon="💬" title="Aucune question" message="Aucune question pour ce cours encore." />
+          {% endfor %}
+        </div>
+
+        {# Liste — Mes questions #}
+        <div x-show="filter === 'mine'" class="space-y-3">
+          {% for question in cd.my_questions %}
+            <c-support.question-row :question="question" :current_user="request.user" />
+          {% empty %}
+            <c-ui.empty-state icon="✍️" title="Pas encore de questions" message="Vous n'avez pas encore posé de question pour ce cours.">
+              <c-ui.btn href="{% url 'course_detail' cd.course.slug %}" variant="outline" size="sm">
+                Aller au cours →
+              </c-ui.btn>
+            </c-ui.empty-state>
+          {% endfor %}
+        </div>
+
+      </div>
+      {% endfor %}
+
+    </div>
+  </div>
+
+  {% else %}
+  {# Pas encore inscrit à un cours #}
+  <c-ui.empty-state
+    icon="📚"
+    title="Vous n'êtes inscrit à aucune formation"
+    message="Rejoignez une formation pour accéder au support.">
+    <c-ui.btn href="{% url 'catalogue' %}" variant="primary">Voir le catalogue</c-ui.btn>
+  </c-ui.empty-state>
+  {% endif %}
+
 </div>
 {% endblock %}

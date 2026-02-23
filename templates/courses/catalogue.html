@@ -6,7 +6,12 @@
 
 {% block content %}
 
-  <section class="bg-white">
+  <section class="bg-white"
+           x-data="{
+             active:   '{{ current_category }}',
+             sort:     '{{ current_sort }}',
+             sortNext(current, asc, desc) { return current === asc ? desc : asc }
+           }">
     <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-8 pt-12 pb-6">
 
       {# ── Header ── #}
@@ -14,8 +19,47 @@
         <c-ui.badge variant="gray">{{ courses|length }} formation{{ courses|length|pluralize }}</c-ui.badge>
       </c-ui.page-header>
 
+      {# ── Pills catégories — filtre HTMX + onglet actif Alpine ── #}
+      {% if categories %}
+        <div class="flex items-center gap-2 flex-wrap mb-6">
+
+          <button type="button"
+                  @click="active = ''"
+                  hx-get="{% url 'catalogue' %}"
+                  hx-target="#catalogue-grid"
+                  hx-swap="innerHTML"
+                  hx-push-url="true"
+                  hx-include="[name='q'], [name='sort']"
+                  hx-indicator="#catalogue-grid"
+                  class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition cursor-pointer"
+                  :class="active === ''
+                    ? 'bg-orange-500 border-orange-500 text-white'
+                    : 'bg-white border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600'">
+            Toutes
+          </button>
+
+          {% for cat in categories %}
+            <button type="button"
+                    @click="active = '{{ cat.slug }}'"
+                    hx-get="{% url 'catalogue' %}?category={{ cat.slug }}"
+                    hx-target="#catalogue-grid"
+                    hx-swap="innerHTML"
+                    hx-push-url="true"
+                    hx-include="[name='q'], [name='sort']"
+                    hx-indicator="#catalogue-grid"
+                    class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition cursor-pointer"
+                    :class="active === '{{ cat.slug }}'
+                      ? 'bg-orange-500 border-orange-500 text-white'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600'">
+              {{ cat.name }}
+            </button>
+          {% endfor %}
+
+        </div>
+      {% endif %}
+
       {# ── Barre de recherche + tri ── #}
-      <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-8" x-data="{ sort: '{{ current_sort }}' }">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
 
         {# Recherche #}
         <div class="relative flex-1 max-w-md">
@@ -31,7 +75,8 @@
             hx-get="{% url 'catalogue' %}"
             hx-trigger="input changed delay:300ms, search"
             hx-target="#catalogue-grid"
-            hx-include="[name='q'], [name='sort']"
+            hx-push-url="true"
+            hx-include="[name='q'], [name='sort'], [name='category']"
           >
         </div>
 
@@ -39,52 +84,51 @@
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-xs text-gray-400 mr-1">Trier par :</span>
 
-          <button
-            class="px-3 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer
-                   {% if current_sort == '-created_at' or current_sort == 'created_at' %}
-                     bg-orange-50 border-orange-200 text-orange-700
-                   {% else %}
-                     bg-white border-gray-200 text-gray-600 hover:border-gray-300
-                   {% endif %}"
-            hx-get="{% url 'catalogue' %}?sort={% if current_sort == '-created_at' %}created_at{% else %}-created_at{% endif %}"
-            hx-target="#catalogue-grid"
-            hx-include="[name='q']"
-          >
+          <button type="button"
+                  @click="sort = sortNext(sort, 'created_at', '-created_at')"
+                  :hx-get="'{% url 'catalogue' %}?sort=' + sortNext(sort, 'created_at', '-created_at')"
+                  hx-target="#catalogue-grid"
+                  hx-push-url="true"
+                  hx-include="[name='q'], [name='category']"
+                  class="px-3 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer"
+                  :class="(sort === '-created_at' || sort === 'created_at')
+                    ? 'bg-orange-50 border-orange-200 text-orange-700'
+                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'">
             Récent
-            {% if current_sort == '-created_at' %}↓{% elif current_sort == 'created_at' %}↑{% endif %}
+            <span x-text="sort === '-created_at' ? '↓' : sort === 'created_at' ? '↑' : ''"></span>
           </button>
 
-          <button
-            class="px-3 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer
-                   {% if current_sort == 'title' or current_sort == '-title' %}
-                     bg-orange-50 border-orange-200 text-orange-700
-                   {% else %}
-                     bg-white border-gray-200 text-gray-600 hover:border-gray-300
-                   {% endif %}"
-            hx-get="{% url 'catalogue' %}?sort={% if current_sort == 'title' %}-title{% else %}title{% endif %}"
-            hx-target="#catalogue-grid"
-            hx-include="[name='q']"
-          >
+          <button type="button"
+                  @click="sort = sortNext(sort, 'title', '-title')"
+                  :hx-get="'{% url 'catalogue' %}?sort=' + sortNext(sort, 'title', '-title')"
+                  hx-target="#catalogue-grid"
+                  hx-push-url="true"
+                  hx-include="[name='q'], [name='category']"
+                  class="px-3 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer"
+                  :class="(sort === 'title' || sort === '-title')
+                    ? 'bg-orange-50 border-orange-200 text-orange-700'
+                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'">
             Titre
-            {% if current_sort == 'title' %}↑{% elif current_sort == '-title' %}↓{% endif %}
+            <span x-text="sort === 'title' ? '↑' : sort === '-title' ? '↓' : ''"></span>
           </button>
 
-          <button
-            class="px-3 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer
-                   {% if current_sort == 'price' or current_sort == '-price' %}
-                     bg-orange-50 border-orange-200 text-orange-700
-                   {% else %}
-                     bg-white border-gray-200 text-gray-600 hover:border-gray-300
-                   {% endif %}"
-            hx-get="{% url 'catalogue' %}?sort={% if current_sort == 'price' %}-price{% else %}price{% endif %}"
-            hx-target="#catalogue-grid"
-            hx-include="[name='q']"
-          >
+          <button type="button"
+                  @click="sort = sortNext(sort, 'price', '-price')"
+                  :hx-get="'{% url 'catalogue' %}?sort=' + sortNext(sort, 'price', '-price')"
+                  hx-target="#catalogue-grid"
+                  hx-push-url="true"
+                  hx-include="[name='q'], [name='category']"
+                  class="px-3 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer"
+                  :class="(sort === 'price' || sort === '-price')
+                    ? 'bg-orange-50 border-orange-200 text-orange-700'
+                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'">
             Prix
-            {% if current_sort == 'price' %}↑{% elif current_sort == '-price' %}↓{% endif %}
+            <span x-text="sort === 'price' ? '↑' : sort === '-price' ? '↓' : ''"></span>
           </button>
 
-          <input type="hidden" name="sort" value="{{ current_sort }}">
+          {# Inputs cachés synchronisés avec Alpine pour hx-include #}
+          <input type="hidden" name="sort"     :value="sort">
+          <input type="hidden" name="category" :value="active">
         </div>
       </div>
 
@@ -95,7 +139,7 @@
   <section class="bg-gray-50/60">
     <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-8 py-12">
 
-      <div id="catalogue-grid">
+      <div id="catalogue-grid" class="transition-opacity duration-150 htmx-request:opacity-50">
         {% include 'courses/partials/catalogue_grid.html' %}
       </div>
 

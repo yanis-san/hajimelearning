@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+
+{% block title %}Hajime Learning — Formez-vous, concrètement.{% endblock %}
+{% block meta_description %}Des formations pratiques pour apprendre à votre rythme. Accès à vie, support inclus, paiement local.{% endblock %}
+
+{% block content %}
+
+  {# ══ HERO ════════════════════════════════════════════════════════════════════ #}
+  <section class="bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 sm:pt-32 sm:pb-24 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+
+      <div class="flex-1 max-w-xl">
+        <span class="inline-block text-xs font-semibold tracking-widest text-orange-500 uppercase mb-5">
+          Hajime Learning
+        </span>
+        <h1 class="text-4xl sm:text-5xl font-medium text-gray-900 tracking-tight leading-[1.15] mb-5">
+          Apprenez.<br>
+          <span class="text-orange-500">À votre rythme.</span>
+        </h1>
+        <p class="text-lg text-gray-500 mb-8 leading-relaxed">
+          Des formations conçues par des experts, du contenu pratique,
+          un suivi personnalisé. Tout ce qu'il faut pour progresser vraiment.
+        </p>
+        <div class="flex items-center gap-4 mb-10">
+          {% if user.is_authenticated %}
+            <c-ui.btn href="{% url 'user_dashboard' %}" size="lg">Mes formations</c-ui.btn>
+            <c-ui.btn href="#catalogue" variant="ghost" size="lg">Explorer ↓</c-ui.btn>
+          {% else %}
+            <c-ui.btn href="{% url 'account_signup' %}" size="lg">Commencer</c-ui.btn>
+            <c-ui.btn href="#catalogue" variant="ghost" size="lg">Explorer ↓</c-ui.btn>
+          {% endif %}
+        </div>
+        <div class="flex items-center gap-6 text-sm text-gray-400">
+          <span>{{ courses|length }} formation{{ courses|length|pluralize }}</span>
+          <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+          <span>Accès à vie</span>
+          <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+          <span>Paiement local</span>
+        </div>
+      </div>
+
+      {# Illustration droite #}
+      <div class="flex-1 hidden lg:flex items-center justify-center">
+        <div class="relative w-80 h-80">
+          <div class="absolute top-4 right-4 w-48 h-48 rounded-full bg-orange-100"></div>
+          <div class="absolute top-12 left-0 bg-white rounded-2xl shadow-lg border border-gray-100 p-5 w-56">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
+              </div>
+              <div>
+                <div class="h-2 w-20 bg-gray-200 rounded-full"></div>
+                <div class="h-2 w-14 bg-gray-100 rounded-full mt-1.5"></div>
+              </div>
+            </div>
+            <div class="w-full h-2 bg-gray-100 rounded-full">
+              <div class="h-2 w-3/5 bg-orange-400 rounded-full"></div>
+            </div>
+          </div>
+          <div class="absolute bottom-8 right-0 bg-white rounded-2xl shadow-lg border border-gray-100 p-4 w-48">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
+                <svg class="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+              </div>
+              <span class="text-xs font-medium text-gray-600">Leçon terminée</span>
+            </div>
+            <div class="space-y-1.5">
+              <div class="h-1.5 w-full bg-gray-100 rounded-full"></div>
+              <div class="h-1.5 w-4/5 bg-gray-100 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  {# ══ FONCTIONNALITÉS ÉTUDIANT ════════════════════════════════════════════════ #}
+  <section class="bg-gray-50/70 border-y border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+
+      <div class="max-w-xl mb-14">
+        <h2 class="text-2xl sm:text-3xl font-medium text-gray-900 tracking-tight mb-3">
+          Tout pour apprendre efficacement.
+        </h2>
+        <p class="text-gray-500">
+          Chaque formation est pensée pour vous faire progresser, pas vous noyer dans la théorie.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {# Progression #}
+        <div class="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-sm transition">
+          <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mb-5">
+            <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">Progression claire</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">
+            Chaque leçon validée est enregistrée. Reprenez exactement là où vous vous étiez arrêté.
+          </p>
+        </div>
+
+        {# Support #}
+        <div class="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-sm transition">
+          <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mb-5">
+            <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">Questions & support</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">
+            Posez vos questions directement dans la leçon. L'instructeur vous répond et marque la question comme résolue.
+          </p>
+        </div>
+
+        {# Quiz #}
+        <div class="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-sm transition">
+          <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mb-5">
+            <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">Quiz de validation</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">
+            Des exercices intégrés pour tester vos connaissances à chaque étape. Vous savez exactement ce que vous maîtrisez.
+          </p>
+        </div>
+
+        {# Notifications #}
+        <div class="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-sm transition">
+          <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mb-5">
+            <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">Notifications en temps réel</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">
+            Soyez alerté dès qu'une réponse arrive ou qu'une leçon est validée. Restez dans le flux sans effort.
+          </p>
+        </div>
+
+        {# Accès à vie #}
+        <div class="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-sm transition">
+          <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mb-5">
+            <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">Accès à vie</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">
+            Payez une fois, accédez pour toujours. Les mises à jour du cours sont incluses sans frais supplémentaires.
+          </p>
+        </div>
+
+        {# Paiement local #}
+        <div class="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-sm transition">
+          <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mb-5">
+            <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-semibold text-gray-900 mb-2">Paiement local (DA)</h3>
+          <p class="text-sm text-gray-500 leading-relaxed">
+            Payez en dinars algériens, sans carte internationale. C'est simple, rapide et sécurisé.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  {# ══ ESPACE INSTRUCTEUR ═══════════════════════════════════════════════════════ #}
+  <section class="bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+
+        {# Texte #}
+        <div class="flex-1 max-w-lg">
+          <span class="inline-block text-xs font-semibold tracking-widest text-orange-500 uppercase mb-4">
+            Pour les experts
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-medium text-gray-900 tracking-tight mb-4">
+            Partagez votre expertise.<br>Créez votre formation.
+          </h2>
+          <p class="text-gray-500 mb-6 leading-relaxed">
+            Vous avez des compétences à transmettre ? Rejoignez la plateforme en tant qu'instructeur.
+            Créez vos modules, vos leçons, vos quiz — et gérez vos étudiants depuis un espace dédié.
+          </p>
+          <ul class="space-y-3 mb-8">
+            {% for item in "123"|make_list %}
+              {% if forloop.first %}
+                <li class="flex items-start gap-3 text-sm text-gray-600">
+                  <svg class="w-4 h-4 text-orange-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  Créer des formations structurées (modules, leçons, quiz)
+                </li>
+              {% elif forloop.counter == 2 %}
+                <li class="flex items-start gap-3 text-sm text-gray-600">
+                  <svg class="w-4 h-4 text-orange-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  Répondre aux questions de vos étudiants en direct
+                </li>
+              {% else %}
+                <li class="flex items-start gap-3 text-sm text-gray-600">
+                  <svg class="w-4 h-4 text-orange-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  Suivre vos statistiques et votre audience depuis un tableau de bord
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+          <div class="flex items-center gap-3">
+            <c-ui.btn href="{% url 'instructor_plans' %}">
+              Devenir instructeur
+            </c-ui.btn>
+            <c-ui.btn href="{% url 'contact' %}" variant="outline">
+              Nous contacter
+            </c-ui.btn>
+          </div>
+          <p class="mt-4 text-xs text-gray-400">
+            L'accès instructeur est soumis à validation. Contactez-nous pour en savoir plus.
+          </p>
+        </div>
+
+        {# Visuel dashboard instructeur #}
+        <div class="flex-1 hidden lg:block">
+          <div class="bg-gray-50 rounded-2xl border border-gray-100 p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-semibold text-gray-700">Tableau de bord</span>
+              <span class="text-xs text-gray-400">Espace instructeur</span>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+              <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
+                <p class="text-xl font-bold text-gray-900">3</p>
+                <p class="text-xs text-gray-400 mt-1">Formations</p>
+              </div>
+              <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
+                <p class="text-xl font-bold text-gray-900">47</p>
+                <p class="text-xs text-gray-400 mt-1">Étudiants</p>
+              </div>
+              <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
+                <p class="text-xl font-bold text-orange-500">2</p>
+                <p class="text-xs text-gray-400 mt-1">Questions</p>
+              </div>
+            </div>
+            <div class="space-y-2">
+              {% for i in "12"|make_list %}
+                <div class="bg-white rounded-xl border border-gray-100 px-4 py-3 flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div class="w-2 h-2 rounded-full bg-orange-300"></div>
+                    <div class="h-2 {% if forloop.first %}w-28{% else %}w-20{% endif %} bg-gray-200 rounded-full"></div>
+                  </div>
+                  <div class="h-2 w-10 bg-gray-100 rounded-full"></div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  {# ══ CATALOGUE ════════════════════════════════════════════════════════════════ #}
+  <section id="catalogue" class="bg-gray-50/70 border-t border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+         x-data="{ active: 'all' }">
+
+      <c-ui.page-header title="Formations" subtitle="Toutes nos formations disponibles">
+        {% if courses %}
+          <c-ui.badge variant="gray">{{ courses|length }} formation{{ courses|length|pluralize }}</c-ui.badge>
+        {% endif %}
+      </c-ui.page-header>
+
+      {# ── Pills catégories — filtre HTMX sur place ── #}
+      {% if categories %}
+        <div class="flex items-center gap-2 flex-wrap mb-6">
+
+          <button type="button"
+                  @click="active = 'all'"
+                  hx-get="{% url 'catalogue' %}"
+                  hx-target="#index-grid"
+                  hx-swap="innerHTML"
+                  hx-indicator="#index-grid"
+                  class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition cursor-pointer"
+                  :class="active === 'all'
+                    ? 'bg-orange-500 border-orange-500 text-white'
+                    : 'bg-white border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600'">
+            Toutes
+          </button>
+
+          {% for cat in categories %}
+            <button type="button"
+                    @click="active = '{{ cat.slug }}'"
+                    hx-get="{% url 'catalogue' %}?category={{ cat.slug }}"
+                    hx-target="#index-grid"
+                    hx-swap="innerHTML"
+                    hx-indicator="#index-grid"
+                    class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition cursor-pointer"
+                    :class="active === '{{ cat.slug }}'
+                      ? 'bg-orange-500 border-orange-500 text-white'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600'">
+              {{ cat.name }}
+            </button>
+          {% endfor %}
+
+        </div>
+      {% endif %}
+
+      {# ── Grille (rendue côté serveur au premier chargement, HTMX ensuite) ── #}
+      <div id="index-grid" class="transition-opacity duration-150 htmx-request:opacity-50">
+        {% if courses %}
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+            {% for course in courses %}
+              <c-course.card :course="course" />
+            {% endfor %}
+          </div>
+        {% else %}
+          <c-ui.empty-state
+            title="Aucune formation disponible"
+            message="Les premières formations arrivent bientôt. Revenez très vite !">
+            <c-ui.btn href="{% url 'account_signup' %}" variant="outline" size="sm">
+              M'avertir à l'ouverture
+            </c-ui.btn>
+          </c-ui.empty-state>
+        {% endif %}
+      </div>
+
+    </div>
+  </section>
+
+  {# ══ CTA FINAL ════════════════════════════════════════════════════════════════ #}
+  {% if not user.is_authenticated %}
+  <section class="bg-white border-t border-gray-100">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+      <h2 class="text-2xl sm:text-3xl font-medium text-gray-900 tracking-tight mb-3">
+        Prêt à commencer ?
+      </h2>
+      <p class="text-gray-500 mb-8">
+        Créez votre compte gratuitement. Accédez aux formations en quelques secondes.
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <c-ui.btn href="{% url 'account_signup' %}" size="lg">Créer mon compte</c-ui.btn>
+        <c-ui.btn href="{% url 'contact' %}" variant="outline" size="lg">Nous contacter</c-ui.btn>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+{% endblock %}

@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
 from courses.models import Course
-from access.models import AccessRequest
+from access.models import AccessRequest, Enrollment
 
 @pytest.mark.django_db
 class TestDashboardLogic:
@@ -19,8 +19,9 @@ class TestDashboardLogic:
         c3 = Course.objects.create(title="Payant 3", slug="p3", price=1000, is_published=True)
         AccessRequest.objects.create(student=student, course=c3, status='PENDING')
         
-        # 4. Cours GRATUIT
+        # 4. Cours GRATUIT (inscrit)
         c4 = Course.objects.create(title="Gratuit", slug="free", price=0, is_published=True)
+        Enrollment.objects.create(student=student, course=c4)
 
         # --- ACTION ---
         client.force_login(student)

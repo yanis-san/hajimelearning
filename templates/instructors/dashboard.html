@@ -118,6 +118,9 @@
               <c-ui.btn href="{% url 'manage_course_students' course.slug %}" variant="outline" size="sm">
                 👥 Étudiants
               </c-ui.btn>
+              <c-ui.btn href="{% url 'instructor_course_questions' course.slug %}" variant="outline" size="sm">
+                💬 Questions
+              </c-ui.btn>
               <c-ui.btn href="{% url 'manage_course_edit' course.slug %}" variant="outline" size="sm">
                 ✏️ Modifier
               </c-ui.btn>

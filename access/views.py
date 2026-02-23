@@ -1,47 +1,45 @@
+import logging
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from courses.models import Course
 from django.db import transaction
-from .models import AccessRequest, ActivationCode, Coupon, user_has_access
-from .forms import AccessRequestForm, CodeActivationForm
 from django.http import HttpResponse
+
+from courses.models import Course
+from .models import AccessRequest, ActivationCode, Coupon, Enrollment, user_has_access
+from .forms import AccessRequestForm, CodeActivationForm
 from .utils import generate_receipt_pdf
+
+logger = logging.getLogger(__name__)
 
 def validate_coupon(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     
-    # On récupère ce que tu as tapé et on enlève les espaces autour
     code_input = request.POST.get('promo_code', '').strip()
-    
-    # --- DEBUG : Regarde ton terminal quand tu tapes ---
-    print(f"🔍 Test Code Promo : Reçu='{code_input}'")
-    
+    logger.debug("Validate coupon: code='%s'", code_input)
+
     context = {'course': course}
 
     try:
-        # CORRECTION ICI : 'code__iexact' ignore les majuscules/minuscules
         coupon = Coupon.objects.get(code__iexact=code_input)
-        
-        print(f"✅ Trouvé en base : '{coupon.code}'") # Debug
 
-        # Vérification validité (Dates + Actif)
         if not coupon.is_valid:
-            print("❌ Code trouvé mais invalide (Date ou Inactif)")
+            logger.debug("Coupon '%s' found but invalid.", coupon.code)
             context['error'] = "Ce code promo a expiré ou n'est pas encore actif."
             context['success'] = False
         else:
-            print("💰 Code valide ! Application de la réduction.")
+            logger.debug("Coupon '%s' valid, applying discount.", coupon.code)
             remise = (course.price * coupon.discount_percent) / 100
             new_price = course.price - remise
-            
+
             context['new_price'] = int(new_price)
             context['coupon'] = coupon
             context['success'] = True
-            
+
     except Coupon.DoesNotExist:
-        print("❌ Code introuvable dans la base de données.")
+        logger.debug("Coupon code '%s' not found.", code_input)
         context['error'] = "Code promo inconnu."
         context['success'] = False
 
@@ -146,6 +144,20 @@ def request_course_access(request, course_id):
         'code_form': code_form,
         'course': course
     })
+
+
+@login_required
+def enroll_free_course(request, course_id):
+    """Inscription à un cours gratuit."""
+    course = get_object_or_404(Course, id=course_id, price=0, is_published=True)
+
+    if user_has_access(request.user, course):
+        messages.info(request, "Vous êtes déjà inscrit à ce cours.")
+        return redirect('course_detail', course_slug=course.slug)
+
+    Enrollment.objects.get_or_create(student=request.user, course=course)
+    messages.success(request, f"Vous êtes maintenant inscrit à « {course.title} » !")
+    return redirect('course_detail', course_slug=course.slug)
 
 
 @login_required

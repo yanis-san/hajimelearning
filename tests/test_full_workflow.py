@@ -28,9 +28,11 @@ class TestFullNotifications:
         # L'admin doit avoir 1 notif
         assert Notification.objects.filter(recipient=admin).count() == 1
         notif = Notification.objects.get(recipient=admin)
-        assert "Nouvelle Question" in notif.title
-        # On vérifie que l'email de l'étudiant est dans le message
-        assert student.email in notif.message
+        assert "Nouvelle question" in notif.title
+        # Le message doit mentionner l'étudiant (prénom/nom ou email) et le cours
+        student_identifier = student.get_full_name() or student.email
+        assert student_identifier in notif.message
+        assert "Maths" in notif.message
 
     def test_course_completion_notification(self, student):
         """ 

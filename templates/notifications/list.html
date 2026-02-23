@@ -9,12 +9,38 @@
               hx-post="{% url 'mark_all_read' %}"
               hx-target="#notification-list"
               hx-swap="innerHTML"
-              hx-confirm="Tout marquer comme lu ?"
+              hx-vals='{"type": "{{ current_type|default:'' }}"}'
               class="text-sm text-orange-600 hover:text-orange-700 font-medium cursor-pointer transition-colors">
         Tout marquer comme lu
       </button>
     {% endif %}
   </c-ui.page-header>
+
+  {# ── Onglets (uniquement si instructeur actif) ── #}
+  {% if is_instructor %}
+    <div class="flex gap-1 mb-4 border-b border-gray-200">
+      <a href="{% url 'my_notifications' %}"
+         class="px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors
+                {% if not current_type %}text-orange-600 border-b-2 border-orange-500 -mb-px{% else %}text-gray-500 hover:text-gray-700 hover:bg-gray-50{% endif %}">
+        Tout
+      </a>
+      <a href="{% url 'my_notifications' %}?type=student"
+         class="px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors
+                {% if current_type == 'student' %}text-orange-600 border-b-2 border-orange-500 -mb-px{% else %}text-gray-500 hover:text-gray-700 hover:bg-gray-50{% endif %}">
+        Mes formations
+      </a>
+      <a href="{% url 'my_notifications' %}?type=instructor"
+         class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors
+                {% if current_type == 'instructor' %}text-orange-600 border-b-2 border-orange-500 -mb-px{% else %}text-gray-500 hover:text-gray-700 hover:bg-gray-50{% endif %}">
+        Espace instructeur
+        {% if navbar_instructor_unread_count > 0 and current_type != 'instructor' %}
+          <span class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-orange-500 rounded-full">
+            {{ navbar_instructor_unread_count }}
+          </span>
+        {% endif %}
+      </a>
+    </div>
+  {% endif %}
 
   {# Liste #}
   <div id="notification-list" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">

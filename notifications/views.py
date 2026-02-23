@@ -5,12 +5,38 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from .models import Notification
 
+# Valeurs autorisées pour le filtre ?type=
+_VALID_TYPES = {Notification.TYPE_STUDENT, Notification.TYPE_INSTRUCTOR}
+
+
 @login_required
 def my_notifications(request):
-    """ Affiche la liste complète des notifications (Page dédiée) """
-    # C'est mieux de trier par date décroissante (plus récent en haut)
-    notifs = Notification.objects.filter(recipient=request.user).order_by('-created_at')
-    return render(request, 'notifications/list.html', {'notifications': notifs})
+    """Affiche la liste complète des notifications (page dédiée).
+
+    Supporte le filtre ?type=student|instructor pour n'afficher
+    que les notifications d'un espace donné.
+    """
+    type_filter = request.GET.get('type')
+    if type_filter not in _VALID_TYPES:
+        type_filter = None  # "Tout"
+
+    base_qs = Notification.objects.filter(recipient=request.user)
+    if type_filter:
+        notifs = base_qs.filter(notification_type=type_filter).order_by('-created_at')
+    else:
+        notifs = base_qs.order_by('-created_at')
+
+    is_instructor = False
+    try:
+        is_instructor = request.user.instructor_profile.is_active
+    except Exception:
+        pass
+
+    return render(request, 'notifications/list.html', {
+        'notifications': notifs,
+        'current_type': type_filter,
+        'is_instructor': is_instructor,
+    })
 
 @login_required
 def mark_read_and_redirect(request, notification_id):
@@ -40,8 +66,11 @@ def mark_notification_read(request, notification_id):
     notif.is_read = not notif.is_read
     notif.save()
 
-    # Recalcul du compteur pour le badge
-    unread_count = request.user.notifications.filter(is_read=False).count()
+    # Recalcul du compteur pour le badge (uniquement notifs étudiant → cloche)
+    unread_count = request.user.notifications.filter(
+        is_read=False,
+        notification_type=Notification.TYPE_STUDENT,
+    ).count()
 
     # Mise à jour du Badge (OOB) — le compteur sur la cloche
     if unread_count > 0:
@@ -64,16 +93,45 @@ def mark_notification_read(request, notification_id):
 @login_required
 @require_POST
 def mark_all_read(request):
-    """ Marque tout comme lu d'un coup """
-    Notification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
+    """Marque tout comme lu d'un coup.
 
-    # Badge OOB (vider le compteur dans la navbar)
-    badge_html = '<div id="notification-badge" hx-swap-oob="true"></div>'
+    Accepte un champ POST `type` (student|instructor) pour ne marquer
+    que les notifications d'un espace.  Sans ce champ, marque tout.
+    """
+    type_filter = request.POST.get('type')
+    if type_filter not in _VALID_TYPES:
+        type_filter = None
+
+    qs = Notification.objects.filter(recipient=request.user, is_read=False)
+    if type_filter:
+        qs = qs.filter(notification_type=type_filter)
+    qs.update(is_read=True)
+
+    # Badge OOB (vider/recalculer le compteur dans la navbar)
+    student_unread = Notification.objects.filter(
+        recipient=request.user,
+        is_read=False,
+        notification_type=Notification.TYPE_STUDENT,
+    ).count()
+    if student_unread > 0:
+        badge_html = (
+            f'<div id="notification-badge" hx-swap-oob="true">'
+            f'<span class="absolute top-1 right-1 inline-flex items-center justify-center '
+            f'w-4 h-4 text-xs font-bold leading-none text-white bg-red-500 rounded-full '
+            f'border-2 border-white">{student_unread}</span>'
+            f'</div>'
+        )
+    else:
+        badge_html = '<div id="notification-badge" hx-swap-oob="true"></div>'
 
     if getattr(request, 'htmx', False):
-        notifs = Notification.objects.filter(recipient=request.user).order_by('-created_at')
+        # Re-rendre la liste filtrée dans le même contexte
+        all_qs = Notification.objects.filter(recipient=request.user)
+        if type_filter:
+            notifs = all_qs.filter(notification_type=type_filter).order_by('-created_at')
+        else:
+            notifs = all_qs.order_by('-created_at')
 
-        # Depuis le dropdown navbar
         if request.headers.get('X-Source') == 'dropdown':
             html = render_to_string(
                 'notifications/partials/dropdown_inner.html',
@@ -81,7 +139,6 @@ def mark_all_read(request):
                 request=request,
             )
         else:
-            # Depuis la page /notifications/
             html = render_to_string(
                 'notifications/partials/notification_list.html',
                 {'notifications': notifs},

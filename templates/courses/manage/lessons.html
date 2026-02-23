@@ -53,10 +53,10 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const el = document.getElementById('lesson-list');
-      if (el) {
-        new Sortable(el, {
+    htmx.onLoad(function(content) {
+      const el = content.querySelector('#lesson-list') || document.getElementById('lesson-list');
+      if (el && !el._sortable) {
+        el._sortable = new Sortable(el, {
           animation: 200,
           handle: '.handle',
           ghostClass: 'bg-orange-50',

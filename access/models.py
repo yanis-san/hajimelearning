@@ -72,17 +72,45 @@ class ActivationCode(models.Model):
     def __str__(self):
         return f"Code {self.course.title}"
 
+# --- INSCRIPTION (cours gratuits) ---
+class Enrollment(models.Model):
+    """Inscription explicite à un cours (gratuit uniquement)."""
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='enrollments',
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name='enrollments',
+    )
+    enrolled_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('student', 'course')
+        verbose_name = "Inscription"
+        verbose_name_plural = "Inscriptions"
+
+    def __str__(self):
+        return f"{self.student.email} → {self.course.title}"
+
+
 # --- LOGIQUE D'ACCÈS ---
 def user_has_access(user, course):
     if not user.is_authenticated: return False
     if user.is_staff: return True
     if course.instructor == user: return True
-    if course.price == 0: return True
 
+    # Cours gratuit : inscription explicite requise
+    if course.price == 0:
+        return Enrollment.objects.filter(student=user, course=course).exists()
+
+    # Cours payant : demande approuvée ou code d'activation
     if AccessRequest.objects.filter(student=user, course=course, status='APPROVED').exists():
         return True
-    
+
     if ActivationCode.objects.filter(used_by=user, course=course, is_used=True).exists():
         return True
-        
+
     return False

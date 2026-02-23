@@ -20,6 +20,15 @@
     {% endif %}
   </a>
 
+  {# ── Pastille catégorie (coin haut gauche) ── #}
+  {% if course.category %}
+    <div class="absolute top-2.5 left-2.5 z-10">
+      <span class="px-2 py-0.5 text-[10px] font-semibold rounded-md bg-black/60 text-white/90 backdrop-blur-sm tracking-wide">
+        {{ course.category.name }}
+      </span>
+    </div>
+  {% endif %}
+
   {# ── Pastille prix (coin haut droit) ── #}
   <div class="absolute top-2.5 right-2.5 z-10">
     {% if course.price == 0 %}

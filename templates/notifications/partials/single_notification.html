@@ -1,6 +1,10 @@
 <div id="notif-item-{{ notif.id }}"
      class="flex items-start gap-3 p-4 border-b border-gray-100 last:border-0 transition
-            {% if not notif.is_read %}bg-orange-50{% else %}bg-white{% endif %}">
+            {% if notif.category == 'support' %}
+              {% if not notif.is_read %}bg-green-50{% else %}bg-green-50/60{% endif %}
+            {% else %}
+              {% if not notif.is_read %}bg-orange-50{% else %}bg-white{% endif %}
+            {% endif %}">
 
   {# Indicateur lu / non lu #}
   <button type="button"
@@ -10,7 +14,8 @@
           class="shrink-0 mt-1 p-1 rounded-full hover:bg-gray-200 transition-colors cursor-pointer"
           title="Marquer comme {% if notif.is_read %}non lu{% else %}lu{% endif %}">
     {% if not notif.is_read %}
-      <span class="block h-2.5 w-2.5 bg-orange-500 rounded-full shadow-sm"></span>
+      <span class="block h-2.5 w-2.5 rounded-full shadow-sm
+                   {% if notif.category == 'support' %}bg-green-500{% else %}bg-orange-500{% endif %}"></span>
     {% else %}
       <span class="block h-2.5 w-2.5 border-2 border-gray-300 rounded-full"></span>
     {% endif %}

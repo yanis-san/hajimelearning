@@ -204,9 +204,15 @@
             {# CTA #}
             <div class="[&>a]:w-full [&>a]:text-center">
               {% if course.price == 0 %}
-                <c-ui.btn href="{% url 'account_login' %}?next={{ request.path }}" variant="primary" size="lg">
-                  S'inscrire gratuitement
-                </c-ui.btn>
+                {% if user.is_authenticated %}
+                  <c-ui.btn href="{% url 'enroll_free' course.id %}" variant="primary" size="lg">
+                    S'inscrire gratuitement
+                  </c-ui.btn>
+                {% else %}
+                  <c-ui.btn href="{% url 'account_login' %}?next={{ request.path }}" variant="primary" size="lg">
+                    Se connecter pour s'inscrire
+                  </c-ui.btn>
+                {% endif %}
               {% else %}
                 <c-ui.btn href="{% url 'request_access' course.id %}" variant="primary" size="lg">
                   Débloquer l'accès

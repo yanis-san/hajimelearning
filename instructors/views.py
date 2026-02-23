@@ -1,6 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Count, Q
+
+from courses.models import Course, Module, Lesson
+from courses.forms import InstructorCourseForm
 from .models import InstructorPlan, InstructorRequest, InstructorProfile
 from .forms import InstructorRequestForm
 from .decorators import instructor_required
@@ -87,9 +91,6 @@ def instructor_dashboard(request):
     """Dashboard instructeur : ses formations + limites + compteurs."""
     profile = request.user.instructor_profile
 
-    from courses.models import Course, Module, Lesson
-    from django.db.models import Count, Q
-
     my_courses = (
         Course.objects.filter(instructor=request.user)
         .annotate(
@@ -99,7 +100,7 @@ def instructor_dashboard(request):
                 'accessrequest',
                 filter=Q(accessrequest__status='APPROVED'),
                 distinct=True,
-            ),
+            ) + Count('enrollments', distinct=True),
         )
         .order_by('-created_at')
     )
@@ -127,8 +128,6 @@ def instructor_course_create(request):
         messages.error(request, "Vous avez atteint le nombre maximum de formations pour votre offre.")
         return redirect('instructor_dashboard')
 
-    from courses.forms import InstructorCourseForm
-
     if request.method == 'POST':
         form = InstructorCourseForm(request.POST, request.FILES)
         if form.is_valid():
@@ -150,9 +149,6 @@ def instructor_course_create(request):
 @instructor_required
 def instructor_course_edit(request, course_slug):
     """Modifier une formation en tant qu'instructeur."""
-    from courses.models import Course
-    from courses.forms import InstructorCourseForm
-
     course = get_object_or_404(Course, slug=course_slug, instructor=request.user)
 
     if request.method == 'POST':

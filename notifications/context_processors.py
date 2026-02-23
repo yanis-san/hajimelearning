@@ -1,24 +1,44 @@
 from .models import Notification
 
+
 def user_notifications(request):
     """
-    Rend les notifications accessibles dans tous les templates
-    via les variables : navbar_notifications et navbar_unread_count
+    Injecte dans tous les templates :
+
+    Flux étudiant (cloche principale navbar) :
+      - navbar_notifications        : 10 dernières notifs 'student'
+      - navbar_unread_count         : nb non lues 'student'
+
+    Flux instructeur (badge espace instructeur) :
+      - navbar_instructor_unread_count : nb non lues 'instructor'
+                                         (0 si pas instructeur actif)
     """
-    if request.user.is_authenticated:
-        # On récupère les 10 dernières notifications (du plus récent au plus vieux)
-        notifs = Notification.objects.filter(recipient=request.user).order_by('-created_at')[:10]
-        
-        # On compte seulement celles qui ne sont pas lues
-        unread_count = Notification.objects.filter(recipient=request.user, is_read=False).count()
-        
+    if not request.user.is_authenticated:
         return {
-            'navbar_notifications': notifs,
-            'navbar_unread_count': unread_count
+            'navbar_notifications': [],
+            'navbar_unread_count': 0,
+            'navbar_instructor_unread_count': 0,
         }
-    
-    # Si l'utilisateur n'est pas connecté, on renvoie des listes vides
+
+    base_qs = request.user.notifications
+
+    student_qs = base_qs.filter(notification_type=Notification.TYPE_STUDENT)
+    navbar_notifications = student_qs.order_by('-created_at')[:10]
+    navbar_unread_count  = student_qs.filter(is_read=False).count()
+
+    # Badge instructeur uniquement si l'utilisateur a un profil actif
+    navbar_instructor_unread_count = 0
+    try:
+        if request.user.instructor_profile.is_active:
+            navbar_instructor_unread_count = base_qs.filter(
+                notification_type=Notification.TYPE_INSTRUCTOR,
+                is_read=False,
+            ).count()
+    except Exception:
+        pass
+
     return {
-        'navbar_notifications': [],
-        'navbar_unread_count': 0
+        'navbar_notifications': navbar_notifications,
+        'navbar_unread_count': navbar_unread_count,
+        'navbar_instructor_unread_count': navbar_instructor_unread_count,
     }

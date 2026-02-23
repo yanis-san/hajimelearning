@@ -2,8 +2,16 @@ from django.contrib import admin
 from django.db import models  # <--- C'EST CETTE LIGNE QUI MANQUAIT
 from unfold.admin import ModelAdmin, StackedInline, TabularInline
 from markdownx.widgets import AdminMarkdownxWidget
-from .models import Course, Module, Lesson, ContentBlock
+from .models import Category, Course, Module, Lesson, ContentBlock
 from .models import QuizResult
+
+
+@admin.register(Category)
+class CategoryAdmin(ModelAdmin):
+    list_display  = ['name', 'slug', 'order']
+    list_editable = ['order']
+    prepopulated_fields = {'slug': ('name',)}
+    ordering = ['order', 'name']
 
 # 1. Configuration des Blocs de Contenu (Page Builder)
 class ContentBlockInline(StackedInline):
@@ -53,8 +61,8 @@ class ModuleInline(TabularInline):
 
 @admin.register(Course)
 class CourseAdmin(ModelAdmin):
-    list_display = ['title', 'price', 'is_published', 'created_at']
-    list_filter = ['is_published']
+    list_display  = ['title', 'category', 'price', 'is_published', 'created_at']
+    list_filter   = ['is_published', 'category']
     search_fields = ['title']
     prepopulated_fields = {"slug": ("title",)}
     inlines = [ModuleInline]

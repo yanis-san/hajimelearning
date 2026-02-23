@@ -5,6 +5,22 @@ from django.core.validators import FileExtensionValidator
 from .validators import get_upload_path, FileSizeValidator, IMAGE_EXTENSIONS, DOC_EXTENSIONS, AUDIO_EXTENSIONS
 from django.urls import reverse
 
+
+class Category(models.Model):
+    """Catégorie d'une formation — gérable depuis l'admin."""
+    name  = models.CharField("Étiquette", max_length=80, unique=True)
+    slug  = models.SlugField(unique=True)
+    order = models.PositiveSmallIntegerField("Ordre", default=0)
+
+    class Meta:
+        ordering            = ['order', 'name']
+        verbose_name        = "Catégorie"
+        verbose_name_plural = "Catégories"
+
+    def __str__(self):
+        return self.name
+
+
 class Course(models.Model):
     title = models.CharField("Titre", max_length=200)
     slug = models.SlugField(unique=True)
@@ -15,6 +31,13 @@ class Course(models.Model):
         related_name='courses_as_instructor',
         verbose_name="Instructeur",
         help_text="L'instructeur propriétaire de cette formation (vide = plateforme)",
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='courses',
+        verbose_name="Catégorie",
     )
     
     # 1. POUR LA CARTE (ACCUEIL)

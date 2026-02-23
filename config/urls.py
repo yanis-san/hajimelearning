@@ -35,6 +35,7 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('access/', include('access.urls')),
     path('support/', include('support.urls')),
+    path('contact/', include('contact.urls')),
     path('', include('courses.urls')),
     path('notifications/', include('notifications.urls')),
     path('instructors/', include('instructors.urls')),

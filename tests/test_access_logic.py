@@ -1,12 +1,12 @@
 import pytest
-from access.models import user_has_access, AccessRequest, ActivationCode
+from access.models import user_has_access, AccessRequest, ActivationCode, Enrollment
 
 '''
 Sécurité de base : Un étudiant lambda ne peut pas voir un cours payant (refused_by_default).
 
 Super-pouvoir Admin : Toi (l'admin), tu peux tout voir, tout le temps (allowed_for_admin).
 
-Logique Freemium : Si le prix est 0 DA, la porte est ouverte (allowed_if_free).
+Inscription obligatoire : Même les cours gratuits nécessitent une inscription explicite.
 
 Paiement CCP : Si tu as cliqué sur "Approved", la porte s'ouvre (allowed_with_approved).
 
@@ -27,8 +27,13 @@ class TestAccessLogic:
         """ Cas 2 : L'admin a toujours accès """
         assert user_has_access(admin_user, course) is True
 
-    def test_access_allowed_if_free(self, student, free_course):
-        """ Cas 3 : Tout le monde a accès à un cours gratuit """
+    def test_access_refused_free_without_enrollment(self, student, free_course):
+        """ Cas 3a : Cours gratuit sans inscription → accès refusé """
+        assert user_has_access(student, free_course) is False
+
+    def test_access_allowed_free_with_enrollment(self, student, free_course):
+        """ Cas 3b : Cours gratuit avec inscription → accès accordé """
+        Enrollment.objects.create(student=student, course=free_course)
         assert user_has_access(student, free_course) is True
 
     def test_access_allowed_with_approved_request(self, student, course):

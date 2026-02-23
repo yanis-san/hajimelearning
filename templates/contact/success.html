@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Message envoyé — Hajime Learning{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto py-20 px-4 text-center"
+     x-data="{ count: 5 }"
+     x-init="
+       let t = setInterval(() => {
+         count--;
+         if (count <= 0) { clearInterval(t); window.location.href = '{% url 'catalogue' %}'; }
+       }, 1000)
+     ">
+
+  {# Icône ── #}
+  <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-6">
+    <svg class="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+    </svg>
+  </div>
+
+  <h1 class="text-2xl font-bold text-gray-900 mb-3">Message bien reçu !</h1>
+  <p class="text-gray-500 mb-8">
+    Merci de nous avoir contactés. Nous vous répondrons dans les plus brefs délais
+    (généralement sous 24–48 h).
+  </p>
+
+  {# ── Compteur ── #}
+  <p class="mb-8 text-sm text-gray-400">
+    Redirection dans <span class="font-semibold tabular-nums text-gray-500" x-text="count"></span> s…
+  </p>
+
+  <div class="flex items-center justify-center gap-3">
+    <c-ui.btn href="{% url 'catalogue' %}" variant="outline">
+      Explorer les formations
+    </c-ui.btn>
+    {% if user.is_authenticated %}
+      <c-ui.btn href="{% url 'user_dashboard' %}">
+        Mon espace
+      </c-ui.btn>
+    {% else %}
+      <c-ui.btn href="{% url 'contact' %}">
+        Nouveau message
+      </c-ui.btn>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

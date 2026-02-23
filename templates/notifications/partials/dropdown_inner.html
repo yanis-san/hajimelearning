@@ -11,8 +11,12 @@
   {% if notifications %}
     {% for notif in notifications %}
       <div id="notif-item-{{ notif.id }}"
-           class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-0 transition-colors
-                  {% if not notif.is_read %}bg-orange-50/40{% endif %}">
+           class="px-4 py-3 border-b border-gray-100 last:border-0 transition-colors hover:brightness-95
+                  {% if notif.category == 'support' %}
+                    {% if not notif.is_read %}bg-green-50{% else %}bg-white{% endif %}
+                  {% else %}
+                    {% if not notif.is_read %}bg-orange-50/40{% else %}bg-white{% endif %}
+                  {% endif %}">
         <a href="{% url 'mark_read_and_redirect' notif.id %}" class="block">
           <p class="text-sm font-medium text-gray-800 truncate">{{ notif.title|default:"Notification" }}</p>
           <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ notif.message }}</p>

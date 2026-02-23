@@ -5,15 +5,26 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse, HttpResponse
 from django.template.loader import render_to_string
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q, F, Prefetch
 from django.contrib.auth import get_user_model
 from django.utils.safestring import mark_safe
+from .models import Category
+from django.urls import reverse
 from markdownx.utils import markdownify
 
 import json
 
 from .models import Course, Lesson, StudentProgress, ContentBlock, QuizQuestion, QuizResult, Module, LandingSection
-from django.db.models import Prefetch
+from .forms import ContentBlockForm, QuizQuestionForm, CourseForm, InstructorCourseForm, ModuleForm, LessonForm, LandingSectionForm
+from .permissions import (
+    builder_access_required, get_managed_course, get_managed_course_from_block,
+    get_managed_course_from_lesson, get_managed_course_from_section,
+    get_managed_course_from_question,
+)
+from access.models import AccessRequest, ActivationCode, Enrollment, user_has_access
+from support.forms import QuestionForm
+
+User = get_user_model()
 
 
 def _is_course_manager(user, course):
@@ -23,41 +34,39 @@ def _is_course_manager(user, course):
     if user.is_staff:
         return True
     return course.instructor_id == user.id
-from .forms import ContentBlockForm, QuizQuestionForm, CourseForm, InstructorCourseForm, ModuleForm, LessonForm, LandingSectionForm
-from .permissions import (
-    builder_access_required, get_managed_course, get_managed_course_from_block,
-    get_managed_course_from_lesson, get_managed_course_from_section,
-    get_managed_course_from_question,
-)
-from access.models import AccessRequest, user_has_access
-from support.forms import QuestionForm
 
-User = get_user_model()
+
 # --- VUES PUBLIQUES (ACCESSIBLES AUX ÉTUDIANTS) ---
 
 def course_list(request):
-    courses = Course.objects.filter(is_published=True, is_featured=True).order_by('-created_at')
-    return render(request, 'courses/course_list.html', {'courses': courses})
+    courses    = Course.objects.filter(is_published=True, is_featured=True).select_related('category').order_by('-created_at')
+    categories = Category.objects.all()
+    return render(request, 'courses/index.html', {'courses': courses, 'categories': categories})
 
 
 def catalogue(request):
-    """Page publique /catalogue/ avec tri et recherche."""
+    """Page publique /catalogue/ avec tri, recherche et filtre catégorie."""
     ALLOWED_SORTS = {
         'title', '-title',
         'price', '-price',
         'created_at', '-created_at',
     }
 
-    sort = request.GET.get('sort', '-created_at')
+    sort         = request.GET.get('sort', '-created_at')
     if sort not in ALLOWED_SORTS:
         sort = '-created_at'
 
-    query = request.GET.get('q', '').strip()
+    query        = request.GET.get('q', '').strip()
+    category_slug = request.GET.get('category', '').strip()
 
-    courses = Course.objects.filter(is_published=True)
+    categories = Category.objects.all()
+    courses    = Course.objects.filter(is_published=True).select_related('category')
 
     if query:
         courses = courses.filter(Q(title__icontains=query) | Q(short_description__icontains=query))
+
+    if category_slug:
+        courses = courses.filter(category__slug=category_slug)
 
     courses = courses.annotate(
         modules_count=Count('modules', filter=Q(modules__is_published=True))
@@ -69,12 +78,15 @@ def catalogue(request):
             'courses': courses,
             'current_sort': sort,
             'search_query': query,
+            'current_category': category_slug,
         })
 
     return render(request, 'courses/catalogue.html', {
         'courses': courses,
         'current_sort': sort,
         'search_query': query,
+        'categories': categories,
+        'current_category': category_slug,
     })
 
 def course_detail(request, course_slug):
@@ -175,14 +187,21 @@ def lesson_detail(request, course_slug, lesson_slug):
 
 @login_required
 def user_dashboard(request):
-    approved_course_ids = AccessRequest.objects.filter(
-        student=request.user, 
-        status='APPROVED'
+    enrolled_ids = Enrollment.objects.filter(
+        student=request.user
+    ).values_list('course_id', flat=True)
+
+    approved_ids = AccessRequest.objects.filter(
+        student=request.user, status='APPROVED'
+    ).values_list('course_id', flat=True)
+
+    activation_ids = ActivationCode.objects.filter(
+        used_by=request.user, is_used=True
     ).values_list('course_id', flat=True)
 
     my_courses = Course.objects.filter(
-        Q(price=0) | Q(id__in=approved_course_ids),
-        is_published=True
+        Q(id__in=enrolled_ids) | Q(id__in=approved_ids) | Q(id__in=activation_ids),
+        is_published=True,
     ).distinct().order_by('-created_at')
 
     return render(request, 'courses/dashboard.html', {'courses': my_courses})
@@ -371,7 +390,8 @@ def manage_course_students(request, course_slug):
 
     students = User.objects.filter(
         Q(accessrequest__course=course, accessrequest__status='APPROVED') |
-        Q(activationcode__course=course, activationcode__is_used=True)
+        Q(activationcode__course=course, activationcode__is_used=True) |
+        Q(enrollments__course=course)
     ).distinct()
 
     # Structure du cours : modules + leçons (publiés ou tous pour le manager)
@@ -676,11 +696,9 @@ def manage_course_landing(request, course_slug):
     course = get_managed_course(request.user, course_slug)
     course = Course.objects.prefetch_related('landing_sections').get(pk=course.pk)
     if request.user.is_staff:
-        from django.urls import reverse
         courses_url = reverse('manage_course_list')
         course_edit_url = reverse('manage_course_edit', args=[course.slug])
     else:
-        from django.urls import reverse
         courses_url = reverse('instructor_dashboard')
         course_edit_url = reverse('instructor_course_edit', args=[course.slug])
     return render(request, 'courses/manage/landing_builder.html', {

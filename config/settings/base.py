@@ -41,8 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'notifications',
     'instructors',
-
-
+    'contact',
 ]
 
 MIDDLEWARE = [
@@ -226,3 +225,6 @@ MARKDOWNX_MARKDOWN_EXTENSIONS = [
     'markdown.extensions.fenced_code',
     'markdown.extensions.nl2br',
 ]
+
+# Email de destination pour le formulaire de contact
+CONTACT_EMAIL = 'contact@hajimelearning.com'

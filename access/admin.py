@@ -1,6 +1,14 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import AccessRequest, ActivationCode, Coupon
+from .models import AccessRequest, ActivationCode, Coupon, Enrollment
+
+
+@admin.register(Enrollment)
+class EnrollmentAdmin(ModelAdmin):
+    list_display = ['student', 'course', 'enrolled_at']
+    list_filter = ['course']
+    search_fields = ['student__email', 'course__title']
+    readonly_fields = ['enrolled_at']
 
 @admin.register(Coupon)
 class CouponAdmin(ModelAdmin):

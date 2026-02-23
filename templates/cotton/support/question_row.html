@@ -1,0 +1,43 @@
+<c-vars question="" current_user="" />
+
+<a href="{% url 'question_detail' question.id %}"
+   class="flex items-start justify-between gap-4 bg-white border border-gray-200 rounded-xl px-4 py-3.5 hover:border-orange-300 hover:shadow-sm transition group">
+
+  <div class="flex-1 min-w-0">
+    {# Titre + badge auteur #}
+    <div class="flex items-center gap-2 flex-wrap">
+      <p class="text-sm font-semibold text-gray-800 group-hover:text-orange-700 transition truncate">
+        {{ question.title }}
+      </p>
+      {% if question.student == current_user %}
+        <c-ui.badge variant="blue">Ma question</c-ui.badge>
+      {% endif %}
+    </div>
+
+    {# Meta #}
+    <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-400">
+      {% if question.lesson %}
+        <span>📄 {{ question.lesson.title }}</span>
+      {% endif %}
+      <span>💬 {{ question.responses.count }} réponse{{ question.responses.count|pluralize }}</span>
+      <span>{{ question.updated_at|timesince }}</span>
+    </div>
+  </div>
+
+  <div class="shrink-0 flex flex-col items-end gap-1.5">
+    {# Status #}
+    {% if question.status == 'RESOLVED' %}
+      <c-ui.badge variant="green">✅ Résolu</c-ui.badge>
+    {% else %}
+      <c-ui.badge variant="orange">⏳ Ouvert</c-ui.badge>
+    {% endif %}
+
+    {# Auteur (si pas la question de l'utilisateur) #}
+    {% if question.student != current_user %}
+      <span class="text-xs text-gray-400">
+        {{ question.student.get_full_name|default:question.student.email }}
+      </span>
+    {% endif %}
+  </div>
+
+</a>
