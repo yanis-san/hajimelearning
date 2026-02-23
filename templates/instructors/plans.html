@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Devenir Instructeur — Hajime Learning{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+
+  {# ── En-tête ── #}
+  <div class="text-center max-w-2xl mx-auto mb-14">
+    <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+      Partagez votre expertise
+    </h1>
+    <p class="text-lg text-gray-500 leading-relaxed">
+      Créez vos formations, touchez des milliers d'étudiants et générez des revenus.
+      Choisissez l'offre qui vous correspond.
+    </p>
+  </div>
+
+  {# ── Alerte si déjà instructeur ou demande en cours ── #}
+  {% if has_profile %}
+    <div class="max-w-md mx-auto mb-10">
+      <c-ui.alert variant="success">
+        Vous êtes instructeur sur l'offre <strong>{{ current_plan.name }}</strong>.
+        <a href="{% url 'instructor_dashboard' %}" class="underline font-semibold">Accéder à mon espace</a>
+      </c-ui.alert>
+    </div>
+  {% elif has_pending %}
+    <div class="max-w-md mx-auto mb-10">
+      <c-ui.alert variant="info">
+        Votre demande est en cours de validation.
+        <a href="{% url 'instructor_request_pending' %}" class="underline font-semibold">Voir le statut</a>
+      </c-ui.alert>
+    </div>
+  {% endif %}
+
+  {# ── Grille des offres ── #}
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-start">
+    {% for plan in plans %}
+      <c-instructor.plan-card :plan="plan" :has_profile="has_profile" :has_pending="has_pending" :current_plan="current_plan" />
+    {% endfor %}
+  </div>
+
+  {# ── FAQ rapide ── #}
+  <div class="mt-20 max-w-2xl mx-auto">
+    <h2 class="text-xl font-bold text-gray-900 text-center mb-8">Questions fréquentes</h2>
+    <div class="space-y-4" x-data="{ active: null }">
+
+      <div class="border border-gray-200 rounded-xl overflow-hidden">
+        <button x-on:click="active = active === 1 ? null : 1"
+                class="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-gray-50 transition">
+          <span class="text-sm font-medium text-gray-800">Comment ça marche ?</span>
+          <svg class="w-4 h-4 text-gray-400 transition-transform" :class="active === 1 && 'rotate-180'"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div x-show="active === 1" x-collapse>
+          <p class="px-5 pb-4 text-sm text-gray-500">
+            Choisissez votre offre, envoyez votre preuve de paiement (CCP ou BaridiMob),
+            et une fois validée, vous pouvez immédiatement créer vos formations.
+          </p>
+        </div>
+      </div>
+
+      <div class="border border-gray-200 rounded-xl overflow-hidden">
+        <button x-on:click="active = active === 2 ? null : 2"
+                class="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-gray-50 transition">
+          <span class="text-sm font-medium text-gray-800">Comment suis-je payé ?</span>
+          <svg class="w-4 h-4 text-gray-400 transition-transform" :class="active === 2 && 'rotate-180'"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div x-show="active === 2" x-collapse>
+          <p class="px-5 pb-4 text-sm text-gray-500">
+            Chaque mois, nous calculons les ventes de vos formations et vous versons votre part
+            selon le pourcentage de votre offre (70%, 80% ou 90%).
+          </p>
+        </div>
+      </div>
+
+      <div class="border border-gray-200 rounded-xl overflow-hidden">
+        <button x-on:click="active = active === 3 ? null : 3"
+                class="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-gray-50 transition">
+          <span class="text-sm font-medium text-gray-800">Puis-je changer d'offre plus tard ?</span>
+          <svg class="w-4 h-4 text-gray-400 transition-transform" :class="active === 3 && 'rotate-180'"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div x-show="active === 3" x-collapse>
+          <p class="px-5 pb-4 text-sm text-gray-500">
+            Oui ! Depuis cette page, cliquez sur « Passer à [offre] » pour l'offre supérieure souhaitée.
+            Envoyez votre preuve de paiement et, une fois validée, vos limites seront automatiquement mises à jour.
+            Vos formations existantes sont conservées.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

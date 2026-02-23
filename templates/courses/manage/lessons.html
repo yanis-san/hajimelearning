@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<c-layout.admin-card
+  title="Leçons : {{ module.title }}"
+  subtitle="{{ course.title }} › {{ module.title }}"
+  back_href="{% url 'manage_course_modules' course.slug %}"
+  back_label="Retour aux modules">
+
+  <c-slot name="breadcrumb">
+    <a href="{% url 'manage_course_list' %}" class="hover:text-gray-800 transition">Cours</a>
+    <span class="text-gray-300">/</span>
+    <a href="{% url 'manage_course_modules' course.slug %}" class="hover:text-gray-800 transition">{{ course.title }}</a>
+    <span class="text-gray-300">/</span>
+    <span class="text-gray-800 font-medium">{{ module.title }}</span>
+  </c-slot>
+
+  {# ── Add lesson form ── #}
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-8">
+    <form hx-post="{% url 'manage_module_lessons' course.slug module.id %}"
+          hx-target="#lesson-list"
+          hx-swap="innerHTML"
+          hx-on::after-request="if(event.detail.successful) this.reset()"
+          class="flex items-center gap-3 flex-wrap">
+      {% csrf_token %}
+      <div class="flex-grow min-w-[200px]">
+        {{ form.title }}
+      </div>
+      <div class="w-48">
+        {{ form.slug }}
+      </div>
+      <label class="flex items-center gap-1.5 text-sm text-gray-600">
+        {{ form.is_free }}
+        Gratuit
+      </label>
+      <c-ui.btn variant="primary" type="submit">
+        ➕ Ajouter une leçon
+      </c-ui.btn>
+    </form>
+  </div>
+
+  {# ── Lesson list (sortable) ── #}
+  <div class="sortable-list space-y-3" id="lesson-list"
+       hx-post="{% url 'manage_lesson_reorder' course.slug module.id %}"
+       hx-trigger="end"
+       hx-target="#reorder-msg">
+
+    {% include 'courses/manage/partials/lesson_list.html' %}
+
+  </div>
+
+  <div id="reorder-msg"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const el = document.getElementById('lesson-list');
+      if (el) {
+        new Sortable(el, {
+          animation: 200,
+          handle: '.handle',
+          ghostClass: 'bg-orange-50',
+          onEnd() { htmx.trigger(el, 'end'); }
+        });
+      }
+    });
+  </script>
+
+</c-layout.admin-card>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load account %}
+
+{% block title %}Confirmer votre e-mail — Hajime Learning{% endblock %}
+
+{% block content %}
+<c-layout.auth-card title="Confirmation de l'e-mail"
+  subtitle="{% if confirmation %}Dernière étape avant de commencer.{% else %}Lien expiré ou invalide.{% endif %}">
+
+  {% if confirmation %}
+    {% user_display confirmation.email_address.user as user_display %}
+    {% if can_confirm %}
+      <p class="text-sm text-gray-600 mb-6">
+        Veuillez confirmer que
+        <strong class="text-gray-900">{{ confirmation.email_address.email }}</strong>
+        est bien l'adresse e-mail de <strong class="text-gray-900">{{ user_display }}</strong>.
+      </p>
+
+      <form method="POST" action="{% url 'account_confirm_email' confirmation.key %}">
+        {% csrf_token %}
+        {{ redirect_field }}
+        <c-ui.btn type="submit" class="w-full justify-center">
+          Confirmer mon adresse e-mail
+        </c-ui.btn>
+      </form>
+    {% else %}
+      <c-ui.alert variant="error" class="mb-4">
+        Impossible de confirmer cette adresse, elle est déjà associée à un autre compte.
+      </c-ui.alert>
+    {% endif %}
+  {% else %}
+    <c-ui.alert variant="warning" class="mb-6">
+      Ce lien de confirmation a expiré ou est invalide.
+    </c-ui.alert>
+    <p class="text-sm text-gray-600 mb-4">
+      Vous pouvez demander un nouveau lien depuis votre espace.
+    </p>
+    <c-ui.btn href="{% url 'account_login' %}" class="w-full justify-center" variant="outline">
+      Retour à la connexion
+    </c-ui.btn>
+  {% endif %}
+
+</c-layout.auth-card>
+{% endblock %}

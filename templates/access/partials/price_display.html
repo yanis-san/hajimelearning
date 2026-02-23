@@ -1,0 +1,24 @@
+<div id="price-box" class="rounded-xl border border-gray-200 bg-white p-4 mb-4">
+    
+    {% if success %}
+        <p class="text-green-600 font-bold">
+            Code {{ coupon.code }} appliqué ! (-{{ coupon.discount_percent }}%)
+        </p>
+        <p class="text-sm text-gray-600 mt-2">
+            Prix initial : <del class="text-gray-400">{{ course.price }} DA</del><br>
+            <span class="text-lg font-semibold text-gray-900">Nouveau prix : {{ new_price }} DA</span>
+        </p>
+        
+        <input type="hidden" name="valid_coupon_id" value="{{ coupon.id }}">
+    
+    {% else %}
+        <p class="font-semibold text-gray-800">Prix à payer : {{ course.price }} DA</p>
+        
+        {% if error %}
+            <p class="text-sm text-red-500 mt-2">⚠️ {{ error }}</p>
+        {% endif %}
+        
+        <input type="hidden" name="valid_coupon_id" value="">
+    {% endif %}
+
+</div>

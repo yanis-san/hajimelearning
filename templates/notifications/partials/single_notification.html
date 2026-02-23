@@ -1,0 +1,40 @@
+<div id="notif-item-{{ notif.id }}"
+     class="flex items-start gap-3 p-4 border-b border-gray-100 last:border-0 transition
+            {% if not notif.is_read %}bg-orange-50{% else %}bg-white{% endif %}">
+
+  {# Indicateur lu / non lu #}
+  <button type="button"
+          hx-post="{% url 'mark_notif_read' notif.id %}"
+          hx-target="#notif-item-{{ notif.id }}"
+          hx-swap="outerHTML"
+          class="shrink-0 mt-1 p-1 rounded-full hover:bg-gray-200 transition-colors cursor-pointer"
+          title="Marquer comme {% if notif.is_read %}non lu{% else %}lu{% endif %}">
+    {% if not notif.is_read %}
+      <span class="block h-2.5 w-2.5 bg-orange-500 rounded-full shadow-sm"></span>
+    {% else %}
+      <span class="block h-2.5 w-2.5 border-2 border-gray-300 rounded-full"></span>
+    {% endif %}
+  </button>
+
+  {# Contenu cliquable #}
+  <div class="flex-1 min-w-0">
+    <a href="{% url 'mark_read_and_redirect' notif.id %}" class="group">
+      <p class="text-sm font-medium text-gray-800 group-hover:text-orange-600 transition-colors truncate">
+        {{ notif.title|default:"Notification" }}
+      </p>
+      <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ notif.message }}</p>
+    </a>
+    {# Bouton marquer comme lu/non lu #}
+    <button type="button"
+            hx-post="{% url 'mark_notif_read' notif.id %}"
+            hx-target="#notif-item-{{ notif.id }}"
+            hx-swap="outerHTML"
+            class="mt-1.5 text-xs font-medium cursor-pointer transition-colors
+                   {% if not notif.is_read %}text-orange-500 hover:text-orange-700{% else %}text-gray-400 hover:text-gray-600{% endif %}">
+      {% if not notif.is_read %}Marquer comme lu{% else %}Marquer comme non lu{% endif %}
+    </button>
+  </div>
+
+  {# Date #}
+  <span class="shrink-0 text-xs text-gray-400 whitespace-nowrap mt-1">{{ notif.created_at|timesince }}</span>
+</div>

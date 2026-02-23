@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<c-layout.admin-card
+  title="Modules : {{ course.title }}"
+  subtitle="Organisez les modules de votre cours"
+  back_href="{% url 'manage_course_list' %}"
+  back_label="Retour aux cours">
+
+  <c-slot name="breadcrumb">
+    <a href="{% url 'manage_course_list' %}" class="hover:text-gray-800 transition">Cours</a>
+    <span class="text-gray-300">/</span>
+    <a href="{% url 'manage_course_edit' course.slug %}" class="hover:text-gray-800 transition">{{ course.title }}</a>
+    <span class="text-gray-300">/</span>
+    <span class="text-gray-800 font-medium">Modules</span>
+  </c-slot>
+
+  <c-slot name="actions">
+    <c-ui.btn variant="outline" size="sm" href="{% url 'course_detail' course.slug %}" target="_blank">
+      👁️ Voir le cours
+    </c-ui.btn>
+  </c-slot>
+
+  {# ── Add module form ── #}
+  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-8">
+    <form hx-post="{% url 'manage_course_modules' course.slug %}"
+          hx-target="#module-list"
+          hx-swap="innerHTML"
+          hx-on::after-request="if(event.detail.successful) this.reset()"
+          class="flex items-center gap-3">
+      {% csrf_token %}
+      <div class="flex-grow">
+        {{ form.title }}
+      </div>
+      <c-ui.btn variant="primary" type="submit">
+        ➕ Ajouter un module
+      </c-ui.btn>
+    </form>
+  </div>
+
+  {# ── Module list (sortable) ── #}
+  <div class="sortable-list space-y-3" id="module-list"
+       hx-post="{% url 'manage_module_reorder' course.slug %}"
+       hx-trigger="end"
+       hx-target="#reorder-msg">
+
+    {% include 'courses/manage/partials/module_list.html' %}
+
+  </div>
+
+  <div id="reorder-msg"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const el = document.getElementById('module-list');
+      if (el) {
+        new Sortable(el, {
+          animation: 200,
+          handle: '.handle',
+          ghostClass: 'bg-orange-50',
+          onEnd() { htmx.trigger(el, 'end'); }
+        });
+      }
+    });
+  </script>
+
+</c-layout.admin-card>
+{% endblock %}

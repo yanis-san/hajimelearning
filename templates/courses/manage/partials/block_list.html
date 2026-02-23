@@ -1,0 +1,5 @@
+{% for block in lesson.blocks.all %}
+    <c-manage.block-item :block="block" :lesson="lesson" />
+{% empty %}
+    <c-ui.empty-state icon="📭" title="Cette leçon est vide" message="Utilisez la barre d'outils ci-dessus pour ajouter du contenu." />
+{% endfor %}

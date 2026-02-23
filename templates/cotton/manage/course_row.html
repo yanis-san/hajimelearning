@@ -1,0 +1,90 @@
+<c-vars course="" />
+
+<tr class="border-b border-gray-100 hover:bg-gray-50/50 transition group">
+  {# Thumbnail + Title #}
+  <td class="py-4 px-4">
+    <div class="flex items-center gap-3">
+      {% if course.thumbnail %}
+        <img src="{{ course.thumbnail.url }}" alt=""
+             class="w-12 h-12 rounded-lg object-cover shrink-0 border border-gray-200">
+      {% else %}
+        <div class="w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center shrink-0 border border-orange-100">
+          <span class="text-orange-400 text-lg">📚</span>
+        </div>
+      {% endif %}
+      <div class="min-w-0">
+        <p class="font-semibold text-gray-800 truncate">{{ course.title }}</p>
+        <p class="text-xs text-gray-400 font-mono truncate">{{ course.slug }}</p>
+      </div>
+    </div>
+  </td>
+
+  {# Status #}
+  <td class="py-4 px-4">
+    {% if course.is_published %}
+      <c-ui.badge variant="green">Publié</c-ui.badge>
+    {% else %}
+      <c-ui.badge variant="gray">Brouillon</c-ui.badge>
+    {% endif %}
+  </td>
+
+  {# Price #}
+  <td class="py-4 px-4 text-sm text-gray-700">
+    {% if course.price == 0 %}
+      <span class="text-green-600 font-medium">Gratuit</span>
+    {% else %}
+      {{ course.price|floatformat:0 }} DA
+    {% endif %}
+  </td>
+
+  {# Modules / Lessons count #}
+  <td class="py-4 px-4 text-sm text-gray-500">
+    {{ course.modules.count }} module{{ course.modules.count|pluralize }}
+  </td>
+
+  {# Actions #}
+  <td class="py-4 px-4">
+    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition"
+         x-data="{ confirmDelete: false }">
+      <c-ui.btn variant="outline" size="sm" href="{% url 'manage_course_edit' course.slug %}">
+        ✏️ Éditer
+      </c-ui.btn>
+      <c-ui.btn variant="ghost" size="sm" href="{% url 'manage_course_modules' course.slug %}">
+        📦 Modules
+      </c-ui.btn>
+      <c-ui.btn variant="ghost" size="sm" href="{% url 'course_detail' course.slug %}">
+        👁️ Voir le cours
+      </c-ui.btn>
+      <c-ui.btn variant="ghost" size="sm" href="{% url 'course_detail' course.slug %}?view=landing">
+        🏪 Vitrine
+      </c-ui.btn>
+      <c-ui.btn variant="ghost" size="sm" href="{% url 'manage_course_students' course.slug %}">
+        👥 Étudiants
+      </c-ui.btn>
+
+      {# Delete with Alpine confirmation #}
+      <button x-show="!confirmDelete"
+              x-on:click="confirmDelete = true"
+              class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition cursor-pointer"
+              title="Supprimer">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+      </button>
+      <div x-show="confirmDelete" x-cloak class="flex items-center gap-1">
+        <span class="text-xs text-red-600 font-medium">Sûr ?</span>
+        <button hx-post="{% url 'manage_course_delete' course.slug %}"
+                hx-target="#course-row-{{ course.id }}"
+                hx-swap="outerHTML"
+                hx-confirm="Supprimer « {{ course.title }} » définitivement ?"
+                class="p-1 rounded bg-red-500 text-white text-xs hover:bg-red-600 transition cursor-pointer">
+          Oui
+        </button>
+        <button x-on:click="confirmDelete = false"
+                class="p-1 rounded bg-gray-200 text-gray-600 text-xs hover:bg-gray-300 transition cursor-pointer">
+          Non
+        </button>
+      </div>
+    </div>
+  </td>
+</tr>

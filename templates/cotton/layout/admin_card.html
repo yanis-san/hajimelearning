@@ -1,0 +1,36 @@
+<c-vars title="" subtitle="" back_href="" back_label="Retour" />
+
+<div class="bg-gray-50 min-h-screen">
+  <div class="max-w-7xl mx-auto px-6 py-8">
+
+    {# Breadcrumb slot #}
+    {% if breadcrumb %}
+      <nav class="mb-6 flex items-center gap-2 text-sm text-gray-500">
+        {{ breadcrumb }}
+      </nav>
+    {% endif %}
+
+    {# Back link #}
+    {% if back_href %}
+      <a href="{{ back_href }}" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 transition mb-4">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        {{ back_label }}
+      </a>
+    {% endif %}
+
+    {# Page header #}
+    {% if title %}
+      <c-ui.page-header title="{{ title }}" subtitle="{{ subtitle }}">
+        {% if actions %}
+          {{ actions }}
+        {% endif %}
+      </c-ui.page-header>
+    {% endif %}
+
+    {# Main content #}
+    {{ slot }}
+
+  </div>
+</div>

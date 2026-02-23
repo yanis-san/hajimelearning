@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load cotton %}
+
+{% block title %}Espace Instructeur — Hajime Learning{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  {# ── En-tête ── #}
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Espace Instructeur</h1>
+      <p class="text-sm text-gray-500 mt-1">
+        Offre <strong>{{ profile.plan.name }}</strong> — {{ profile.revenue_percent }}% de revenus
+        <a href="{% url 'instructor_plans' %}" class="text-orange-500 hover:text-orange-700 font-medium ml-2 text-xs transition">
+          Changer d'offre →
+        </a>
+      </p>
+    </div>
+    {% if profile.can_create_course %}
+      <c-ui.btn href="{% url 'instructor_course_create' %}" variant="primary">
+        + Nouvelle formation
+      </c-ui.btn>
+    {% endif %}
+  </div>
+
+  {# ── Compteurs globaux ── #}
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+
+    {# Formations #}
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Formations</span>
+        <span class="text-xs text-gray-400">
+          {% if profile.max_courses == 0 %}∞{% else %}{{ profile.max_courses }}{% endif %} max
+        </span>
+      </div>
+      <p class="text-2xl font-bold text-gray-900">{{ my_courses|length }}</p>
+      {% if profile.max_courses > 0 %}
+        <div class="mt-2 w-full bg-gray-100 rounded-full h-1.5">
+          <div class="h-1.5 rounded-full transition-all {% if profile.courses_remaining == 0 %}bg-red-500{% else %}bg-orange-500{% endif %}"
+               style="width: {% widthratio my_courses|length profile.max_courses 100 %}%"></div>
+        </div>
+        <p class="text-xs text-gray-400 mt-1">
+          {% if profile.courses_remaining == 0 %}
+            Limite atteinte
+          {% else %}
+            {{ profile.courses_remaining }} restante{{ profile.courses_remaining|pluralize }}
+          {% endif %}
+        </p>
+      {% else %}
+        <p class="text-xs text-gray-400 mt-2">Illimité</p>
+      {% endif %}
+    </div>
+
+    {# Étudiants #}
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Étudiants</span>
+      </div>
+      <p class="text-2xl font-bold text-gray-900">{{ total_students }}</p>
+      <p class="text-xs text-gray-400 mt-2">Toutes formations</p>
+    </div>
+
+    {# Modules totaux #}
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Modules</span>
+        <span class="text-xs text-gray-400">
+          {% if profile.max_modules_per_course == 0 %}∞{% else %}{{ profile.max_modules_per_course }}{% endif %} / formation
+        </span>
+      </div>
+      <p class="text-2xl font-bold text-gray-900">{{ total_modules }}</p>
+      <p class="text-xs text-gray-400 mt-2">Total créés</p>
+    </div>
+
+    {# Leçons totales #}
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Leçons</span>
+        <span class="text-xs text-gray-400">
+          {% if profile.max_lessons_per_course == 0 %}∞{% else %}{{ profile.max_lessons_per_course }}{% endif %} / formation
+        </span>
+      </div>
+      <p class="text-2xl font-bold text-gray-900">{{ total_lessons }}</p>
+      <p class="text-xs text-gray-400 mt-2">Total créées</p>
+    </div>
+  </div>
+
+  {# ── Liste des formations avec compteurs inline ── #}
+  {% if my_courses %}
+    <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Mes formations</h2>
+    <div class="space-y-3">
+      {% for course in my_courses %}
+        <div class="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            {# Infos #}
+            <div class="min-w-0">
+              <h3 class="text-base font-semibold text-gray-900 truncate">{{ course.title }}</h3>
+              <div class="flex items-center gap-3 mt-1.5 flex-wrap">
+                {% if course.is_published %}
+                  <c-ui.badge variant="green">Publié</c-ui.badge>
+                {% else %}
+                  <c-ui.badge variant="orange">Brouillon</c-ui.badge>
+                {% endif %}
+                <span class="text-xs text-gray-400">{{ course.price }} DA</span>
+              </div>
+            </div>
+
+            {# Actions #}
+            <div class="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+              <c-ui.btn href="{% url 'manage_course_modules' course.slug %}" variant="outline" size="sm">
+                📦 Modules
+              </c-ui.btn>
+              <c-ui.btn href="{% url 'manage_course_landing' course.slug %}" variant="outline" size="sm">
+                🎨 Vitrine
+              </c-ui.btn>
+              <c-ui.btn href="{% url 'manage_course_students' course.slug %}" variant="outline" size="sm">
+                👥 Étudiants
+              </c-ui.btn>
+              <c-ui.btn href="{% url 'manage_course_edit' course.slug %}" variant="outline" size="sm">
+                ✏️ Modifier
+              </c-ui.btn>
+              <c-ui.btn href="{% url 'course_detail' course.slug %}" variant="ghost" size="sm">
+                Voir
+              </c-ui.btn>
+            </div>
+          </div>
+
+          {# ── Compteurs par formation ── #}
+          <div class="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-x-6 gap-y-2">
+            {# Modules #}
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-gray-500">Modules</span>
+              <span class="text-xs font-semibold text-gray-800">{{ course.modules_count }}</span>
+              {% if profile.max_modules_per_course > 0 %}
+                <span class="text-xs text-gray-400">/ {{ profile.max_modules_per_course }}</span>
+                <div class="w-16 bg-gray-100 rounded-full h-1">
+                  <div class="h-1 rounded-full transition-all {% if course.modules_count >= profile.max_modules_per_course %}bg-red-500{% else %}bg-orange-400{% endif %}"
+                       style="width: {% widthratio course.modules_count profile.max_modules_per_course 100 %}%"></div>
+                </div>
+              {% else %}
+                <span class="text-xs text-gray-400">/ ∞</span>
+              {% endif %}
+            </div>
+
+            {# Leçons #}
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-gray-500">Leçons</span>
+              <span class="text-xs font-semibold text-gray-800">{{ course.lessons_count }}</span>
+              {% if profile.max_lessons_per_course > 0 %}
+                <span class="text-xs text-gray-400">/ {{ profile.max_lessons_per_course }}</span>
+                <div class="w-16 bg-gray-100 rounded-full h-1">
+                  <div class="h-1 rounded-full transition-all {% if course.lessons_count >= profile.max_lessons_per_course %}bg-red-500{% else %}bg-orange-400{% endif %}"
+                       style="width: {% widthratio course.lessons_count profile.max_lessons_per_course 100 %}%"></div>
+                </div>
+              {% else %}
+                <span class="text-xs text-gray-400">/ ∞</span>
+              {% endif %}
+            </div>
+
+            {# Étudiants #}
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-gray-500">Étudiants</span>
+              <span class="text-xs font-semibold text-gray-800">{{ course.students_count }}</span>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <c-ui.empty-state
+      icon='<svg class="w-12 h-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>'
+      title="Pas encore de formation"
+      message="Créez votre première formation pour commencer à enseigner." />
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,118 @@
+<c-vars section="" course="" />
+
+<div id="section-item-{{ section.id }}"
+     class="{% if not section.is_visible %}opacity-50{% endif %} bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex items-start gap-4 hover:shadow-md transition group">
+
+  <input type="hidden" name="section_order" value="{{ section.id }}">
+
+  {# Drag handle #}
+  <div class="handle cursor-move flex flex-col items-center justify-center p-2 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition text-gray-400 hover:text-gray-600 mt-1 select-none"
+       title="Glisser pour déplacer">
+    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+    </svg>
+  </div>
+
+  {# Content preview #}
+  <div class="flex-grow min-w-0">
+
+    {# Type badge + title + visibility indicator #}
+    <div class="flex items-center gap-2 mb-2">
+      {% if section.section_type == 'text' %}
+        <c-ui.badge variant="blue">📝 Texte</c-ui.badge>
+      {% elif section.section_type == 'image' %}
+        <c-ui.badge variant="orange">🖼️ Image</c-ui.badge>
+      {% elif section.section_type == 'video' %}
+        <c-ui.badge variant="red">🎬 Vidéo</c-ui.badge>
+      {% elif section.section_type == 'features' %}
+        <c-ui.badge variant="green">✅ Points forts</c-ui.badge>
+      {% elif section.section_type == 'hero' %}
+        <c-ui.badge variant="orange">🦸 Hero</c-ui.badge>
+      {% elif section.section_type == 'text_image' %}
+        <c-ui.badge variant="blue">📐 Texte + Image</c-ui.badge>
+      {% elif section.section_type == 'faq' %}
+        <c-ui.badge variant="green">❓ FAQ</c-ui.badge>
+      {% elif section.section_type == 'testimonials' %}
+        <c-ui.badge variant="blue">💬 Témoignages</c-ui.badge>
+      {% endif %}
+
+      {% if section.title %}
+        <span class="font-semibold text-gray-700 truncate">{{ section.title }}</span>
+      {% endif %}
+
+      {% if not section.is_visible %}
+        <span class="text-xs text-gray-400 italic">masquée</span>
+      {% endif %}
+
+      {% if section.background != 'none' %}
+        <span class="text-xs text-gray-400">fond : {{ section.get_background_display }}</span>
+      {% endif %}
+    </div>
+
+    {# Preview du contenu #}
+    <div class="text-sm text-gray-600">
+      {% if section.section_type == 'text' or section.section_type == 'features' or section.section_type == 'faq' %}
+        <p class="line-clamp-2">{{ section.body|striptags|truncatechars:150 }}</p>
+      {% elif section.section_type == 'video' %}
+        <span class="text-gray-500">ID YouTube :</span>
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono">{{ section.video_id }}</code>
+      {% elif section.section_type == 'image' %}
+        {% if section.image %}
+          <img src="{{ section.image.url }}" alt="" class="w-32 h-20 object-cover rounded-lg border border-gray-200">
+        {% else %}
+          <span class="text-gray-400 italic">Aucune image</span>
+        {% endif %}
+      {% elif section.section_type == 'hero' %}
+        {% if section.subtitle %}<p class="text-gray-500 italic truncate">{{ section.subtitle }}</p>{% endif %}
+        {% if section.cta_text %}<span class="inline-block mt-1 text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">{{ section.cta_text }}</span>{% endif %}
+        {% if section.image %}
+          <img src="{{ section.image.url }}" alt="" class="w-32 h-20 object-cover rounded-lg border border-gray-200 mt-1">
+        {% endif %}
+      {% elif section.section_type == 'text_image' %}
+        <div class="flex items-center gap-2">
+          {% if section.image %}
+            <img src="{{ section.image.url }}" alt="" class="w-20 h-14 object-cover rounded-lg border border-gray-200">
+          {% endif %}
+          <p class="line-clamp-2 flex-1">{{ section.body|striptags|truncatechars:80 }}</p>
+          <span class="text-xs text-gray-400">Image {{ section.get_image_position_display }}</span>
+        </div>
+      {% endif %}
+
+      {% if section.css_class %}
+        <p class="text-xs text-gray-400 mt-1">CSS : <code class="bg-gray-50 px-1 rounded">{{ section.css_class }}</code></p>
+      {% endif %}
+    </div>
+
+  </div>
+
+  {# Actions #}
+  <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+    <c-ui.btn variant="ghost" size="sm"
+              hx-post="{% url 'toggle_landing_section_visibility' section.id %}"
+              hx-target="#section-list"
+              title="{% if section.is_visible %}Masquer{% else %}Afficher{% endif %}">
+      {% if section.is_visible %}👁️{% else %}🙈{% endif %}
+    </c-ui.btn>
+    <c-ui.btn variant="ghost" size="sm"
+              hx-post="{% url 'duplicate_landing_section' section.id %}"
+              hx-target="#section-list"
+              title="Dupliquer">
+      📋
+    </c-ui.btn>
+    <c-ui.btn variant="ghost" size="sm"
+              hx-get="{% url 'edit_landing_section' section.id %}"
+              hx-target="#section-form-container"
+              hx-swap="innerHTML"
+              title="Modifier">
+      ✏️
+    </c-ui.btn>
+    <c-ui.btn variant="ghost" size="sm"
+              hx-post="{% url 'delete_landing_section' section.id %}"
+              hx-confirm="Voulez-vous vraiment supprimer cette section ?"
+              hx-target="#section-list"
+              title="Supprimer">
+      🗑️
+    </c-ui.btn>
+  </div>
+
+</div>

@@ -1,0 +1,46 @@
+<c-vars variant="info" title="" dismissible="false" />
+
+<div {% if dismissible == 'true' %}x-data="{ show: true }" x-show="show" x-transition{% endif %}
+     class="flex gap-3 p-4 rounded-xl border
+            {% if variant == 'success' %}bg-green-50 border-green-200 text-green-800
+            {% elif variant == 'warning' %}bg-yellow-50 border-yellow-200 text-yellow-800
+            {% elif variant == 'error' %}bg-red-50 border-red-200 text-red-800
+            {% else %}bg-blue-50 border-blue-200 text-blue-800{% endif %}"
+     {{ attrs }}>
+
+  <div class="shrink-0 mt-0.5">
+    {% if variant == 'success' %}
+      <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    {% elif variant == 'warning' %}
+      <svg class="w-5 h-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+      </svg>
+    {% elif variant == 'error' %}
+      <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    {% else %}
+      <svg class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    {% endif %}
+  </div>
+
+  <div class="flex-1 min-w-0">
+    {% if title %}
+      <p class="font-semibold text-sm mb-1">{{ title }}</p>
+    {% endif %}
+    <div class="text-sm">{{ slot }}</div>
+  </div>
+
+  {% if dismissible == 'true' %}
+    <button type="button" @click="show = false"
+            class="shrink-0 ml-auto -mt-0.5 p-1 rounded-lg opacity-60 hover:opacity-100 transition-opacity focus:outline-none">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  {% endif %}
+</div>

@@ -1,0 +1,14 @@
+{# Partial HTMX : contenu du tbody pour la table des cours (tri dynamique) #}
+{% for course in courses %}
+  <c-manage.course-row :course="course" />
+{% empty %}
+  <tr>
+    <td colspan="5" class="py-12 text-center">
+      <c-ui.empty-state
+        icon="📚"
+        title="Aucun cours"
+        message="Aucun cours ne correspond à votre recherche.">
+      </c-ui.empty-state>
+    </td>
+  </tr>
+{% endfor %}

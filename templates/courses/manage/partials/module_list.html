@@ -1,0 +1,8 @@
+{% for module in course.modules.all %}
+  <c-manage.module-item :module="module" :course="course" />
+{% empty %}
+  <c-ui.empty-state
+    icon="📦"
+    title="Aucun module"
+    message="Ajoutez un premier module pour commencer à structurer votre cours." />
+{% endfor %}

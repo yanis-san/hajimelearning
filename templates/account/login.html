@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion — Hajime Learning{% endblock %}
+
+{% block content %}
+<c-layout.auth-card title="Connexion" subtitle="Bon retour parmi nous.">
+    
+  {% if form.non_field_errors %}
+    <c-ui.alert variant="error" class="mb-6">
+      {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+    </c-ui.alert>
+  {% endif %}
+
+  <form method="POST" action="{% url 'account_login' %}" class="space-y-4">
+    {% csrf_token %}
+
+    <c-form.input
+      name="login"
+      type="email"
+      label="Adresse e-mail"
+      placeholder="exemple@email.com"
+      :value="form.login.value|default:''"
+      :error="form.login.errors.0" />
+
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-sm font-medium text-gray-700">Mot de passe</span>
+        <a href="{% url 'account_reset_password' %}" class="text-xs text-orange-500 hover:text-orange-700 font-medium transition">
+          Mot de passe oublié ?
+        </a>
+      </div>
+      <c-form.input
+        name="password"
+        type="password"
+        placeholder="••••••••"
+        :error="form.password.errors.0" />
+    </div>
+
+    {% if redirect_field_value %}
+      <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+
+    <div class="pt-2">
+      <c-ui.btn type="submit" class="w-full justify-center">Se connecter</c-ui.btn>
+    </div>
+  </form>
+
+  <p class="mt-6 text-center text-sm text-gray-500 border-t border-gray-100 pt-6">
+    Pas encore de compte ?
+    <a href="{% url 'account_signup' %}" class="text-orange-500 hover:text-orange-700 font-medium ml-1">S'inscrire</a>
+  </p>
+
+</c-layout.auth-card>
+{% endblock %}

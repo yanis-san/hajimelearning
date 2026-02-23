@@ -1,0 +1,89 @@
+<c-vars block="" lesson="" />
+
+<div id="block-item-{{ block.id }}"
+     class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex items-start gap-4 hover:shadow-md transition group">
+
+  <input type="hidden" name="block_order" value="{{ block.id }}">
+
+  {# Drag handle #}
+  <div class="handle cursor-move flex flex-col items-center justify-center p-2 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition text-gray-400 hover:text-gray-600 mt-1 select-none"
+       title="Glisser pour déplacer">
+    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+    </svg>
+  </div>
+
+  {# Content #}
+  <div class="flex-grow min-w-0">
+
+    {# Type badge + title #}
+    <div class="flex items-center gap-2 mb-2">
+      {% if block.type == 'text' %}
+        <c-ui.badge variant="blue">📝 Texte</c-ui.badge>
+      {% elif block.type == 'video' %}
+        <c-ui.badge variant="red">🎬 Vidéo</c-ui.badge>
+      {% elif block.type == 'audio' %}
+        <c-ui.badge variant="orange">🎧 Audio</c-ui.badge>
+      {% elif block.type == 'file' %}
+        <c-ui.badge variant="yellow">📎 Fichier</c-ui.badge>
+      {% elif block.type == 'quiz' %}
+        <c-ui.badge variant="green">🧠 Quiz</c-ui.badge>
+      {% endif %}
+
+      {% if block.type == 'quiz' and block.quiz_title %}
+        <span class="font-semibold text-gray-700 truncate">{{ block.quiz_title }}</span>
+      {% elif block.title %}
+        <span class="font-semibold text-gray-700 truncate">{{ block.title }}</span>
+      {% endif %}
+    </div>
+
+    {# Content preview #}
+    <div class="text-sm text-gray-600">
+      {% if block.type == 'text' %}
+        <p class="line-clamp-2">{{ block.text_content|striptags|truncatechars:150 }}</p>
+
+      {% elif block.type == 'video' %}
+        <span class="text-gray-500">ID Vidéo :</span>
+        <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono">{{ block.video_id }}</code>
+
+      {% elif block.type == 'audio' or block.type == 'file' %}
+        <span class="text-gray-500">Fichier :</span>
+        <span class="font-medium italic">{{ block.file_content.name|default:"—" }}</span>
+
+      {% elif block.type == 'quiz' %}
+        <div id="quiz-questions-{{ block.id }}" class="bg-gray-50 p-3 rounded-lg border border-gray-100 mt-1 space-y-1">
+          {% include 'courses/manage/partials/quiz_question_list.html' %}
+        </div>
+        <button hx-get="{% url 'add_quiz_question' block.id %}"
+                hx-target="#quiz-questions-{{ block.id }}"
+                hx-swap="beforeend"
+                class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-green-700 hover:text-green-800 cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Ajouter une question
+        </button>
+      {% endif %}
+    </div>
+
+  </div>
+
+  {# Actions #}
+  <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+    <c-ui.btn variant="ghost" size="sm"
+              hx-get="{% url 'edit_block' block.id %}"
+              hx-target="#block-form-container"
+              hx-swap="innerHTML"
+              title="Modifier">
+      ✏️
+    </c-ui.btn>
+    <c-ui.btn variant="ghost" size="sm"
+              hx-post="{% url 'delete_block' block.id %}"
+              hx-confirm="Voulez-vous vraiment supprimer ce bloc (et son contenu) ?"
+              hx-target="#block-list"
+              title="Supprimer">
+      🗑️
+    </c-ui.btn>
+  </div>
+
+</div>

@@ -1,0 +1,36 @@
+{# Composant : En-tête de colonne triable pour les tableaux admin #}
+{# Usage : <c-manage.sort-header field="title" :current_sort="current_sort" label="Titre" /> #}
+<c-vars field="" current_sort="" label="" />
+
+{% with sort_asc=field %}
+{% with sort_desc="-"|add:field %}
+
+<th class="text-left py-3 px-4 text-xs font-medium uppercase tracking-wider select-none
+           {% if current_sort == sort_asc or current_sort == sort_desc %}text-orange-600{% else %}text-gray-500{% endif %}">
+  <button
+    class="flex items-center gap-1 hover:text-orange-600 transition-colors cursor-pointer"
+    hx-get="{% url 'manage_course_list' %}?sort={% if current_sort == sort_asc %}{{ sort_desc }}{% else %}{{ sort_asc }}{% endif %}"
+    hx-target="#course-table-body"
+    hx-swap="innerHTML"
+    hx-push-url="true"
+  >
+    {{ label }}
+    {# Icône de direction #}
+    {% if current_sort == sort_asc %}
+      <svg class="w-3.5 h-3.5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+      </svg>
+    {% elif current_sort == sort_desc %}
+      <svg class="w-3.5 h-3.5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      </svg>
+    {% else %}
+      <svg class="w-3.5 h-3.5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+      </svg>
+    {% endif %}
+  </button>
+</th>
+
+{% endwith %}
+{% endwith %}

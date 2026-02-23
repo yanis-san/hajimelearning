@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-10 px-4">
+
+  <c-ui.page-header title="Notifications">
+    {% if notifications %}
+      <button type="button"
+              hx-post="{% url 'mark_all_read' %}"
+              hx-target="#notification-list"
+              hx-swap="innerHTML"
+              hx-confirm="Tout marquer comme lu ?"
+              class="text-sm text-orange-600 hover:text-orange-700 font-medium cursor-pointer transition-colors">
+        Tout marquer comme lu
+      </button>
+    {% endif %}
+  </c-ui.page-header>
+
+  {# Liste #}
+  <div id="notification-list" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    {% include "notifications/partials/notification_list.html" %}
+  </div>
+
+</div>
+{% endblock %}

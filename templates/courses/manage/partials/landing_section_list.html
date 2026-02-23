@@ -1,0 +1,5 @@
+{% load md %}
+
+{% for section in course.landing_sections.all %}
+  <c-manage.landing-section-item :section="section" :course="course" />
+{% endfor %}

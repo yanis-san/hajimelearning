@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+  <script src="{% static 'js/marked.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<c-layout.admin-card
+  title="Éditer : {{ lesson.title }}"
+  subtitle="{{ lesson.module.course.title }} › {{ lesson.module.title }}"
+  back_href="{% url 'course_detail' lesson.module.course.slug %}"
+  back_label="Retour au cours">
+
+  {# ── Breadcrumb ── #}
+  <c-slot name="breadcrumb">
+    <a href="{% url 'course_detail' lesson.module.course.slug %}" class="hover:text-gray-800 transition">{{ lesson.module.course.title }}</a>
+    <span class="text-gray-300">/</span>
+    <span class="text-gray-600">{{ lesson.module.title }}</span>
+    <span class="text-gray-300">/</span>
+    <span class="text-gray-800 font-medium">{{ lesson.title }}</span>
+  </c-slot>
+
+  {# ── Action: voir le résultat ── #}
+  <c-slot name="actions">
+    <c-ui.btn variant="outline" size="sm" href="{% url 'lesson_detail' lesson.module.course.slug lesson.slug %}" target="_blank">
+      👁️ Voir le résultat
+    </c-ui.btn>
+  </c-slot>
+
+  {# ── Toolbar: palette de blocs ── #}
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 sticky top-20 z-10 flex flex-wrap gap-3 justify-center items-center">
+    <span class="text-sm font-medium text-gray-400">Ajouter :</span>
+
+    <c-ui.btn variant="ghost" size="sm"
+              hx-get="{% url 'add_block' lesson.id 'text' %}"
+              hx-target="#block-form-container" hx-swap="innerHTML">
+      📝 Texte
+    </c-ui.btn>
+
+    <c-ui.btn variant="ghost" size="sm"
+              hx-get="{% url 'add_block' lesson.id 'video' %}"
+              hx-target="#block-form-container" hx-swap="innerHTML">
+      🎬 Vidéo
+    </c-ui.btn>
+
+    <c-ui.btn variant="ghost" size="sm"
+              hx-get="{% url 'add_block' lesson.id 'audio' %}"
+              hx-target="#block-form-container" hx-swap="innerHTML">
+      🎧 Audio
+    </c-ui.btn>
+
+    <c-ui.btn variant="ghost" size="sm"
+              hx-get="{% url 'add_block' lesson.id 'file' %}"
+              hx-target="#block-form-container" hx-swap="innerHTML">
+      📎 Fichier
+    </c-ui.btn>
+
+    <c-ui.btn variant="ghost" size="sm"
+              hx-get="{% url 'add_block' lesson.id 'quiz' %}"
+              hx-target="#block-form-container" hx-swap="innerHTML">
+      🧠 Quiz
+    </c-ui.btn>
+  </div>
+
+  {# ── Form container (filled via HTMX) ── #}
+  <div id="block-form-container" class="mb-8"></div>
+
+  {# ── Sortable block list ── #}
+  <form class="sortable-list space-y-4" id="block-list"
+        hx-post="{% url 'update_block_order' %}"
+        hx-trigger="end"
+        hx-target="#reorder-msg">
+
+    {% csrf_token %}
+
+    {% include 'courses/manage/partials/block_list.html' %}
+
+  </form>
+
+  <div id="reorder-msg"></div>
+
+  {# ── SortableJS init ── #}
+  <script>
+    htmx.onLoad(function(content) {
+      var sortables = content.querySelectorAll(".sortable-list");
+      for (var i = 0; i < sortables.length; i++) {
+        var sortable = sortables[i];
+        new Sortable(sortable, {
+          animation: 150,
+          handle: '.handle',
+          ghostClass: 'bg-orange-50',
+          onEnd: function (evt) {
+            this.el.dispatchEvent(new Event('end'));
+          }
+        });
+      }
+    });
+  </script>
+
+</c-layout.admin-card>
+{% endblock %}

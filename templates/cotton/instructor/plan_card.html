@@ -1,0 +1,109 @@
+<c-vars plan="" has_profile="False" has_pending="False" current_plan="" />
+
+<div class="relative flex flex-col bg-white rounded-2xl border
+            {% if plan.is_featured %}border-orange-300 shadow-lg ring-2 ring-orange-100 scale-[1.03]{% else %}border-gray-200 shadow-sm{% endif %}
+            overflow-hidden transition-all duration-200 hover:shadow-md" {{ attrs }}>
+
+  {# Badge "Populaire" #}
+  {% if plan.is_featured %}
+    <div class="absolute top-0 right-0 bg-orange-500 text-white text-[11px] font-bold uppercase tracking-wider px-4 py-1 rounded-bl-xl">
+      Populaire
+    </div>
+  {% endif %}
+
+  <div class="p-6 lg:p-8 flex flex-col flex-grow">
+
+    {# En-tête #}
+    <div class="mb-6">
+      <h3 class="text-lg font-bold text-gray-900 mb-1">{{ plan.name }}</h3>
+      {% if plan.description %}
+        <p class="text-sm text-gray-500">{{ plan.description }}</p>
+      {% endif %}
+    </div>
+
+    {# Prix #}
+    <div class="mb-6">
+      <div class="flex items-baseline gap-1">
+        <span class="text-4xl font-bold text-gray-900">{{ plan.price|floatformat:"0" }}</span>
+        <span class="text-lg text-gray-500 font-medium">DA</span>
+      </div>
+      <p class="text-xs text-gray-400 mt-1">Paiement unique — Accès à vie</p>
+    </div>
+
+    {# Highlight : revenus #}
+    <div class="bg-orange-50 rounded-xl px-4 py-3 mb-6 text-center">
+      <span class="text-2xl font-bold text-orange-600">{{ plan.revenue_percent }}%</span>
+      <p class="text-xs text-orange-600/70 font-medium mt-0.5">de vos revenus</p>
+    </div>
+
+    {# Limites clés #}
+    <div class="space-y-3 mb-6 text-sm text-gray-600">
+      <div class="flex items-center gap-2.5">
+        <svg class="w-4.5 h-4.5 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        <span>{% if plan.max_courses == 0 %}Formations illimitées{% else %}{{ plan.max_courses }} formation{{ plan.max_courses|pluralize }}{% endif %}</span>
+      </div>
+      <div class="flex items-center gap-2.5">
+        <svg class="w-4.5 h-4.5 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+        </svg>
+        <span>{% if plan.max_modules_per_course == 0 %}Modules illimités{% else %}{{ plan.max_modules_per_course }} modules / formation{% endif %}</span>
+      </div>
+      <div class="flex items-center gap-2.5">
+        <svg class="w-4.5 h-4.5 text-orange-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <span>{% if plan.max_lessons_per_course == 0 %}Leçons illimitées{% else %}{{ plan.max_lessons_per_course }} leçons / formation{% endif %}</span>
+      </div>
+    </div>
+
+    {# Avantages (checklist) #}
+    {% if plan.get_features_list %}
+    <div class="space-y-2.5 mb-8 flex-grow">
+      {% for feature in plan.get_features_list %}
+        <div class="flex items-start gap-2.5">
+          <svg class="w-4 h-4 text-green-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          <span class="text-sm text-gray-600">{{ feature }}</span>
+        </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {# CTA #}
+    <div class="mt-auto">
+      {% if has_pending %}
+        <c-ui.btn variant="outline" disabled="true" class="w-full justify-center">
+          Demande en cours
+        </c-ui.btn>
+      {% elif has_profile and current_plan.pk == plan.pk %}
+        <c-ui.btn variant="outline" disabled="true" class="w-full justify-center">
+          Offre actuelle
+        </c-ui.btn>
+      {% elif has_profile and current_plan.order >= plan.order %}
+        <c-ui.btn variant="outline" disabled="true" class="w-full justify-center">
+          Offre inférieure
+        </c-ui.btn>
+      {% elif has_profile %}
+        <c-ui.btn
+          href="{% url 'instructor_request' plan.slug %}"
+          variant="{% if plan.is_featured %}primary{% else %}outline{% endif %}"
+          size="{% if plan.is_featured %}lg{% else %}md{% endif %}"
+          class="w-full justify-center">
+          Passer à {{ plan.name }}
+        </c-ui.btn>
+      {% else %}
+        <c-ui.btn
+          href="{% url 'instructor_request' plan.slug %}"
+          variant="{% if plan.is_featured %}primary{% else %}outline{% endif %}"
+          size="{% if plan.is_featured %}lg{% else %}md{% endif %}"
+          class="w-full justify-center">
+          Choisir {{ plan.name }}
+        </c-ui.btn>
+      {% endif %}
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,179 @@
+<div class="bg-white border border-orange-200 rounded-xl p-6 shadow-sm"
+     x-data="{
+       tab: 'edit',
+       renderMd(src, targetId) {
+         const el = document.getElementById(targetId);
+         if (!src.trim()) { el.innerHTML = '<p class=&quot;text-gray-400 italic text-sm&quot;>L\'aperçu apparaîtra ici…</p>'; return; }
+         el.innerHTML = '<div class=&quot;prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-a:text-orange-600 prose-strong:text-gray-800&quot;>' + marked.parse(src) + '</div>';
+       }
+     }">
+
+  <h3 class="text-lg font-semibold text-gray-800 mb-4">
+    {% if section %}✏️ Modifier la section{% else %}✨ Nouvelle section :
+      {% if section_type == 'text' %}📝 Texte
+      {% elif section_type == 'image' %}🖼️ Image
+      {% elif section_type == 'video' %}🎬 Vidéo YouTube
+      {% elif section_type == 'features' %}✅ Points forts
+      {% elif section_type == 'hero' %}🦸 Hero
+      {% elif section_type == 'text_image' %}📐 Texte + Image
+      {% elif section_type == 'faq' %}❓ FAQ
+      {% elif section_type == 'testimonials' %}💬 Témoignages
+      {% endif %}
+    {% endif %}
+  </h3>
+
+  <form method="POST" enctype="multipart/form-data"
+        hx-post="{% if section %}{% url 'edit_landing_section' section.id %}{% else %}{% url 'add_landing_section' course.slug section_type %}{% endif %}"
+        hx-target="#section-list"
+        hx-swap="innerHTML">
+
+    {% csrf_token %}
+
+    {# ── Titre (optionnel, tous les types) ── #}
+    <div class="mb-4">
+      <label for="id_title" class="block text-sm font-medium text-gray-700 mb-1">Titre (optionnel)</label>
+      {{ form.title }}
+    </div>
+
+    {# ── Hero : sous-titre + CTA ── #}
+    {% if section_type == 'hero' %}
+      <div class="mb-4">
+        <label for="id_subtitle" class="block text-sm font-medium text-gray-700 mb-1">Sous-titre / Accroche</label>
+        {{ form.subtitle }}
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label for="id_cta_text" class="block text-sm font-medium text-gray-700 mb-1">Texte du bouton CTA</label>
+          {{ form.cta_text }}
+        </div>
+        <div>
+          <label for="id_cta_url" class="block text-sm font-medium text-gray-700 mb-1">Lien du bouton</label>
+          {{ form.cta_url }}
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Image de fond</label>
+        {% if section and section.image %}
+          <div class="mb-2">
+            <img src="{{ section.image.url }}" alt="" class="w-40 h-24 rounded-lg object-cover border border-gray-200">
+          </div>
+        {% endif %}
+        {{ form.image }}
+      </div>
+    {% endif %}
+
+    {# ── Contenu Markdown (text, features, faq, text_image, hero body optionnel) ── #}
+    {% if section_type == 'text' or section_type == 'features' or section_type == 'faq' or section_type == 'text_image' or section_type == 'testimonials' %}
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-1">
+          <label for="id_body" class="block text-sm font-medium text-gray-700">
+            {% if section_type == 'faq' %}
+              Questions & Réponses
+              <span class="text-xs text-gray-400">(Séparez chaque Q/R avec ### Question)</span>
+            {% elif section_type == 'testimonials' %}
+              Témoignages
+              <span class="text-xs text-gray-400">(Format : ### ★★★★★ | Nom\nTémoignage)</span>
+            {% elif section_type == 'text_image' %}
+              Contenu texte
+            {% else %}
+              Contenu Markdown
+              {% if section_type == 'features' %}
+                <span class="text-xs text-gray-400">(utilisez des listes à puces : - Point 1)</span>
+              {% endif %}
+            {% endif %}
+          </label>
+          <div class="flex rounded-lg bg-gray-100 p-0.5">
+            <button type="button"
+                    x-on:click="tab = 'edit'"
+                    :class="tab === 'edit' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'"
+                    class="px-3 py-1 text-xs font-medium rounded-md transition cursor-pointer">
+              ✏️ Édition
+            </button>
+            <button type="button"
+                    x-on:click="tab = 'split'; $nextTick(() => { $refs.splitEditor.value = document.getElementById('id_body').value; renderMd($refs.splitEditor.value, 'section-md-preview') })"
+                    :class="tab === 'split' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'"
+                    class="px-3 py-1 text-xs font-medium rounded-md transition cursor-pointer">
+              ⬛⬜ Split
+            </button>
+            <button type="button"
+                    x-on:click="tab = 'preview'; $nextTick(() => renderMd(document.getElementById('id_body').value, 'section-md-preview'))"
+                    :class="tab === 'preview' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'"
+                    class="px-3 py-1 text-xs font-medium rounded-md transition cursor-pointer">
+              👁️ Aperçu
+            </button>
+          </div>
+        </div>
+
+        {# Edit mode #}
+        <div x-show="tab === 'edit'">
+          {{ form.body }}
+        </div>
+
+        {# Split mode #}
+        <div x-show="tab === 'split'" x-cloak class="grid grid-cols-2 gap-4">
+          <textarea x-ref="splitEditor"
+                    x-on:input="document.getElementById('id_body').value = $el.value; renderMd($el.value, 'section-md-preview')"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                    rows="10"></textarea>
+          <div id="section-md-preview" class="prose prose-sm max-w-none p-4 border border-gray-200 rounded-xl bg-gray-50 overflow-y-auto"></div>
+        </div>
+
+        {# Preview mode #}
+        <div x-show="tab === 'preview'" x-cloak>
+          <div id="section-md-preview" class="prose prose-sm max-w-none p-4 border border-gray-200 rounded-xl bg-gray-50 min-h-[200px]"></div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if section_type == 'video' %}
+      <div class="mb-4">
+        <label for="id_video_id" class="block text-sm font-medium text-gray-700 mb-1">ID de la vidéo YouTube</label>
+        {{ form.video_id }}
+        <p class="text-xs text-gray-400 mt-1">L'identifiant après watch?v= (ex: dQw4w9WgXcQ)</p>
+      </div>
+    {% endif %}
+
+    {% if section_type == 'image' or section_type == 'text_image' %}
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+        {% if section and section.image %}
+          <div class="mb-2">
+            <img src="{{ section.image.url }}" alt="" class="w-40 h-24 rounded-lg object-cover border border-gray-200">
+          </div>
+        {% endif %}
+        {{ form.image }}
+      </div>
+    {% endif %}
+
+    {% if section_type == 'text_image' %}
+      <div class="mb-4">
+        <label for="id_image_position" class="block text-sm font-medium text-gray-700 mb-1">Position de l'image</label>
+        {{ form.image_position }}
+      </div>
+    {% endif %}
+
+    {# ── Options de style ── #}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+        <label for="id_background" class="block text-sm font-medium text-gray-700 mb-1">Fond</label>
+        {{ form.background }}
+      </div>
+      <div>
+        <label for="id_css_class" class="block text-sm font-medium text-gray-700 mb-1">Classes Tailwind</label>
+        {{ form.css_class }}
+      </div>
+    </div>
+
+    {# ── Actions ── #}
+    <div class="flex items-center gap-3 pt-2">
+      <c-ui.btn variant="primary" type="submit">
+        {% if section %}💾 Enregistrer{% else %}➕ Ajouter{% endif %}
+      </c-ui.btn>
+      <button type="button"
+              x-on:click="document.getElementById('section-form-container').innerHTML = ''"
+              class="text-sm text-gray-500 hover:text-gray-700 cursor-pointer">
+        Annuler
+      </button>
+    </div>
+  </form>
+</div>

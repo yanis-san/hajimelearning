@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Hajime Learning - Apprenez en ligne{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}La meilleure plateforme de formation en Algérie.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}formation, ligne, algérie, cours, python, dev{% endblock %}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}Hajime Learning{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Formez-vous dès aujourd'hui.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{% static 'img/default-share.jpg' %}{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+
+    <link href="{% static 'css/dist/styles.css' %}" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="{% static 'js/htmx.min.js' %}"></script>
+    <script defer src="{% static 'js/alpine.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        [x-cloak] { display: none !important; }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="h-full flex flex-col text-gray-900 antialiased"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+    <c-layout.navbar />
+
+    <c-layout.flash-messages />
+
+    <main class="flex-grow w-full">
+        {% block content %}{% endblock %}
+    </main>
+
+    <c-layout.footer />
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto py-10 px-4">
+
+  {# Back link #}
+  <a href="{% url 'my_questions' %}" class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 transition mb-6">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+    Retour à mes questions
+  </a>
+
+  {# Question card #}
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+    <div class="flex items-start justify-between gap-4">
+      <h1 class="text-xl font-bold text-gray-900 flex-1">{{ question.title }}</h1>
+
+      <div class="flex items-center gap-2 shrink-0">
+        {# Status badge #}
+        {% if question.status == 'RESOLVED' %}
+          <c-ui.badge variant="green">✅ Résolu</c-ui.badge>
+        {% elif question.status == 'CLOSED' %}
+          <c-ui.badge variant="gray">Fermé</c-ui.badge>
+        {% else %}
+          <c-ui.badge variant="orange">⏳ En cours</c-ui.badge>
+        {% endif %}
+
+        {# Mark resolved button #}
+        {% if question.status != 'RESOLVED' %}
+          {% if user == question.student or user.is_staff %}
+            <form method="POST" action="{% url 'mark_resolved' question.id %}">
+              {% csrf_token %}
+              <c-ui.btn variant="primary" size="sm" type="submit">
+                ✓ Résoudre
+              </c-ui.btn>
+            </form>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="mt-4 text-sm text-gray-700 leading-relaxed">
+      {{ question.content|linebreaks }}
+    </div>
+
+    <div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-3 text-xs text-gray-500">
+      <c-ui.avatar :user="question.student" size="sm" />
+      <span>{{ question.student.first_name|default:question.student.email }}</span>
+      <span class="text-gray-300">•</span>
+      <span>{{ question.created_at|date:"d M Y à H:i" }}</span>
+    </div>
+  </div>
+
+  {# Responses #}
+  <div class="mt-8">
+    <h3 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+      <svg class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+      </svg>
+      Discussion ({{ question.responses.count }})
+    </h3>
+
+    <div class="space-y-3">
+      {% for response in question.responses.all %}
+        <c-support.reply-card :response="response" />
+      {% empty %}
+        <div class="text-center py-8 text-gray-400 text-sm italic">
+          Aucune réponse pour le moment.
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# Reply form #}
+  {% if can_reply %}
+    <div class="mt-8 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <h4 class="text-sm font-semibold text-gray-800 mb-4">Ajouter une réponse</h4>
+      <form method="POST">
+        {% csrf_token %}
+        <div class="space-y-1">
+          {{ form.content }}
+        </div>
+        <div class="flex justify-end mt-4">
+          <c-ui.btn variant="primary" type="submit">
+            Publier la réponse
+          </c-ui.btn>
+        </div>
+      </form>
+    </div>
+  {% else %}
+    <div class="mt-8 bg-gray-50 border border-gray-200 rounded-xl p-5 text-center text-sm text-gray-500">
+      🔒 Les réponses sont fermées pour cette discussion.
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

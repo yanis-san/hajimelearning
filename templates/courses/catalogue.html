@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Catalogue des formations — Hajime Learning{% endblock %}
+{% block meta_description %}Découvrez toutes nos formations en ligne. Filtrez par prix, titre ou date. Python, Django, développement web et plus encore.{% endblock %}
+{% block og_description %}Découvrez toutes nos formations en ligne.{% endblock %}
+
+{% block content %}
+
+  <section class="bg-white">
+    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-8 pt-12 pb-6">
+
+      {# ── Header ── #}
+      <c-ui.page-header title="Catalogue" subtitle="Toutes nos formations disponibles">
+        <c-ui.badge variant="gray">{{ courses|length }} formation{{ courses|length|pluralize }}</c-ui.badge>
+      </c-ui.page-header>
+
+      {# ── Barre de recherche + tri ── #}
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-8" x-data="{ sort: '{{ current_sort }}' }">
+
+        {# Recherche #}
+        <div class="relative flex-1 max-w-md">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input
+            type="search"
+            name="q"
+            value="{{ search_query }}"
+            placeholder="Rechercher une formation…"
+            class="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 transition"
+            hx-get="{% url 'catalogue' %}"
+            hx-trigger="input changed delay:300ms, search"
+            hx-target="#catalogue-grid"
+            hx-include="[name='q'], [name='sort']"
+          >
+        </div>
+
+        {# Boutons de tri #}
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs text-gray-400 mr-1">Trier par :</span>
+
+          <button
+            class="px-3 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer
+                   {% if current_sort == '-created_at' or current_sort == 'created_at' %}
+                     bg-orange-50 border-orange-200 text-orange-700
+                   {% else %}
+                     bg-white border-gray-200 text-gray-600 hover:border-gray-300
+                   {% endif %}"
+            hx-get="{% url 'catalogue' %}?sort={% if current_sort == '-created_at' %}created_at{% else %}-created_at{% endif %}"
+            hx-target="#catalogue-grid"
+            hx-include="[name='q']"
+          >
+            Récent
+            {% if current_sort == '-created_at' %}↓{% elif current_sort == 'created_at' %}↑{% endif %}
+          </button>
+
+          <button
+            class="px-3 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer
+                   {% if current_sort == 'title' or current_sort == '-title' %}
+                     bg-orange-50 border-orange-200 text-orange-700
+                   {% else %}
+                     bg-white border-gray-200 text-gray-600 hover:border-gray-300
+                   {% endif %}"
+            hx-get="{% url 'catalogue' %}?sort={% if current_sort == 'title' %}-title{% else %}title{% endif %}"
+            hx-target="#catalogue-grid"
+            hx-include="[name='q']"
+          >
+            Titre
+            {% if current_sort == 'title' %}↑{% elif current_sort == '-title' %}↓{% endif %}
+          </button>
+
+          <button
+            class="px-3 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer
+                   {% if current_sort == 'price' or current_sort == '-price' %}
+                     bg-orange-50 border-orange-200 text-orange-700
+                   {% else %}
+                     bg-white border-gray-200 text-gray-600 hover:border-gray-300
+                   {% endif %}"
+            hx-get="{% url 'catalogue' %}?sort={% if current_sort == 'price' %}-price{% else %}price{% endif %}"
+            hx-target="#catalogue-grid"
+            hx-include="[name='q']"
+          >
+            Prix
+            {% if current_sort == 'price' %}↑{% elif current_sort == '-price' %}↓{% endif %}
+          </button>
+
+          <input type="hidden" name="sort" value="{{ current_sort }}">
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  {# ── Grille des cours ── #}
+  <section class="bg-gray-50/60">
+    <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-8 py-12">
+
+      <div id="catalogue-grid">
+        {% include 'courses/partials/catalogue_grid.html' %}
+      </div>
+
+    </div>
+  </section>
+
+{% endblock %}

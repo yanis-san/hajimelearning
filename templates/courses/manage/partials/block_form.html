@@ -1,0 +1,157 @@
+<div class="bg-white border border-orange-200 rounded-xl p-6 shadow-sm"
+     x-data="{
+       tab: 'edit',
+       renderMd(src, targetId) {
+         const el = document.getElementById(targetId);
+         if (!src.trim()) { el.innerHTML = '<p class=&quot;text-gray-400 italic text-sm&quot;>L\'aperçu apparaîtra ici…</p>'; return; }
+         el.innerHTML = '<div class=&quot;prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-a:text-orange-600 prose-strong:text-gray-800 prose-table:text-sm&quot;>' + marked.parse(src) + '</div>';
+       }
+     }">
+
+  <h3 class="text-lg font-semibold text-gray-800 mb-4">
+    {% if block %}✏️ Modifier le bloc{% else %}✨ Nouveau bloc : {{ block_type|title }}{% endif %}
+  </h3>
+
+  <form method="POST" enctype="multipart/form-data"
+        hx-post="{% if block %}{% url 'edit_block' block.id %}{% else %}{% url 'add_block' lesson.id block_type %}{% endif %}"
+        hx-target="#block-list"
+        hx-swap="innerHTML">
+
+    {% csrf_token %}
+
+    {# ── Texte avec preview live (client-side marked.js) ── #}
+    {% if block_type == 'text' or block.type == 'text' %}
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <label class="block text-sm font-medium text-gray-700">
+            Contenu Texte <span class="text-red-500">*</span>
+          </label>
+          {# Tabs Édition / Aperçu #}
+          <div class="flex rounded-lg bg-gray-100 p-0.5">
+            <button type="button"
+                    x-on:click="tab = 'edit'"
+                    :class="tab === 'edit' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'"
+                    class="px-3 py-1 text-xs font-medium rounded-md transition cursor-pointer">
+              ✏️ Édition
+            </button>
+            <button type="button"
+                    x-on:click="tab = 'split'; $nextTick(() => { $refs.splitEditor.value = document.getElementById('id_text_content').value; renderMd($refs.splitEditor.value, 'md-live-preview') })"
+                    :class="tab === 'split' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'"
+                    class="px-3 py-1 text-xs font-medium rounded-md transition cursor-pointer">
+              ⬛⬜ Split
+            </button>
+            <button type="button"
+                    x-on:click="tab = 'preview'; $nextTick(() => renderMd(document.getElementById('id_text_content').value, 'md-full-preview'))"
+                    :class="tab === 'preview' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'"
+                    class="px-3 py-1 text-xs font-medium rounded-md transition cursor-pointer">
+              👁️ Aperçu
+            </button>
+          </div>
+        </div>
+
+        {# Edit-only mode #}
+        <div x-show="tab === 'edit'" x-transition>
+          {{ form.text_content }}
+        </div>
+
+        {# Split mode: editor + preview side by side — rendu instantané via marked.js #}
+        <div x-show="tab === 'split'" x-transition class="grid grid-cols-2 gap-4">
+          <div>
+            <textarea x-ref="splitEditor"
+                      x-on:input="document.getElementById('id_text_content').value = $refs.splitEditor.value; renderMd($refs.splitEditor.value, 'md-live-preview')"
+                      rows="16"
+                      placeholder="Votre texte (Markdown)..."
+                      class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition font-mono text-sm resize-y"></textarea>
+          </div>
+          <div id="md-live-preview"
+               class="border border-gray-200 rounded-xl p-4 bg-gray-50 overflow-y-auto max-h-[28rem]">
+            <p class="text-gray-400 italic text-sm">L'aperçu apparaîtra ici…</p>
+          </div>
+        </div>
+
+        {# Preview-only mode — rendu instantané via marked.js #}
+        <div x-show="tab === 'preview'" x-transition>
+          <div id="md-full-preview"
+               class="border border-gray-200 rounded-xl p-6 bg-gray-50 min-h-[12rem] overflow-y-auto">
+            <p class="text-gray-400 italic text-sm">L'aperçu apparaîtra ici…</p>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {# ── Vidéo ── #}
+    {% if block_type == 'video' or block.type == 'video' %}
+      <div class="space-y-1">
+        <label for="id_video_id" class="block text-sm font-medium text-gray-700">
+          ID Vidéo <span class="text-red-500">*</span>
+        </label>
+        {{ form.video_id }}
+      </div>
+    {% endif %}
+
+    {# ── Audio ── #}
+    {% if block_type == 'audio' or block.type == 'audio' %}
+      <div class="space-y-4">
+        <div class="space-y-1">
+          <label for="id_title" class="block text-sm font-medium text-gray-700">Titre de l'audio</label>
+          {{ form.title }}
+          <p class="text-xs text-gray-400">Optionnel</p>
+        </div>
+        <div class="space-y-1">
+          <label for="id_file_content" class="block text-sm font-medium text-gray-700">
+            Fichier MP3 <span class="text-red-500">*</span>
+          </label>
+          {{ form.file_content }}
+        </div>
+        <div class="space-y-1">
+          <label for="id_text_content" class="block text-sm font-medium text-gray-700">Consigne</label>
+          <textarea name="text_content" rows="2"
+                    class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition resize-y">{{ form.text_content.value|default:'' }}</textarea>
+        </div>
+        <div class="bg-yellow-50 p-3 rounded-xl border border-yellow-200">
+          <label class="block text-sm font-medium text-yellow-800 mb-1">Fichier Correction</label>
+          {{ form.related_file }}
+          <p class="text-xs text-yellow-600 mt-1">Optionnel</p>
+        </div>
+      </div>
+    {% endif %}
+
+    {# ── Fichier ── #}
+    {% if block_type == 'file' or block.type == 'file' %}
+      <div class="space-y-4">
+        <div class="space-y-1">
+          <label for="id_title" class="block text-sm font-medium text-gray-700">Nom du fichier (affiché)</label>
+          {{ form.title }}
+        </div>
+        <div class="space-y-1">
+          <label for="id_file_content" class="block text-sm font-medium text-gray-700">
+            Sélectionner le fichier <span class="text-red-500">*</span>
+          </label>
+          {{ form.file_content }}
+        </div>
+      </div>
+    {% endif %}
+
+    {# ── Quiz ── #}
+    {% if block_type == 'quiz' or block.type == 'quiz' %}
+      <div class="bg-green-50 p-4 rounded-xl border border-green-200">
+        <label for="id_quiz_title" class="block text-sm font-medium text-green-800 mb-1">
+          Nom du Quiz <span class="text-red-500">*</span>
+        </label>
+        {{ form.quiz_title }}
+      </div>
+    {% endif %}
+
+    {# ── Actions ── #}
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
+      <c-ui.btn variant="ghost" type="button"
+                x-on:click="document.getElementById('block-form-container').innerHTML = ''">
+        Annuler
+      </c-ui.btn>
+      <c-ui.btn variant="primary" type="submit">
+        Sauvegarder
+      </c-ui.btn>
+    </div>
+
+  </form>
+</div>

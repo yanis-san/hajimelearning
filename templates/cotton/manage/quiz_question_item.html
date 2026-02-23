@@ -1,0 +1,20 @@
+<c-vars q="" block="" index="" />
+
+<div class="flex justify-between items-center py-2.5 border-b border-gray-100 last:border-0">
+  <div class="flex items-center gap-2 min-w-0">
+    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-100 text-orange-700 text-xs font-bold shrink-0">
+      {{ index }}
+    </span>
+    <span class="text-sm text-gray-700 truncate">{{ q.question_text }}</span>
+    <c-ui.badge variant="green">{{ q.correct_answer|upper }}</c-ui.badge>
+  </div>
+  <button hx-post="{% url 'delete_quiz_question' q.id %}"
+          hx-target="#quiz-questions-{{ block.id }}"
+          hx-confirm="Supprimer cette question ?"
+          class="text-gray-400 hover:text-red-500 transition cursor-pointer shrink-0 ml-2"
+          title="Supprimer">
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+  </button>
+</div>

@@ -1,0 +1,17 @@
+{# Partial HTMX : grille de cartes du catalogue (rechargée dynamiquement) #}
+{% if courses %}
+  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+    {% for course in courses %}
+      <c-course.card :course="course" />
+    {% endfor %}
+  </div>
+{% else %}
+  <c-ui.empty-state
+    icon="🔍"
+    title="Aucune formation"
+    message="Aucune formation ne correspond à votre recherche. Essayez un autre terme.">
+    <c-ui.btn href="{% url 'catalogue' %}" variant="outline" size="sm">
+      Voir tout le catalogue
+    </c-ui.btn>
+  </c-ui.empty-state>
+{% endif %}

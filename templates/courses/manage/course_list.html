@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestion des cours — Admin{% endblock %}
+
+{% block content %}
+<c-layout.admin-card
+  title="Gestion des cours"
+  subtitle="Créez, éditez et organisez vos cours">
+
+  <c-slot name="actions">
+    <c-ui.btn variant="primary" href="{% url 'manage_course_create' %}">
+      ➕ Nouveau cours
+    </c-ui.btn>
+  </c-slot>
+
+  {# ── Barre de recherche + compteur ── #}
+  <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+    <div class="relative flex-1 max-w-md">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input
+        type="search"
+        name="q"
+        value="{{ search_query }}"
+        placeholder="Rechercher un cours…"
+        class="w-full pl-10 pr-4 py-2 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 transition"
+        hx-get="{% url 'manage_course_list' %}"
+        hx-trigger="input changed delay:300ms, search"
+        hx-target="#course-table-body"
+        hx-include="[name='q']"
+        hx-push-url="true"
+      >
+    </div>
+    <div class="text-sm text-gray-400">
+      <c-ui.badge variant="gray">{{ courses|length }} cours</c-ui.badge>
+    </div>
+  </div>
+
+  {# ── Tableau avec tri ── #}
+  {% if courses or search_query %}
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-200 bg-gray-50/50">
+              <c-manage.sort-header field="title" current_sort="{{ current_sort }}" label="Cours" />
+              <c-manage.sort-header field="is_published" current_sort="{{ current_sort }}" label="Statut" />
+              <c-manage.sort-header field="price" current_sort="{{ current_sort }}" label="Prix" />
+              <c-manage.sort-header field="modules_count" current_sort="{{ current_sort }}" label="Modules" />
+              <th class="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="course-table-body">
+            {% for course in courses %}
+              <c-manage.course-row :course="course" />
+            {% empty %}
+              <tr>
+                <td colspan="5" class="py-12 text-center">
+                  <c-ui.empty-state
+                    icon="🔍"
+                    title="Aucun cours"
+                    message="Aucun cours ne correspond à votre recherche.">
+                  </c-ui.empty-state>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <c-ui.empty-state
+      icon="📚"
+      title="Aucun cours"
+      message="Commencez par créer votre premier cours.">
+      <c-ui.btn variant="primary" href="{% url 'manage_course_create' %}">
+        ➕ Créer un cours
+      </c-ui.btn>
+    </c-ui.empty-state>
+  {% endif %}
+
+</c-layout.admin-card>
+{% endblock %}

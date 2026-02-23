@@ -1,0 +1,15 @@
+<c-vars percent="0" color="orange" show_label="true" />
+
+<div class="flex items-center gap-3" {{ attrs }}>
+  <div class="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+    <div class="h-2 rounded-full transition-all duration-500
+                {% if color == 'green' %}bg-green-500
+                {% elif color == 'red' %}bg-red-500
+                {% elif color == 'blue' %}bg-blue-500
+                {% else %}bg-orange-500{% endif %}"
+         style="width: {{ percent }}%"></div>
+  </div>
+  {% if show_label == 'true' %}
+    <span class="text-xs font-medium text-gray-500 w-9 text-right shrink-0">{{ percent }}%</span>
+  {% endif %}
+</div>

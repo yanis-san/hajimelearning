@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page { size: A4; margin: 2cm; }
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.5; color: #333; }
+        .header { border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; }
+        .logo { font-size: 24px; font-weight: bold; color: #2563eb; }
+        .invoice-title { font-size: 20px; font-weight: bold; text-align: right; color: #555; }
+        .details-box { margin-bottom: 40px; }
+        .table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .table th { text-align: left; border-bottom: 2px solid #ddd; padding: 10px; background: #f9f9f9; }
+        .table td { border-bottom: 1px solid #eee; padding: 10px; }
+        .total { text-align: right; font-size: 18px; font-weight: bold; margin-top: 20px; }
+        .footer { margin-top: 50px; font-size: 10px; text-align: center; color: #999; border-top: 1px solid #eee; padding-top: 10px; }
+        .stamp { border: 2px solid #16a34a; color: #16a34a; display: inline-block; padding: 5px 10px; font-weight: bold; transform: rotate(-5deg); margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">Hajime Learning</div>
+        <div class="invoice-title">REÇU DE PAIEMENT</div>
+    </div>
+
+    <div class="details-box">
+        <p>
+            <strong>Réf :</strong> REC-{{ request.id }}<br>
+            <strong>Date :</strong> {{ request.created_at|date:"d/m/Y" }}<br>
+            <strong>Client :</strong> {{ request.student.first_name }} {{ request.student.last_name }}<br>
+            <strong>Email :</strong> {{ request.student.email }}
+        </p>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Désignation</th>
+                <th>Tarif Initial</th>
+                <th>Réduction</th>
+                <th style="text-align: right;">Total Payé</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    Formation : <strong>{{ request.course.title }}</strong><br>
+                    <small>Accès illimité</small>
+                </td>
+                <td>{{ request.course.price }} DA</td>
+                <td>
+                    {% if request.applied_coupon %}
+                        <span style="color: green;">Code {{ request.applied_coupon.code }} (-{{ request.applied_coupon.discount_percent }}%)</span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td style="text-align: right;">
+                    {{ request.final_price }} DA
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="total">
+        Total Payé : {{ request.final_price }} DA
+    </div>
+
+    <div style="text-align: center;">
+        <div class="stamp">PAYÉ / VALIDÉ</div>
+    </div>
+
+    <div class="footer">
+        Ce reçu est généré automatiquement par Hajime Learning.<br>
+        Pour toute question : contact@hajimelearning.dz
+    </div>
+
+</body>
+</html>

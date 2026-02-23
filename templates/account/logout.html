@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Déconnexion</h2>
+    <p>Êtes-vous sûr de vouloir vous déconnecter ?</p>
+
+    <form method="POST" action="{% url 'account_logout' %}">
+        {% csrf_token %}
+        <button type="submit">Oui, me déconnecter</button>
+    </form>
+{% endblock %}

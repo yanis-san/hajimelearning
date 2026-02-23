@@ -1,0 +1,54 @@
+<c-vars notif="" compact="false" />
+
+{% if compact == 'true' %}
+  {# Version compacte : utilisée dans le dropdown navbar #}
+  <div id="notif-item-{{ notif.id }}"
+       class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-0 transition-colors
+              {% if not notif.is_read %}bg-orange-50/40{% endif %}">
+    <a href="{% url 'mark_read_and_redirect' notif.id %}" class="block">
+      {% if notif.title %}
+        <p class="text-sm font-semibold text-gray-800 mb-0.5 line-clamp-1">{{ notif.title }}</p>
+      {% endif %}
+      <p class="text-sm text-gray-600 line-clamp-2">{{ notif.message }}</p>
+      <p class="text-xs text-gray-400 mt-1">{{ notif.created_at|timesince }}</p>
+    </a>
+    <button type="button"
+            hx-post="{% url 'mark_notif_read' notif.id %}"
+            hx-target="#notif-item-{{ notif.id }}"
+            hx-swap="outerHTML"
+            @click.stop
+            class="mt-1 text-xs font-medium cursor-pointer transition-colors
+                   {% if not notif.is_read %}text-orange-500 hover:text-orange-700{% else %}text-gray-400 hover:text-gray-600{% endif %}">
+      {% if not notif.is_read %}Marquer comme lu{% else %}Marquer comme non lu{% endif %}
+    </button>
+  </div>
+
+{% else %}
+  {# Version complète : utilisée dans la page liste des notifications #}
+  <div id="notif-{{ notif.pk }}"
+       class="flex items-start gap-4 p-4 rounded-xl border transition-all
+              {% if not notif.is_read %}bg-orange-50 border-orange-100{% else %}bg-white border-gray-100{% endif %}"
+       {{ attrs }}>
+    <div class="flex-1 min-w-0">
+      <a href="{{ notif.link }}" class="block group">
+        {% if notif.title %}
+          <p class="text-sm font-semibold text-gray-800 group-hover:text-orange-600 transition mb-0.5">{{ notif.title }}</p>
+        {% endif %}
+        <p class="text-sm text-gray-600">{{ notif.message }}</p>
+        <p class="text-xs text-gray-400 mt-1">{{ notif.created_at|timesince }}</p>
+      </a>
+    </div>
+    {% if not notif.is_read %}
+      <button hx-post="{% url 'mark_notif_read' notif.pk %}"
+              hx-target="#notif-{{ notif.pk }}"
+              hx-swap="outerHTML"
+              @click.stop
+              class="shrink-0 mt-1 p-1.5 rounded-lg text-gray-400 hover:text-orange-600 hover:bg-orange-100 transition focus:outline-none"
+              title="Marquer comme lu">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+      </button>
+    {% endif %}
+  </div>
+{% endif %}

@@ -1,0 +1,8 @@
+{% for lesson in module.lessons.all %}
+  <c-manage.lesson-item :lesson="lesson" :course="course" :module="module" />
+{% empty %}
+  <c-ui.empty-state
+    icon="📖"
+    title="Aucune leçon"
+    message="Ajoutez une première leçon à ce module." />
+{% endfor %}

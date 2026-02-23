@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un compte — Hajime Learning{% endblock %}
+
+{% block content %}
+<c-layout.auth-card title="Créer un compte" subtitle="Rejoignez Hajime Learning gratuitement.">
+
+  {% if form.non_field_errors %}
+    <c-ui.alert variant="error" class="mb-6">
+      {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+    </c-ui.alert>
+  {% endif %}
+
+  <form method="POST" action="{% url 'account_signup' %}" class="space-y-4">
+    {% csrf_token %}
+
+    {# Nom & Prénom #}
+    <div class="grid grid-cols-2 gap-3">
+      <c-form.input name="first_name" label="Prénom" placeholder="Yanis"
+        :value="form.first_name.value|default:''"
+        :error="form.first_name.errors.0" required="true" />
+      <c-form.input name="last_name" label="Nom" placeholder="Ben..."
+        :value="form.last_name.value|default:''"
+        :error="form.last_name.errors.0" required="true" />
+    </div>
+
+    {# Email #}
+    <c-form.input name="email" type="email" label="Adresse e-mail"
+      placeholder="mon.email@exemple.com"
+      :value="form.email.value|default:''"
+      :error="form.email.errors.0" required="true" />
+
+    {# Téléphone #}
+    <c-form.input name="phone_number" type="tel" label="Téléphone"
+      placeholder="+213..."
+      :value="form.phone_number.value|default:''"
+      :error="form.phone_number.errors.0" />
+
+    {# Genre & Date de naissance #}
+    <div class="grid grid-cols-2 gap-3">
+      <c-form.select name="gender" label="Sexe" :error="form.gender.errors.0">
+        {% for value, label in form.gender.field.choices %}
+          <option value="{{ value }}" {% if form.gender.value == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </c-form.select>
+      <c-form.input name="birth_date" type="date" label="Date de naissance"
+        :value="form.birth_date.value|default:''"
+        :error="form.birth_date.errors.0" />
+    </div>
+
+    {# Pays & Ville #}
+    <div class="grid grid-cols-2 gap-3">
+      <c-form.select name="country" label="Pays" :error="form.country.errors.0">
+        {% for value, label in form.country.field.choices %}
+          <option value="{{ value }}" {% if form.country.value == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </c-form.select>
+      <c-form.input name="city" label="Ville" placeholder="Alger"
+        :value="form.city.value|default:''"
+        :error="form.city.errors.0" />
+    </div>
+
+    {# Mot de passe #}
+    <c-form.input name="password1" type="password" label="Mot de passe"
+      placeholder="••••••••"
+      :error="form.password1.errors.0" required="true" />
+    <c-form.input name="password2" type="password" label="Confirmer le mot de passe"
+      placeholder="••••••••"
+      :error="form.password2.errors.0" required="true" />
+
+    <div class="pt-2">
+      <c-ui.btn type="submit" class="w-full justify-center">Créer mon compte</c-ui.btn>
+    </div>
+  </form>
+
+  <p class="mt-6 text-center text-sm text-gray-500 border-t border-gray-100 pt-6">
+    Déjà inscrit ?
+    <a href="{% url 'account_login' %}" class="text-orange-500 hover:text-orange-700 font-medium ml-1">Se connecter</a>
+  </p>
+
+</c-layout.auth-card>
+{% endblock %}

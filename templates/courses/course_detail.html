@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% load static md %}
+
+{% block title %}{{ course.title }} | Hajime Learning{% endblock %}
+{% block meta_description %}{{ course.meta_description|default:course.short_description }}{% endblock %}
+{% block meta_keywords %}{{ course.keywords }}{% endblock %}
+
+{% block og_title %}{{ course.title }}{% endblock %}
+{% block og_description %}{{ course.meta_description|default:course.short_description }}{% endblock %}
+
+{% block og_image %}
+    {% if course.thumbnail %}
+        {{ course.thumbnail.url }}
+    {% else %}
+        {% static 'img/default-share.jpg' %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  {% if has_access and not preview_landing %}
+    {# ══════════════════════════════════════════════════════ #}
+    {# ──              VUE ÉTUDIANT INSCRIT                ── #}
+    {# ══════════════════════════════════════════════════════ #}
+
+    {# Breadcrumb #}
+    <nav class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+      <a href="{% url 'user_dashboard' %}" class="hover:text-orange-600 transition">Mes cours</a>
+      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      <span class="text-gray-700 font-medium truncate">{{ course.title }}</span>
+    </nav>
+
+    {# Carte de progression #}
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 lg:p-8 shadow-sm mb-10 relative overflow-hidden">
+      <c-ui.badge variant="green" class="absolute top-4 right-4">Inscrit</c-ui.badge>
+
+      <h1 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 pr-20">{{ course.title }}</h1>
+      <p class="text-gray-500 mb-6 max-w-2xl">{{ course.short_description }}</p>
+
+      <div class="max-w-md">
+        <div class="flex justify-between text-sm font-medium text-gray-600 mb-1.5">
+          <span>Progression</span>
+          <span class="text-orange-600">{{ progress_percent }}%</span>
+        </div>
+        <c-ui.progress-bar percent="{{ progress_percent }}" color="orange" />
+      </div>
+
+      {% if user.is_staff %}
+        <div class="mt-6 pt-4 border-t border-gray-100 flex items-center gap-3">
+          <c-ui.btn href="{% url 'manage_course_students' course.slug %}" variant="ghost" size="sm">
+            <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Stats étudiants
+          </c-ui.btn>
+          <c-ui.btn href="{% url 'course_detail' course.slug %}?view=landing" variant="ghost" size="sm">
+            👁️ Voir la vitrine
+          </c-ui.btn>
+          <c-ui.btn href="{% url 'manage_course_landing' course.slug %}" variant="ghost" size="sm">
+            🎨 Éditer la vitrine
+          </c-ui.btn>
+        </div>
+      {% endif %}
+    </div>
+
+    {# Programme (vue inscrit) #}
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-xl font-bold text-gray-900 mb-5">Votre progression</h2>
+
+      <div class="space-y-3">
+        {% for module in course.modules.all %}
+          <c-course.module-accordion
+            :module="module"
+            index="{{ forloop.counter0 }}"
+            has_access="true"
+            :completed_ids="completed_lesson_ids"
+            is_manager="{{ is_manager }}" />
+        {% endfor %}
+      </div>
+    </div>
+
+  {% else %}
+    {# ══════════════════════════════════════════════════════ #}
+    {# ──            PAGE DE VENTE (VISITEUR)              ── #}
+    {# ══════════════════════════════════════════════════════ #}
+
+    <div class="lg:grid lg:grid-cols-3 lg:gap-10">
+
+      {# Colonne principale #}
+      <div class="lg:col-span-2">
+
+        {# Breadcrumb #}
+        <nav class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+          <a href="{% url 'course_list' %}" class="hover:text-orange-600 transition">Catalogue</a>
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          <span class="text-gray-700 font-medium truncate">{{ course.title }}</span>
+        </nav>
+
+        <h1 class="text-3xl lg:text-4xl font-extrabold text-gray-900 mb-4">{{ course.title }}</h1>
+        <p class="text-lg text-gray-500 mb-8 max-w-2xl">{{ course.short_description }}</p>
+
+        {# ── Lien admin rapide vers le builder ── #}
+        {% if user.is_staff %}
+          <div class="mb-6 flex items-center gap-3">
+            {% if preview_landing %}
+              <c-ui.btn variant="outline" size="sm" href="{% url 'course_detail' course.slug %}">
+                ← Retour à ma progression
+              </c-ui.btn>
+            {% endif %}
+            <c-ui.btn variant="ghost" size="sm" href="{% url 'manage_course_landing' course.slug %}">
+              🎨 Éditer la vitrine
+            </c-ui.btn>
+          </div>
+        {% endif %}
+
+        {% if landing_sections %}
+          {# ══ MODE SECTIONS PERSONNALISÉES ══ #}
+          {% for section in landing_sections %}
+            <c-course.landing-section :section="section" />
+          {% endfor %}
+
+        {% else %}
+          {# ══ MODE CLASSIQUE (FALLBACK) ══ #}
+
+          {# Trailer vidéo #}
+          {% if course.trailer_video_id %}
+            <div class="bg-black rounded-2xl overflow-hidden shadow-lg mb-10 aspect-video">
+              <iframe src="https://www.youtube.com/embed/{{ course.trailer_video_id }}"
+                      class="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen></iframe>
+            </div>
+          {% endif %}
+
+          {# Description longue #}
+          <div class="prose prose-gray prose-lg max-w-none mb-10">
+            {{ course.description|md }}
+          </div>
+
+          {# Ce que vous allez apprendre #}
+          {% if course.what_you_will_learn %}
+            <div class="bg-green-50 border border-green-100 rounded-xl p-6 mb-8">
+              <h3 class="text-lg font-bold text-green-900 mb-3 flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Ce que vous allez apprendre
+              </h3>
+              <div class="prose prose-sm prose-green max-w-none text-green-800">
+                {{ course.what_you_will_learn|md }}
+              </div>
+            </div>
+          {% endif %}
+
+          {# Pré-requis #}
+          {% if course.prerequisites %}
+            <div class="bg-orange-50 border border-orange-100 rounded-xl p-6 mb-8">
+              <h3 class="text-lg font-bold text-orange-900 mb-3 flex items-center gap-2">
+                <svg class="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Pré-requis
+              </h3>
+              <div class="prose prose-sm prose-orange max-w-none text-orange-800">
+                {{ course.prerequisites|md }}
+              </div>
+            </div>
+          {% endif %}
+
+        {% endif %}
+      </div>
+
+      {# Sidebar : carte d'achat #}
+      <div class="mt-8 lg:mt-0 lg:col-span-1">
+        <div class="sticky top-24 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+
+          {# Image vitrine (cover_image prioritaire, thumbnail en fallback) #}
+          <div class="h-48 bg-gray-100 w-full">
+            {% if course.cover_image %}
+              <img src="{{ course.cover_image.url }}" alt="{{ course.title }}" class="w-full h-full object-cover">
+            {% elif course.thumbnail %}
+              <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="w-full h-full object-cover">
+            {% else %}
+              <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-100 to-orange-50">
+                <svg class="w-16 h-16 text-orange-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="p-6">
+            {# Prix #}
+            <div class="text-center mb-6">
+              {% if course.price == 0 %}
+                <span class="text-3xl font-extrabold text-green-600">Gratuit</span>
+              {% else %}
+                <span class="text-3xl font-extrabold text-gray-900">{{ course.price }} DA</span>
+              {% endif %}
+              <span class="text-sm text-gray-400 block mt-1">Accès à vie</span>
+            </div>
+
+            {# CTA #}
+            <div class="[&>a]:w-full [&>a]:text-center">
+              {% if course.price == 0 %}
+                <c-ui.btn href="{% url 'account_login' %}?next={{ request.path }}" variant="primary" size="lg">
+                  S'inscrire gratuitement
+                </c-ui.btn>
+              {% else %}
+                <c-ui.btn href="{% url 'request_access' course.id %}" variant="primary" size="lg">
+                  Débloquer l'accès
+                </c-ui.btn>
+              {% endif %}
+            </div>
+
+            <p class="mt-4 text-center text-xs text-gray-400 flex items-center justify-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+              Paiement sécurisé (CCP / BaridiMob)
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    {# Programme de la formation #}
+    <div class="mt-16 max-w-4xl mx-auto">
+      <h2 class="text-xl font-bold text-gray-900 mb-5">Programme de la formation</h2>
+
+      <div class="space-y-3">
+        {% for module in course.modules.all %}
+          <c-course.module-accordion
+            :module="module"
+            index="{{ forloop.counter0 }}"
+            has_access="false"
+            completed_ids=""
+            is_manager="{{ is_manager }}" />
+        {% endfor %}
+      </div>
+    </div>
+
+  {% endif %}
+</div>
+{% endblock %}
