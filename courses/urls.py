@@ -14,6 +14,7 @@ urlpatterns = [
     # Page d'une leçon (ex: /course/python-debutant/lesson/installation/)
     path('course/<slug:course_slug>/lesson/<slug:lesson_slug>/', views.lesson_detail, name='lesson_detail'),
     path('course/<slug:course_slug>/lesson/<slug:lesson_slug>/complete/', views.mark_lesson_complete, name='mark_lesson_complete'),
+    path('course/<slug:course_slug>/certificate/', views.download_certificate, name='download_certificate'),
 
     # ── Admin CRUD ──
     path('manage/courses/', views.manage_course_list, name='manage_course_list'),

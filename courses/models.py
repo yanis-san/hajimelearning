@@ -297,3 +297,33 @@ class StudentProgress(models.Model):
 
     def __str__(self):
         return f"{self.student.email} - {self.lesson.title}"
+
+
+class CourseCompletion(models.Model):
+    """Enregistrement unique quand un étudiant termine toutes les leçons d'un cours."""
+    student = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='completions',
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name='completions',
+    )
+    completed_at = models.DateTimeField(auto_now_add=True)
+    certificate_pdf = models.FileField(
+        "Certificat PDF",
+        upload_to='certificates/',
+        blank=True,
+        null=True,
+    )
+
+    class Meta:
+        unique_together = ['student', 'course']
+        ordering = ['-completed_at']
+        verbose_name = "Complétion de cours"
+        verbose_name_plural = "Complétions de cours"
+
+    def __str__(self):
+        return f"{self.student.email} — {self.course.title}"

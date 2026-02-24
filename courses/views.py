@@ -17,7 +17,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-from .models import Course, Lesson, StudentProgress, ContentBlock, QuizQuestion, QuizResult, Module, LandingSection
+from .models import Course, Lesson, StudentProgress, ContentBlock, QuizQuestion, QuizResult, Module, LandingSection, CourseCompletion
 from .forms import ContentBlockForm, QuizQuestionForm, CourseForm, InstructorCourseForm, ModuleForm, LessonForm, LandingSectionForm
 from .permissions import (
     builder_access_required, get_managed_course, get_managed_course_from_block,
@@ -208,7 +208,16 @@ def user_dashboard(request):
         is_published=True,
     ).distinct().order_by('-created_at')
 
-    return render(request, 'courses/dashboard.html', {'courses': my_courses})
+    # Cours complétés → pour afficher le bouton certificat
+    completed_course_ids = set(
+        CourseCompletion.objects.filter(student=request.user)
+        .values_list('course_id', flat=True)
+    )
+
+    return render(request, 'courses/dashboard.html', {
+        'courses': my_courses,
+        'completed_course_ids': completed_course_ids,
+    })
 
 @login_required
 @require_POST
@@ -222,7 +231,26 @@ def mark_lesson_complete(request, course_slug, lesson_slug):
         return redirect('course_detail', course_slug=course_slug)
 
     StudentProgress.objects.get_or_create(student=request.user, lesson=current_lesson)
-    
+
+    # ── Vérification complétion totale du cours ──────────────────────────────
+    total_published = Lesson.objects.filter(
+        module__course=course, module__is_published=True, is_published=True
+    ).count()
+    completed_count = StudentProgress.objects.filter(
+        student=request.user,
+        lesson__module__course=course,
+        lesson__is_published=True,
+        lesson__module__is_published=True,
+    ).count()
+
+    if total_published > 0 and completed_count >= total_published:
+        completion, created = CourseCompletion.objects.get_or_create(
+            student=request.user, course=course
+        )
+        if created:
+            from .tasks import generate_certificate_pdf
+            generate_certificate_pdf.delay(completion.id)
+
     course_lessons = Lesson.objects.filter(
         module__course=current_lesson.module.course
     ).order_by('module__order', 'order')
@@ -238,6 +266,26 @@ def mark_lesson_complete(request, course_slug, lesson_slug):
 
     messages.success(request, "Félicitations ! Vous avez terminé ce cours.")
     return redirect('course_detail', course_slug=course_slug)
+
+
+@login_required
+def download_certificate(request, course_slug):
+    """Télécharge le certificat PDF de complétion d'un cours."""
+    course = get_object_or_404(Course, slug=course_slug, is_published=True)
+    completion = get_object_or_404(CourseCompletion, student=request.user, course=course)
+
+    if not completion.certificate_pdf:
+        messages.warning(
+            request,
+            "Votre certificat est en cours de génération, revenez dans quelques instants.",
+        )
+        return redirect('user_dashboard')
+
+    response = HttpResponse(completion.certificate_pdf.read(), content_type='application/pdf')
+    filename = f"Certificat_{course.slug}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
+
 
 @login_required
 @require_POST

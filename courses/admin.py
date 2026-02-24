@@ -3,7 +3,7 @@ from django.db import models  # <--- C'EST CETTE LIGNE QUI MANQUAIT
 from unfold.admin import ModelAdmin, StackedInline, TabularInline
 from markdownx.widgets import AdminMarkdownxWidget
 from .models import Category, Course, Module, Lesson, ContentBlock
-from .models import QuizResult
+from .models import QuizResult, CourseCompletion, StudentProgress
 
 
 @admin.register(Category)
@@ -104,7 +104,18 @@ class QuizResultAdmin(ModelAdmin):
     get_quiz_name.short_description = "Quiz"
 
     def score_display(self, obj):
-        # Affiche un score visuel (ex: 8/10)
-        # On peut ajouter de la couleur si c'est faible/fort
         return f"{obj.score} / {obj.total_questions}"
     score_display.short_description = "Note"
+
+
+@admin.register(CourseCompletion)
+class CourseCompletionAdmin(ModelAdmin):
+    list_display = ['student', 'course', 'completed_at', 'has_certificate']
+    list_filter = ['course', 'completed_at']
+    search_fields = ['student__email', 'course__title']
+    readonly_fields = ['student', 'course', 'completed_at', 'certificate_pdf']
+
+    def has_certificate(self, obj):
+        return bool(obj.certificate_pdf)
+    has_certificate.boolean = True
+    has_certificate.short_description = "Certificat généré"
