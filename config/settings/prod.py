@@ -52,9 +52,11 @@ DATABASES = {
         'PASSWORD': os.environ.get('DB_PASSWORD'),
         'HOST': os.environ.get('DB_HOST', 'localhost'),
         'PORT': os.environ.get('DB_PORT', '3306'),
+        'CONN_MAX_AGE': 60,
         'OPTIONS': {
             'charset': 'utf8mb4',
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'connect_timeout': 10,
         },
     }
 }
@@ -69,8 +71,11 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 
 # --- CELERY (Redis via env var en prod) ---
-CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
+_broker = os.environ.get('CELERY_BROKER_URL')
+if not _broker:
+    raise ValueError("ERREUR PROD : Variable 'CELERY_BROKER_URL' manquante !")
+CELERY_BROKER_URL = _broker
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', _broker)
 
 # --- OPTIMISATION STATIQUES (WhiteNoise Prod) ---
 STORAGES = {
@@ -82,9 +87,17 @@ STORAGES = {
     },
 }
 
-# --- SÉCURITÉ HTTPS ---
+# --- SECURITE HTTPS ---
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
+# HSTS — force HTTPS pendant 1 an
+SECURE_HSTS_SECONDS = 31_536_000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+# Cookies
+CSRF_COOKIE_HTTPONLY = False   # HTMX/Alpine ont besoin de lire le cookie CSRF
+SESSION_COOKIE_HTTPONLY = True
+X_FRAME_OPTIONS = 'DENY'

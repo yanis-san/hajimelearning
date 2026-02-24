@@ -1,15 +1,31 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from .models import AccessRequest
-from .tasks import send_access_confirmation_email # <--- On importe la tâche
+from .tasks import send_access_confirmation_email
+
+
+@receiver(pre_save, sender=AccessRequest)
+def track_previous_status(sender, instance, **kwargs):
+    """
+    Stocke le statut avant sauvegarde pour éviter les doublons d'email
+    (ex: admin qui modifie une note sur un APPROVED déjà existant).
+    """
+    if instance.pk:
+        try:
+            instance._previous_status = AccessRequest.objects.get(pk=instance.pk).status
+        except AccessRequest.DoesNotExist:
+            instance._previous_status = None
+    else:
+        instance._previous_status = None
+
 
 @receiver(post_save, sender=AccessRequest)
 def trigger_access_email(sender, instance, created, **kwargs):
     """
-    Déclencheur : Si approuvé, on lance la tâche Celery.
+    Envoie l'email de confirmation UNIQUEMENT quand le statut
+    passe à APPROVED pour la première fois (transition).
+    Ne se redéclenche pas si l'admin ré-enregistre un accès déjà approuvé.
     """
-    if instance.status == 'APPROVED':
-        # .delay() est la commande magique.
-        # Elle dit : "Mets cette tâche dans Redis, le worker la fera plus tard".
-        # On passe l'ID, pas l'objet complet !
+    previous = getattr(instance, '_previous_status', None)
+    if instance.status == 'APPROVED' and previous != 'APPROVED':
         send_access_confirmation_email.delay(instance.id)

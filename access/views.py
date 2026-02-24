@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.db import transaction
 from django.http import HttpResponse
+from django.views.decorators.http import require_POST
 
 from courses.models import Course
 from .models import AccessRequest, ActivationCode, Coupon, Enrollment, user_has_access
@@ -14,6 +15,7 @@ from .utils import generate_receipt_pdf
 
 logger = logging.getLogger(__name__)
 
+@require_POST
 def validate_coupon(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     

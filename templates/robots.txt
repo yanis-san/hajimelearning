@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /access/
+Disallow: /support/ask/
+Disallow: /manage/
+Disallow: /instructors/builder/
+Disallow: /markdownx/
+
+Sitemap: https://hajimelearning.dz/sitemap.xml

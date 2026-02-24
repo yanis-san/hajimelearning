@@ -13,6 +13,9 @@ from django.urls import reverse
 from markdownx.utils import markdownify
 
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 from .models import Course, Lesson, StudentProgress, ContentBlock, QuizQuestion, QuizResult, Module, LandingSection
 from .forms import ContentBlockForm, QuizQuestionForm, CourseForm, InstructorCourseForm, ModuleForm, LessonForm, LandingSectionForm
@@ -90,11 +93,12 @@ def catalogue(request):
     })
 
 def course_detail(request, course_slug):
-    course = get_object_or_404(Course.objects.prefetch_related('landing_sections'), slug=course_slug)
+    # Requête légère pour les vérifications de permissions (pas de prefetch inutile)
+    course = get_object_or_404(Course.objects.select_related('instructor'), slug=course_slug)
     is_manager = _is_course_manager(request.user, course)
     has_access = user_has_access(request.user, course)
 
-    # Précharger modules/leçons filtrés (publiés seulement pour les étudiants)
+    # Requête complète avec les bonnes précharges selon le rôle
     if is_manager:
         modules_qs = Module.objects.prefetch_related('lessons')
     else:
@@ -207,8 +211,16 @@ def user_dashboard(request):
     return render(request, 'courses/dashboard.html', {'courses': my_courses})
 
 @login_required
+@require_POST
 def mark_lesson_complete(request, course_slug, lesson_slug):
     current_lesson = get_object_or_404(Lesson, module__course__slug=course_slug, slug=lesson_slug)
+    course = current_lesson.module.course
+
+    # Sécurité : vérifier que l'étudiant a bien accès au cours
+    if not _is_course_manager(request.user, course) and not user_has_access(request.user, course):
+        messages.error(request, "Vous n'avez pas accès à ce cours.")
+        return redirect('course_detail', course_slug=course_slug)
+
     StudentProgress.objects.get_or_create(student=request.user, lesson=current_lesson)
     
     course_lessons = Lesson.objects.filter(
@@ -245,8 +257,11 @@ def save_quiz_result(request, block_id):
             }
         )
         return JsonResponse({'status': 'success'})
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Données invalides.'}, status=400)
+    except Exception:
+        logger.exception("Erreur inattendue dans save_quiz_result (block_id=%s)", block_id)
+        return JsonResponse({'status': 'error', 'message': 'Une erreur est survenue.'}, status=500)
 
 
 # --- VUES BUILDER (SÉCURISÉES : STAFF ONLY) ---
