@@ -45,7 +45,7 @@ weasyprint==68.1
 
 # --- Base de données Prod (MySQL via cPanel) ---
 PyMySQL==1.1.2
-cryptography==46.0.5
+cryptography==46.0.7
 
 # --- Utilitaires ---
 anyio==4.11.0
