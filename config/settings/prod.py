@@ -70,12 +70,13 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 
-# --- CELERY (Redis via env var en prod) ---
-_broker = os.environ.get('CELERY_BROKER_URL')
-if not _broker:
-    raise ValueError("ERREUR PROD : Variable 'CELERY_BROKER_URL' manquante !")
-CELERY_BROKER_URL = _broker
-CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', _broker)
+# --- CELERY (Désactivé / Mode Synchrone sur cPanel) ---
+# On exécute les tâches immédiatement dans le même thread 
+# pour éviter d'avoir besoin d'un worker Celery et de Redis sur cPanel.
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+CELERY_BROKER_URL = 'memory://'
+CELERY_RESULT_BACKEND = 'cache+memory://'
 
 # --- OPTIMISATION STATIQUES (WhiteNoise Prod) ---
 STORAGES = {
