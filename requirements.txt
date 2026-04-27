@@ -10,7 +10,7 @@ asgiref==3.8.1
 sqlparse==0.5.3
 
 # --- Auth ---
-django-allauth==65.13.0
+django-allauth==65.14.1
 
 # --- Admin ---
 django-unfold==0.71.0
