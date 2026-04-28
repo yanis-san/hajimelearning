@@ -151,7 +151,7 @@ ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 
 # 5. Email
 # EMAIL_BACKEND est défini dans dev.py ou prod.py
-DEFAULT_FROM_EMAIL = 'Hajime Learning <ne-pas-repondre@hajimelearning.dz>'
+DEFAULT_FROM_EMAIL = 'Hajime Learning <noreply@hajimelearning.com>'
 
 # 6. Redirections
 LOGIN_REDIRECT_URL = '/dashboard/'

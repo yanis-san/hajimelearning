@@ -1,7 +1,16 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
+from django.conf import settings
 from .models import AccessRequest
 from .tasks import send_access_confirmation_email
+
+
+def _dispatch(task, *args):
+    """Lance une task Celery : synchrone en DEBUG (pas de broker requis), async en prod."""
+    if settings.DEBUG:
+        task.apply(args=args)
+    else:
+        task.delay(*args)
 
 
 @receiver(pre_save, sender=AccessRequest)
@@ -28,4 +37,4 @@ def trigger_access_email(sender, instance, created, **kwargs):
     """
     previous = getattr(instance, '_previous_status', None)
     if instance.status == 'APPROVED' and previous != 'APPROVED':
-        send_access_confirmation_email.delay(instance.id)
+        _dispatch(send_access_confirmation_email, instance.id)

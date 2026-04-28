@@ -249,7 +249,11 @@ def mark_lesson_complete(request, course_slug, lesson_slug):
         )
         if created:
             from .tasks import generate_certificate_pdf
-            generate_certificate_pdf.delay(completion.id)
+            from django.conf import settings as _settings
+            if _settings.DEBUG:
+                generate_certificate_pdf.apply(args=(completion.id,))
+            else:
+                generate_certificate_pdf.delay(completion.id)
 
     course_lessons = Lesson.objects.filter(
         module__course=current_lesson.module.course

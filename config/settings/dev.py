@@ -17,3 +17,9 @@ MIDDLEWARE.append("django_browser_reload.middleware.BrowserReloadMiddleware")
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+# Celery : exécution synchrone en dev (pas besoin de Redis/RabbitMQ)
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True  # les exceptions remontent normalement
+CELERY_BROKER_URL = 'memory://'
+CELERY_BACKEND = 'cache+memory://'

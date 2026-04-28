@@ -61,14 +61,21 @@ DATABASES = {
     }
 }
 
-# --- EMAILS (SMTP en production) ---
-# Configurez ces variables d'env dans cPanel : EMAIL_HOST, EMAIL_HOST_USER, etc.
+# --- EMAILS (Configuration cPanel SMTP) ---
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'mail.hajimelearning.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 465))
+EMAIL_USE_SSL = True  # Port 465 utilise SSL
+EMAIL_USE_TLS = False
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER') # noreply@hajimelearning.com
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+# L'expéditeur affiché
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Hajime Learning <noreply@hajimelearning.com>')
+CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', 'contact@hajimelearning.com')
+
+# Préfixe pour les emails django-allauth
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Hajime Learning] "
 
 # --- CELERY (Désactivé / Mode Synchrone sur cPanel) ---
 # On exécute les tâches immédiatement dans le même thread 
