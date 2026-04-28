@@ -1,5 +1,14 @@
 from django.urls import path
+from django.conf import settings
 from . import views
+from django.contrib import admin
+from django.urls import path, include
+# --- AJOUTE CETTE LIGNE ---
+from django.conf import settings 
+# --------------------------
+from django.conf.urls.static import static
+from django.views.static import serve
+from django.urls import re_path
 
 urlpatterns = [
     # Page d'accueil (Liste des cours)
@@ -55,3 +64,15 @@ urlpatterns = [
     path('manage/course/<slug:course_slug>/stats/', views.manage_course_students, name='manage_course_students'),
     path('manage/preview-markdown/', views.preview_markdown, name='preview_markdown'),
 ]
+
+
+
+if not settings.DEBUG:
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve, {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+    ]
+else:
+    # En développement local
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
