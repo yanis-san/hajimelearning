@@ -59,8 +59,13 @@ urlpatterns = [
     path('manage/preview-markdown/', views.preview_markdown, name='preview_markdown'),
 ]
 
+from django.views.static import serve
+from django.urls import re_path
 
-
-# En développement local uniquement — en prod, Apache/LiteSpeed sert /media/ directement
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# On laisse Django servir les médias en production sur cPanel
+# car configurer Apache pour servir le dossier media peut être complexe en hébergement mutualisé.
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {
+        'document_root': settings.MEDIA_ROOT,
+    }),
+]
