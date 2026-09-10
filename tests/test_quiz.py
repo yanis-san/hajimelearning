@@ -24,6 +24,8 @@ class TestQuizLogic:
         """ Vérifie que l'API sauvegarde bien le score """
         # 1. On connecte l'étudiant
         client.force_login(student)
+        from access.models import AccessRequest
+        AccessRequest.objects.create(student=student, course=quiz_block.lesson.module.course, status='APPROVED')
         
         # 2. On prépare les données (simule le JS)
         data = {'score': 8, 'total': 10}
@@ -48,6 +50,8 @@ class TestQuizLogic:
     def test_save_quiz_result_updates_existing(self, client, student, quiz_block):
         """ Vérifie qu'on écrase l'ancien score (pas de doublon) """
         client.force_login(student)
+        from access.models import AccessRequest
+        AccessRequest.objects.create(student=student, course=quiz_block.lesson.module.course, status='APPROVED')
         url = reverse('save_quiz_result', args=[quiz_block.id])
 
         # Premier essai : 5/10

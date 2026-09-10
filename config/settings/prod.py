@@ -115,6 +115,10 @@ ADMINS = [
     ('Admin Hajime', os.environ.get('ADMIN_EMAIL', 'admin@hajimelearning.com')),
 ]
 
+# On s'assure que le dossier logs existe pour éviter le crash en prod
+LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR.mkdir(exist_ok=True)
+
 # --- LOGGING ---
 LOGGING = {
     'version': 1,
