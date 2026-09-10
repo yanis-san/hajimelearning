@@ -12,6 +12,4 @@ class CourseSitemap(Sitemap):
 
     def lastmod(self, obj):
         # Indique à Google la date de dernière mise à jour du contenu
-        # Assure-toi que ton modèle Course a bien un champ updated_at, 
-        # sinon utilise created_at ou retire cette méthode.
-        return obj.created_at
+        return obj.updated_at

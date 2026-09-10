@@ -1,0 +1,10 @@
+# Dépendances de développement uniquement
+# Installe d'abord les dépendances principales :
+#   pip install -r requirements.txt
+# Puis les dépendances de dev :
+#   pip install -r requirements-dev.txt
+
+-r requirements.txt
+
+pytest==9.0.1
+pytest-django==4.11.1

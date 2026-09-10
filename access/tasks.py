@@ -4,6 +4,12 @@ from django.conf import settings
 from .models import AccessRequest
 from .utils import generate_receipt_pdf
 
+import os
+
+# URL du site — variable d'env en prod, fallback en dev
+SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000').rstrip('/')
+
+
 @shared_task
 def send_access_confirmation_email(request_id):
     try:
@@ -13,7 +19,6 @@ def send_access_confirmation_email(request_id):
         
         subject = f"✅ Accès validé + Reçu : {course.title}"
         
-        # J'ai ajouté le titre du cours ici pour satisfaire le test et être plus clair
         body = f"""
         Bonjour {user.first_name or user.email},
 
@@ -22,7 +27,7 @@ def send_access_confirmation_email(request_id):
         Votre paiement de {req.final_price} DA a bien été validé.
         Vous trouverez votre reçu de paiement en pièce jointe.
 
-        Accéder au cours : http://127.0.0.1:8000/course/{course.slug}/
+        Accéder au cours : {SITE_URL}/course/{course.slug}/
 
         Cordialement,
         L'équipe.

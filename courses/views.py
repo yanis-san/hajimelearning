@@ -285,7 +285,13 @@ def download_certificate(request, course_slug):
         )
         return redirect('user_dashboard')
 
-    response = HttpResponse(completion.certificate_pdf.read(), content_type='application/pdf')
+    pdf_file = completion.certificate_pdf
+    try:
+        pdf_content = pdf_file.read()
+    finally:
+        pdf_file.close()
+
+    response = HttpResponse(pdf_content, content_type='application/pdf')
     filename = f"Certificat_{course.slug}.pdf"
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response
@@ -299,7 +305,12 @@ def save_quiz_result(request, block_id):
         score = data.get('score')
         total = data.get('total')
         block = get_object_or_404(ContentBlock, id=block_id)
-        
+
+        # Sécurité : vérifier que l'étudiant a accès au cours
+        course = block.lesson.module.course
+        if not _is_course_manager(request.user, course) and not user_has_access(request.user, course):
+            return JsonResponse({'status': 'error', 'message': 'Accès refusé.'}, status=403)
+
         QuizResult.objects.update_or_create(
             student=request.user,
             block=block,
@@ -486,30 +497,39 @@ def manage_course_students(request, course_slug):
 
     student_stats = []
 
-    for student in students:
-        # Leçons complétées
-        completed_ids = set(
-            StudentProgress.objects.filter(
-                student=student, lesson__module__course=course
-            ).values_list('lesson_id', flat=True)
-        )
+    # ── Pré-chargement en bloc (élimine les N+1) ──────────────────────
+    all_progress = StudentProgress.objects.filter(
+        lesson__module__course=course
+    ).values_list('student_id', 'lesson_id', 'completed_at')
 
-        last_progress = StudentProgress.objects.filter(
-            student=student, lesson__module__course=course
-        ).order_by('-completed_at').first()
-        last_active = last_progress.completed_at if last_progress else student.last_login
+    # Index : {student_id: {lesson_ids}, ...}  et  {student_id: last_active}
+    progress_by_student = {}
+    last_active_by_student = {}
+    for sid, lid, completed_at in all_progress:
+        progress_by_student.setdefault(sid, set()).add(lid)
+        prev = last_active_by_student.get(sid)
+        if prev is None or completed_at > prev:
+            last_active_by_student[sid] = completed_at
+
+    # Quiz results en bloc
+    all_quiz_results = QuizResult.objects.filter(
+        block__in=quiz_blocks
+    ).values_list('student_id', 'block_id', 'score', 'total_questions')
+
+    quiz_results_by_student = {}
+    for sid, bid, score, total_q in all_quiz_results:
+        pct = int((score / total_q) * 100) if total_q else 0
+        quiz_results_by_student.setdefault(sid, {})[bid] = {
+            'score': score,
+            'total': total_q,
+            'percent': pct,
+        }
+
+    for student in students:
+        completed_ids = progress_by_student.get(student.id, set())
+        last_active = last_active_by_student.get(student.id, student.last_login)
 
         percent = int((len(completed_ids) / total_lessons) * 100) if total_lessons > 0 else 0
-
-        # Résultats quiz : {block_id: {'score': x, 'total': y, 'percent': z}}
-        quiz_results = {}
-        for qr in QuizResult.objects.filter(student=student, block__in=quiz_blocks):
-            pct = int((qr.score / qr.total_questions) * 100) if qr.total_questions else 0
-            quiz_results[qr.block_id] = {
-                'score': qr.score,
-                'total': qr.total_questions,
-                'percent': pct,
-            }
 
         student_stats.append({
             'user': student,
@@ -517,7 +537,7 @@ def manage_course_students(request, course_slug):
             'completed': len(completed_ids),
             'completed_ids': completed_ids,
             'last_active': last_active,
-            'quiz_results': quiz_results,
+            'quiz_results': quiz_results_by_student.get(student.id, {}),
         })
 
     student_stats.sort(key=lambda x: x['percent'], reverse=True)

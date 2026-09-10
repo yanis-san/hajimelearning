@@ -63,3 +63,10 @@ def free_course():
         price=0,
         is_published=True
     )
+
+# --- MOCKS GLOBAUX ---
+@pytest.fixture(autouse=True)
+def mock_pdf_generation(monkeypatch):
+    """Bypass la génération de PDF (WeasyPrint) pour éviter les crashs GTK sous Windows/Tests."""
+    monkeypatch.setattr('access.tasks.generate_receipt_pdf', lambda req: b'PDF_MOCK')
+    monkeypatch.setattr('courses.tasks.generate_certificate_pdf', lambda comp: b'PDF_MOCK')

@@ -1,9 +1,11 @@
 from django.template.loader import render_to_string
-from weasyprint import HTML
 from io import BytesIO
+
 
 def generate_receipt_pdf(access_request):
     """ Génère le PDF du reçu et retourne les bytes """
+    from weasyprint import HTML
+
     html_string = render_to_string('access/receipt_pdf.html', {
         'request': access_request,
     })

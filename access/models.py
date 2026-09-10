@@ -25,9 +25,12 @@ class Coupon(models.Model):
     @property
     def is_valid(self):
         now = timezone.now()
-        if not self.is_active: return False
-        if self.valid_from and now < self.valid_from: return False
-        if self.valid_until and now > self.valid_until: return False
+        if not self.is_active:
+            return False
+        if self.valid_from and now < self.valid_from:
+            return False
+        if self.valid_until and now > self.valid_until:
+            return False
         return True
 
 # --- MODÈLE DEMANDE D'ACCÈS ---
@@ -98,9 +101,12 @@ class Enrollment(models.Model):
 
 # --- LOGIQUE D'ACCÈS ---
 def user_has_access(user, course):
-    if not user.is_authenticated: return False
-    if user.is_staff: return True
-    if course.instructor == user: return True
+    if not user.is_authenticated:
+        return False
+    if user.is_staff:
+        return True
+    if course.instructor == user:
+        return True
 
     # Cours gratuit : inscription explicite requise
     if course.price == 0:
