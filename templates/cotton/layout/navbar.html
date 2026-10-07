@@ -44,17 +44,21 @@
                   </span>
                 {% endif %}
               </a>
+            {% comment %} Masqué : plateforme mono-formateur
             {% else %}
               <a href="{% url 'instructor_plans' %}"
                  class="text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 rounded-lg transition">
                 Devenir Instructeur
               </a>
+            {% endcomment %}
             {% endif %}
+          {% comment %} Masqué : plateforme mono-formateur
           {% else %}
             <a href="{% url 'instructor_plans' %}"
                class="text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 px-3 py-2 rounded-lg transition">
               Devenir Instructeur
             </a>
+          {% endcomment %}
           {% endif %}
         </div>
       </div>
@@ -150,11 +154,13 @@
               </span>
             {% endif %}
           </a>
+        {% comment %} Masqué : plateforme mono-formateur
         {% else %}
           <a href="{% url 'instructor_plans' %}"
              class="block text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-orange-50 px-3 py-2.5 rounded-xl transition">
             Devenir Instructeur
           </a>
+        {% endcomment %}
         {% endif %}
         <a href="{% url 'user_profile' %}"
            class="flex items-center gap-3 text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-orange-50 px-3 py-2.5 rounded-xl transition">
@@ -171,10 +177,12 @@
           </form>
         </div>
       {% else %}
+        {% comment %} Masqué : plateforme mono-formateur
         <a href="{% url 'instructor_plans' %}"
            class="block text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-orange-50 px-3 py-2.5 rounded-xl transition">
           Devenir Instructeur
         </a>
+        {% endcomment %}
         <a href="{% url 'account_login' %}"
            class="block text-sm font-medium text-gray-700 hover:text-orange-600 hover:bg-orange-50 px-3 py-2.5 rounded-xl transition">
           Se connecter
