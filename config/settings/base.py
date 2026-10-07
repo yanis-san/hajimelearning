@@ -231,3 +231,8 @@ MARKDOWNX_MARKDOWN_EXTENSIONS = [
 
 # Email de destination pour le formulaire de contact
 CONTACT_EMAIL = 'contact@hajimelearning.com'
+
+# Plateforme mono-formateur : les pages publiques "Devenir instructeur"
+# (/instructors/, demandes) redirigent vers l'accueil pour les non-staff.
+# Passer à True pour réouvrir les inscriptions instructeur.
+INSTRUCTOR_SIGNUP_ENABLED = False

@@ -16,6 +16,13 @@ def celery_eager():
     )
 
 
+# --- INSTRUCTEURS : inscription ouverte en tests (fermée en prod) ---
+
+@pytest.fixture(autouse=True)
+def instructor_signup_enabled(settings):
+    settings.INSTRUCTOR_SIGNUP_ENABLED = True
+
+
 # --- UTILISATEURS ---
 
 @pytest.fixture

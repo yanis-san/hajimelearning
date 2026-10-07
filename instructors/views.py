@@ -1,3 +1,6 @@
+from functools import wraps
+
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -10,6 +13,17 @@ from .forms import InstructorRequestForm
 from .decorators import instructor_required
 
 
+def signup_open_required(view_func):
+    """Redirige vers l'accueil si l'inscription instructeur est fermée (sauf staff)."""
+    @wraps(view_func)
+    def _wrapped(request, *args, **kwargs):
+        if not getattr(settings, 'INSTRUCTOR_SIGNUP_ENABLED', True) and not request.user.is_staff:
+            return redirect('course_list')
+        return view_func(request, *args, **kwargs)
+    return _wrapped
+
+
+@signup_open_required
 def instructor_plans(request):
     """Page publique : les 3 offres pour devenir instructeur."""
     plans = InstructorPlan.objects.filter(is_active=True)
@@ -36,6 +50,7 @@ def instructor_plans(request):
     })
 
 
+@signup_open_required
 @login_required
 def instructor_request(request, plan_slug):
     """Formulaire de demande pour un plan spécifique (inscription ou upgrade)."""
