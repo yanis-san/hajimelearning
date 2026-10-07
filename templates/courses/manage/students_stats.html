@@ -2,21 +2,7 @@
 {% load md %}
 
 {% block content %}
-<c-layout.admin-card
-  title="Suivi des élèves"
-  subtitle="{{ course.title }} • {{ student_stats|length }} inscrit{{ student_stats|length|pluralize }}"
-  back_href="{% url 'manage_course_list' %}"
-  back_label="Mes cours">
-
-  <c-slot name="breadcrumb">
-    <a href="{% url 'manage_course_list' %}" class="hover:text-gray-800 transition">Mes cours</a>
-    <span class="text-gray-300">/</span>
-    <span class="text-gray-800 font-medium">Suivi des élèves</span>
-  </c-slot>
-
-  <c-slot name="actions">
-    <c-ui.badge variant="orange">{{ total_lessons }} leçon{{ total_lessons|pluralize }} au total</c-ui.badge>
-  </c-slot>
+<c-layout.course_builder :course="course" active_tab="students">
 
   {% if student_stats %}
 
@@ -182,5 +168,5 @@
                    message="Aucun étudiant inscrit pour le moment." />
   {% endif %}
 
-</c-layout.admin-card>
+</c-layout.course_builder>
 {% endblock %}

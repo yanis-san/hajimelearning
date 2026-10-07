@@ -6,27 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<c-layout.admin-card
-  title="Vitrine : {{ course.title }}"
-  subtitle="Composez librement la page de présentation de votre cours"
-  back_href="{{ course_edit_url }}"
-  back_label="Retour au cours">
-
-  {# ── Breadcrumb ── #}
-  <c-slot name="breadcrumb">
-    <a href="{{ courses_url }}" class="hover:text-gray-800 transition">Cours</a>
-    <span class="text-gray-300">/</span>
-    <a href="{{ course_edit_url }}" class="hover:text-gray-800 transition">{{ course.title }}</a>
-    <span class="text-gray-300">/</span>
-    <span class="text-gray-800 font-medium">Vitrine</span>
-  </c-slot>
-
-  {# ── Action: voir le résultat ── #}
-  <c-slot name="actions">
-    <c-ui.btn variant="outline" size="sm" href="{% url 'course_detail' course.slug %}?view=landing" target="_blank">
-      👁️ Voir la page
-    </c-ui.btn>
-  </c-slot>
+<c-layout.course_builder :course="course" active_tab="landing">
 
   {# ── Toolbar : palette de sections ── #}
   <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 sticky top-20 z-10 flex flex-wrap gap-3 justify-center items-center">
@@ -139,5 +119,5 @@
     });
   </script>
 
-</c-layout.admin-card>
+</c-layout.course_builder>
 {% endblock %}

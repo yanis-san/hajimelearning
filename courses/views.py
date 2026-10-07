@@ -617,10 +617,22 @@ def manage_course_edit(request, course_slug):
         form = FormClass(request.POST, request.FILES, instance=course)
         if form.is_valid():
             course = form.save()
+            if request.headers.get('HX-Request'):
+                return HttpResponse(
+                    '<span id="save-indicator" class="text-green-500 text-sm font-medium flex items-center gap-1">🟢 Sauvegardé</span>'
+                )
             messages.success(request, f'Cours « {course.title} » mis à jour.')
             if request.user.is_staff:
                 return redirect('manage_course_list')
             return redirect('instructor_dashboard')
+        else:
+            if request.headers.get('HX-Request'):
+                # Si erreur de validation, on renvoie le formulaire avec les erreurs
+                # Le plus simple est de renvoyer le template partiel de l'indicateur d'erreur
+                return HttpResponse(
+                    '<span id="save-indicator" class="text-red-500 text-sm font-medium flex items-center gap-1">🔴 Erreur de sauvegarde</span>',
+                    status=400
+                )
     else:
         form = FormClass(instance=course)
     return render(request, 'courses/manage/course_form.html', {

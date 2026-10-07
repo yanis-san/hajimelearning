@@ -1,0 +1,63 @@
+<c-vars course="" active_tab="infos" is_edit="True" />
+
+{% if is_edit %}
+<c-layout.admin-card
+  title="{{ course.title }}"
+  subtitle="Course Builder"
+  back_href="{% url 'manage_course_list' %}"
+  back_label="Retour aux cours">
+
+  <c-slot name="actions">
+    <c-ui.btn variant="outline" size="sm" href="{% url 'course_detail' course.slug %}" target="_blank">
+      👁️ Voir le cours
+    </c-ui.btn>
+  </c-slot>
+
+  <div id="builder-layout" class="flex flex-col md:flex-row gap-8">
+    <!-- Sidebar Navigation -->
+    <div class="w-full md:w-64 flex-shrink-0">
+      <nav class="flex flex-col space-y-1">
+        <a href="{% url 'manage_course_edit' course.slug %}"
+           class="px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-colors {% if active_tab == 'infos' %}bg-orange-100 text-orange-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}"
+           hx-get="{% url 'manage_course_edit' course.slug %}"
+           hx-select="#builder-layout" hx-target="#builder-layout" hx-swap="outerHTML" hx-push-url="true">
+          ⚙️ Paramètres
+        </a>
+        <a href="{% url 'manage_course_modules' course.slug %}"
+           class="px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-colors {% if active_tab == 'modules' %}bg-orange-100 text-orange-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}"
+           hx-get="{% url 'manage_course_modules' course.slug %}"
+           hx-select="#builder-layout" hx-target="#builder-layout" hx-swap="outerHTML" hx-push-url="true">
+          📦 Modules & Leçons
+        </a>
+        <a href="{% url 'manage_course_landing' course.slug %}"
+           class="px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-colors {% if active_tab == 'landing' %}bg-orange-100 text-orange-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}"
+           hx-get="{% url 'manage_course_landing' course.slug %}"
+           hx-select="#builder-layout" hx-target="#builder-layout" hx-swap="outerHTML" hx-push-url="true">
+          🎨 Page Vitrine
+        </a>
+        <a href="{% url 'manage_course_students' course.slug %}"
+           class="px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-colors {% if active_tab == 'students' %}bg-orange-100 text-orange-700{% else %}text-gray-600 hover:bg-gray-100{% endif %}"
+           hx-get="{% url 'manage_course_students' course.slug %}"
+           hx-select="#builder-layout" hx-target="#builder-layout" hx-swap="outerHTML" hx-push-url="true">
+          👥 Étudiants
+        </a>
+      </nav>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex-grow min-w-0">
+      {{ slot }}
+    </div>
+  </div>
+</c-layout.admin-card>
+{% else %}
+<c-layout.admin-card
+  title="Nouveau cours"
+  subtitle="Remplissez les informations pour créer un cours"
+  back_href="{% url 'manage_course_list' %}"
+  back_label="Retour aux cours">
+  
+  {{ slot }}
+  
+</c-layout.admin-card>
+{% endif %}

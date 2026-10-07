@@ -6,209 +6,211 @@
 {% endblock %}
 
 {% block content %}
-<c-layout.admin-card
-  title="{% if is_edit %}Éditer : {{ course.title }}{% else %}Nouveau cours{% endif %}"
-  subtitle="{% if is_edit %}Modifiez les informations du cours{% else %}Remplissez les informations pour créer un cours{% endif %}"
-  back_href="{% url 'manage_course_list' %}"
-  back_label="Retour aux cours">
+<c-layout.course_builder :course="course" active_tab="infos" :is_edit="is_edit">
 
-  {% if is_edit %}
-    <c-slot name="breadcrumb">
-      <a href="{% url 'manage_course_list' %}" class="hover:text-gray-800 transition">Cours</a>
-      <span class="text-gray-300">/</span>
-      <span class="text-gray-800 font-medium">{{ course.title }}</span>
-    </c-slot>
-
-    <c-slot name="actions">
-      <c-ui.btn variant="outline" size="sm" href="{% url 'manage_course_landing' course.slug %}">
-        🎨 Vitrine
-      </c-ui.btn>
-      <c-ui.btn variant="outline" size="sm" href="{% url 'manage_course_modules' course.slug %}">
-        📦 Modules
-      </c-ui.btn>
-      <c-ui.btn variant="outline" size="sm" href="{% url 'course_detail' course.slug %}" target="_blank">
-        👁️ Voir
-      </c-ui.btn>
-    </c-slot>
-  {% endif %}
-
-  <form method="post" enctype="multipart/form-data" class="space-y-8 max-w-4xl">
+  <form method="post" enctype="multipart/form-data" class="max-w-4xl"
+        x-data="{ tab: 'infos' }"
+        hx-post="."
+        hx-trigger="change delay:1s from:input, change delay:1s from:textarea, change delay:1s from:select, submit"
+        hx-target="#save-indicator-container"
+        hx-swap="innerHTML">
     {% csrf_token %}
 
-    {# ── Informations principales ── #}
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5">
-      <h2 class="text-lg font-semibold text-gray-800">Informations principales</h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div>
-          <label for="id_title" class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
-          {{ form.title }}
-          {% if form.title.errors %}<p class="text-xs text-red-500 mt-1">{{ form.title.errors.0 }}</p>{% endif %}
-        </div>
-        <div>
-          <label for="id_slug" class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-          {{ form.slug }}
-          <p class="text-xs text-gray-400 mt-1">{{ form.slug.help_text }}</p>
-          {% if form.slug.errors %}<p class="text-xs text-red-500 mt-1">{{ form.slug.errors.0 }}</p>{% endif %}
-        </div>
-      </div>
-
-      <div>
-        <label for="id_short_description" class="block text-sm font-medium text-gray-700 mb-1">Accroche (carte d'accueil)</label>
-        {{ form.short_description }}
-        {% if form.short_description.errors %}<p class="text-xs text-red-500 mt-1">{{ form.short_description.errors.0 }}</p>{% endif %}
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div>
-          <label for="id_price" class="block text-sm font-medium text-gray-700 mb-1">Prix (DA)</label>
-          {{ form.price }}
-          {% if form.price.errors %}<p class="text-xs text-red-500 mt-1">{{ form.price.errors.0 }}</p>{% endif %}
-        </div>
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">🃏 Image carte <span class="text-xs text-gray-400">(catalogue, accueil)</span></label>
-            {% if is_edit and course.thumbnail %}
-              <div class="mb-2">
-                <img src="{{ course.thumbnail.url }}" alt="" class="w-24 h-24 rounded-lg object-cover border border-gray-200">
-              </div>
-            {% endif %}
-            {{ form.thumbnail }}
-            {% if form.thumbnail.errors %}<p class="text-xs text-red-500 mt-1">{{ form.thumbnail.errors.0 }}</p>{% endif %}
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">🖼️ Image vitrine <span class="text-xs text-gray-400">(page de vente — sidebar)</span></label>
-            {% if is_edit and course.cover_image %}
-              <div class="mb-2">
-                <img src="{{ course.cover_image.url }}" alt="" class="w-24 h-24 rounded-lg object-cover border border-gray-200">
-              </div>
-            {% endif %}
-            {{ form.cover_image }}
-            {% if form.cover_image.errors %}<p class="text-xs text-red-500 mt-1">{{ form.cover_image.errors.0 }}</p>{% endif %}
-          </div>
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-3">
-        <div class="flex items-center gap-3">
-          {{ form.is_published }}
-          <label for="id_is_published" class="text-sm font-medium text-gray-700">Publier ce cours</label>
-        </div>
-        {% if request.user.is_superuser %}
-        <div class="flex items-center gap-3">
-          {{ form.is_featured }}
-          <label for="id_is_featured" class="text-sm font-medium text-gray-700">Afficher sur l'accueil</label>
-          <span class="text-xs text-gray-400">(visible sur la page d'accueil)</span>
-        </div>
-        <div class="flex items-center gap-3">
-          {{ form.hide_title_on_card }}
-          <label for="id_hide_title_on_card" class="text-sm font-medium text-gray-700">Masquer le titre sur la carte</label>
-          <span class="text-xs text-gray-400">(si la jaquette contient déjà le titre)</span>
-        </div>
-        {% endif %}
+    <!-- En-tête des onglets -->
+    <div class="flex border-b border-gray-200 mb-6 gap-6 relative">
+      <button type="button" @click="tab = 'infos'" :class="tab === 'infos' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-2 border-b-2 font-medium text-sm transition-colors">Informations</button>
+      <button type="button" @click="tab = 'vente'" :class="tab === 'vente' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-2 border-b-2 font-medium text-sm transition-colors">Page de vente</button>
+      <button type="button" @click="tab = 'seo'" :class="tab === 'seo' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-2 border-b-2 font-medium text-sm transition-colors">SEO</button>
+      
+      <!-- Indicateur de sauvegarde auto -->
+      <div id="save-indicator-container" class="absolute right-0 bottom-2 flex items-center htmx-indicator-container">
+        <!-- Rempli par HTMX lors de la sauvegarde -->
       </div>
     </div>
 
-    {# ── Page de vente (Markdown) ── #}
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5"
-         x-data="{
-           tab: 'edit',
-           renderMd(src, targetId) {
-             const el = document.getElementById(targetId);
-             if (el && window.marked) {
-               el.innerHTML = marked.parse(document.getElementById(src).value || '');
+    <!-- Contenu des onglets -->
+    <div class="space-y-8 min-h-[400px]">
+      {# ── Informations principales ── #}
+      <div x-show="tab === 'infos'" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5" style="display: none;">
+        <h2 class="text-lg font-semibold text-gray-800">Informations principales</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label for="id_title" class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
+            {{ form.title }}
+            {% if form.title.errors %}<p class="text-xs text-red-500 mt-1">{{ form.title.errors.0 }}</p>{% endif %}
+          </div>
+          <div>
+            <label for="id_slug" class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+            {{ form.slug }}
+            <p class="text-xs text-gray-400 mt-1">{{ form.slug.help_text }}</p>
+            {% if form.slug.errors %}<p class="text-xs text-red-500 mt-1">{{ form.slug.errors.0 }}</p>{% endif %}
+          </div>
+        </div>
+
+        <div>
+          <label for="id_short_description" class="block text-sm font-medium text-gray-700 mb-1">Accroche (carte d'accueil)</label>
+          {{ form.short_description }}
+          {% if form.short_description.errors %}<p class="text-xs text-red-500 mt-1">{{ form.short_description.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label for="id_price" class="block text-sm font-medium text-gray-700 mb-1">Prix (DA)</label>
+            {{ form.price }}
+            {% if form.price.errors %}<p class="text-xs text-red-500 mt-1">{{ form.price.errors.0 }}</p>{% endif %}
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">🃏 Image carte <span class="text-xs text-gray-400">(catalogue, accueil)</span></label>
+              {% if is_edit and course.thumbnail %}
+                <div class="mb-2">
+                  <img src="{{ course.thumbnail.url }}" alt="" class="w-24 h-24 rounded-lg object-cover border border-gray-200">
+                </div>
+              {% endif %}
+              {{ form.thumbnail }}
+              {% if form.thumbnail.errors %}<p class="text-xs text-red-500 mt-1">{{ form.thumbnail.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">🖼️ Image vitrine <span class="text-xs text-gray-400">(page de vente — sidebar)</span></label>
+              {% if is_edit and course.cover_image %}
+                <div class="mb-2">
+                  <img src="{{ course.cover_image.url }}" alt="" class="w-24 h-24 rounded-lg object-cover border border-gray-200">
+                </div>
+              {% endif %}
+              {{ form.cover_image }}
+              {% if form.cover_image.errors %}<p class="text-xs text-red-500 mt-1">{{ form.cover_image.errors.0 }}</p>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center gap-3">
+            {{ form.is_published }}
+            <label for="id_is_published" class="text-sm font-medium text-gray-700">Publier ce cours</label>
+          </div>
+          {% if request.user.is_superuser %}
+          <div class="flex items-center gap-3">
+            {{ form.is_featured }}
+            <label for="id_is_featured" class="text-sm font-medium text-gray-700">Afficher sur l'accueil</label>
+            <span class="text-xs text-gray-400">(visible sur la page d'accueil)</span>
+          </div>
+          <div class="flex items-center gap-3">
+            {{ form.hide_title_on_card }}
+            <label for="id_hide_title_on_card" class="text-sm font-medium text-gray-700">Masquer le titre sur la carte</label>
+            <span class="text-xs text-gray-400">(si la jaquette contient déjà le titre)</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {# ── Page de vente (Markdown) ── #}
+      <div x-show="tab === 'vente'" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5" style="display: none;"
+           x-data="{
+             mdTab: 'edit',
+             renderMd(src, targetId) {
+               const el = document.getElementById(targetId);
+               if (el && window.marked) {
+                 el.innerHTML = marked.parse(document.getElementById(src).value || '');
+               }
              }
-           }
-         }">
-      <h2 class="text-lg font-semibold text-gray-800">Page de vente</h2>
+           }">
+        <h2 class="text-lg font-semibold text-gray-800">Page de vente</h2>
 
-      {# Description longue with preview #}
-      <div>
-        <div class="flex items-center justify-between mb-2">
-          <label for="id_description" class="block text-sm font-medium text-gray-700">Description détaillée</label>
-          <div class="flex gap-1">
-            <button type="button" x-on:click="tab = 'edit'"
-                    :class="tab === 'edit' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100'"
-                    class="px-2.5 py-1 text-xs rounded-lg transition cursor-pointer font-medium">
-              ✏️ Édition
-            </button>
-            <button type="button" x-on:click="tab = 'split'; $nextTick(() => renderMd('id_description', 'desc-preview'))"
-                    :class="tab === 'split' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100'"
-                    class="px-2.5 py-1 text-xs rounded-lg transition cursor-pointer font-medium">
-              ⬛⬜ Split
-            </button>
-            <button type="button" x-on:click="tab = 'preview'; $nextTick(() => renderMd('id_description', 'desc-preview'))"
-                    :class="tab === 'preview' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100'"
-                    class="px-2.5 py-1 text-xs rounded-lg transition cursor-pointer font-medium">
-              👁️ Aperçu
-            </button>
+        {# Description longue with preview #}
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label for="id_description" class="block text-sm font-medium text-gray-700">Description détaillée</label>
+            <div class="flex gap-1">
+              <button type="button" x-on:click="mdTab = 'edit'"
+                      :class="mdTab === 'edit' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100'"
+                      class="px-2.5 py-1 text-xs rounded-lg transition cursor-pointer font-medium">
+                ✏️ Édition
+              </button>
+              <button type="button" x-on:click="mdTab = 'split'; $nextTick(() => renderMd('id_description', 'desc-preview'))"
+                      :class="mdTab === 'split' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100'"
+                      class="px-2.5 py-1 text-xs rounded-lg transition cursor-pointer font-medium">
+                ⬛⬜ Split
+              </button>
+              <button type="button" x-on:click="mdTab = 'preview'; $nextTick(() => renderMd('id_description', 'desc-preview'))"
+                      :class="mdTab === 'preview' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100'"
+                      class="px-2.5 py-1 text-xs rounded-lg transition cursor-pointer font-medium">
+                👁️ Aperçu
+              </button>
+            </div>
           </div>
+
+          <div x-show="mdTab === 'edit'">
+            {{ form.description }}
+          </div>
+          <div x-show="mdTab === 'split'" x-cloak class="grid grid-cols-2 gap-4">
+            <textarea x-on:input="document.getElementById('id_description').value = $el.value; renderMd('id_description', 'desc-preview')"
+                      x-init="$el.value = document.getElementById('id_description')?.value || ''"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                      rows="10"></textarea>
+            <div id="desc-preview" class="prose prose-sm max-w-none p-4 border border-gray-200 rounded-xl bg-gray-50 overflow-y-auto"></div>
+          </div>
+          <div x-show="mdTab === 'preview'" x-cloak>
+            <div id="desc-preview" class="prose prose-sm max-w-none p-4 border border-gray-200 rounded-xl bg-gray-50 min-h-[200px]"></div>
+          </div>
+          {% if form.description.errors %}<p class="text-xs text-red-500 mt-1">{{ form.description.errors.0 }}</p>{% endif %}
         </div>
 
-        <div x-show="tab === 'edit'">
-          {{ form.description }}
+        {# What you will learn #}
+        <div>
+          <label for="id_what_you_will_learn" class="block text-sm font-medium text-gray-700 mb-1">Ce que vous allez apprendre</label>
+          {{ form.what_you_will_learn }}
+          {% if form.what_you_will_learn.errors %}<p class="text-xs text-red-500 mt-1">{{ form.what_you_will_learn.errors.0 }}</p>{% endif %}
         </div>
-        <div x-show="tab === 'split'" x-cloak class="grid grid-cols-2 gap-4">
-          <textarea x-on:input="document.getElementById('id_description').value = $el.value; renderMd('id_description', 'desc-preview')"
-                    x-init="$el.value = document.getElementById('id_description')?.value || ''"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
-                    rows="10"></textarea>
-          <div id="desc-preview" class="prose prose-sm max-w-none p-4 border border-gray-200 rounded-xl bg-gray-50 overflow-y-auto"></div>
+
+        <div>
+          <label for="id_prerequisites" class="block text-sm font-medium text-gray-700 mb-1">Pré-requis</label>
+          {{ form.prerequisites }}
+          {% if form.prerequisites.errors %}<p class="text-xs text-red-500 mt-1">{{ form.prerequisites.errors.0 }}</p>{% endif %}
         </div>
-        <div x-show="tab === 'preview'" x-cloak>
-          <div id="desc-preview" class="prose prose-sm max-w-none p-4 border border-gray-200 rounded-xl bg-gray-50 min-h-[200px]"></div>
+
+        <div>
+          <label for="id_trailer_video_id" class="block text-sm font-medium text-gray-700 mb-1">ID Vidéo Trailer (YouTube)</label>
+          {{ form.trailer_video_id }}
+          {% if form.trailer_video_id.errors %}<p class="text-xs text-red-500 mt-1">{{ form.trailer_video_id.errors.0 }}</p>{% endif %}
         </div>
-        {% if form.description.errors %}<p class="text-xs text-red-500 mt-1">{{ form.description.errors.0 }}</p>{% endif %}
       </div>
 
-      {# What you will learn #}
-      <div>
-        <label for="id_what_you_will_learn" class="block text-sm font-medium text-gray-700 mb-1">Ce que vous allez apprendre</label>
-        {{ form.what_you_will_learn }}
-        {% if form.what_you_will_learn.errors %}<p class="text-xs text-red-500 mt-1">{{ form.what_you_will_learn.errors.0 }}</p>{% endif %}
-      </div>
+      {# ── SEO ── #}
+      <div x-show="tab === 'seo'" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5" style="display: none;">
+        <h2 class="text-lg font-semibold text-gray-800">SEO</h2>
 
-      <div>
-        <label for="id_prerequisites" class="block text-sm font-medium text-gray-700 mb-1">Pré-requis</label>
-        {{ form.prerequisites }}
-        {% if form.prerequisites.errors %}<p class="text-xs text-red-500 mt-1">{{ form.prerequisites.errors.0 }}</p>{% endif %}
-      </div>
+        <div>
+          <label for="id_meta_description" class="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
+          {{ form.meta_description }}
+          <p class="text-xs text-gray-400 mt-1">160 caractères max pour Google</p>
+          {% if form.meta_description.errors %}<p class="text-xs text-red-500 mt-1">{{ form.meta_description.errors.0 }}</p>{% endif %}
+        </div>
 
-      <div>
-        <label for="id_trailer_video_id" class="block text-sm font-medium text-gray-700 mb-1">ID Vidéo Trailer (YouTube)</label>
-        {{ form.trailer_video_id }}
-        {% if form.trailer_video_id.errors %}<p class="text-xs text-red-500 mt-1">{{ form.trailer_video_id.errors.0 }}</p>{% endif %}
-      </div>
-    </div>
-
-    {# ── SEO ── #}
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5">
-      <h2 class="text-lg font-semibold text-gray-800">SEO</h2>
-
-      <div>
-        <label for="id_meta_description" class="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
-        {{ form.meta_description }}
-        <p class="text-xs text-gray-400 mt-1">160 caractères max pour Google</p>
-        {% if form.meta_description.errors %}<p class="text-xs text-red-500 mt-1">{{ form.meta_description.errors.0 }}</p>{% endif %}
-      </div>
-
-      <div>
-        <label for="id_keywords" class="block text-sm font-medium text-gray-700 mb-1">Mots-clés</label>
-        {{ form.keywords }}
-        {% if form.keywords.errors %}<p class="text-xs text-red-500 mt-1">{{ form.keywords.errors.0 }}</p>{% endif %}
+        <div>
+          <label for="id_keywords" class="block text-sm font-medium text-gray-700 mb-1">Mots-clés</label>
+          {{ form.keywords }}
+          {% if form.keywords.errors %}<p class="text-xs text-red-500 mt-1">{{ form.keywords.errors.0 }}</p>{% endif %}
+        </div>
       </div>
     </div>
 
     {# ── Actions ── #}
-    <div class="flex items-center gap-4">
-      <c-ui.btn variant="primary" type="submit">
-        {% if is_edit %}💾 Enregistrer{% else %}➕ Créer le cours{% endif %}
-      </c-ui.btn>
-      <c-ui.btn variant="outline" href="{% url 'manage_course_list' %}">
-        Annuler
-      </c-ui.btn>
+    <div class="flex items-center justify-between mt-8 pt-4 border-t border-gray-100">
+      <div class="flex items-center gap-4">
+        <c-ui.btn variant="primary" type="submit">
+          {% if is_edit %}💾 Forcer la sauvegarde{% else %}➕ Créer le cours{% endif %}
+        </c-ui.btn>
+        <c-ui.btn variant="outline" href="{% url 'manage_course_list' %}">
+          Retour à la liste
+        </c-ui.btn>
+      </div>
+      <span class="text-xs text-gray-400 flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+        Sauvegarde automatique activée
+      </span>
     </div>
 
   </form>
-</c-layout.admin-card>
+</c-layout.course_builder>
 {% endblock %}

@@ -5,7 +5,7 @@
 
   {# ── Header du module (clickable) ── #}
   <button x-on:click="open = !open"
-          class="w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition text-left cursor-pointer">
+          class="w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-400">
     <div class="flex items-center gap-3 min-w-0">
       <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-100 text-orange-600 text-sm font-bold shrink-0">
         {{ module.order }}
@@ -31,7 +31,7 @@
       <li class="group hover:bg-orange-50/50 transition-colors duration-150">
         {% if lesson.is_free or has_access == 'true' %}
           <a href="{% url 'lesson_detail' module.course.slug lesson.slug %}"
-             class="flex items-center justify-between px-5 py-3.5">
+             class="flex items-center justify-between px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-400">
             <div class="flex items-center gap-3 min-w-0">
               {# Icône statut #}
               {% if lesson.id in completed_ids %}
@@ -39,7 +39,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
               {% else %}
-                <span class="w-5 h-5 flex items-center justify-center shrink-0 rounded-full border-2 border-gray-200 text-[10px] text-gray-400">
+                <span class="w-5 h-5 flex items-center justify-center shrink-0 rounded-full border-2 border-gray-200 text-xs text-gray-400">
                   {{ lesson.order }}
                 </span>
               {% endif %}

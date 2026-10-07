@@ -29,7 +29,7 @@
          class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-base font-semibold
                 {% if bg == 'orange' %}bg-white text-orange-600 hover:bg-gray-50
                 {% else %}bg-orange-500 text-white hover:bg-orange-600{% endif %}
-                shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5">
+                shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
         {{ section.cta_text }}
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
@@ -90,7 +90,7 @@
     {% for question, answer in section.body|faq_items %}
       <div x-data="{ open: false }" class="py-4">
         <button x-on:click="open = !open"
-                class="w-full flex items-center justify-between text-left cursor-pointer group">
+                class="w-full flex items-center justify-between text-left cursor-pointer group focus:outline-none focus:ring-2 focus:ring-orange-400 rounded-lg px-1 -ml-1">
           <span class="text-base font-medium text-gray-800 group-hover:text-orange-600 transition pr-4">
             {{ question }}
           </span>

@@ -37,7 +37,11 @@
 
   {% if dismissible == 'true' %}
     <button type="button" @click="show = false"
-            class="shrink-0 ml-auto -mt-0.5 p-1 rounded-lg opacity-60 hover:opacity-100 transition-opacity focus:outline-none">
+            class="shrink-0 ml-auto -mt-0.5 p-1 rounded-lg opacity-60 hover:opacity-100 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-1
+                   {% if variant == 'success' %}focus:ring-green-400
+                   {% elif variant == 'warning' %}focus:ring-yellow-400
+                   {% elif variant == 'error' %}focus:ring-red-400
+                   {% else %}focus:ring-blue-400{% endif %}">
       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
       </svg>

@@ -1,19 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<c-layout.admin-card
-  title="Leçons : {{ module.title }}"
-  subtitle="{{ course.title }} › {{ module.title }}"
-  back_href="{% url 'manage_course_modules' course.slug %}"
-  back_label="Retour aux modules">
-
-  <c-slot name="breadcrumb">
-    <a href="{% url 'manage_course_list' %}" class="hover:text-gray-800 transition">Cours</a>
-    <span class="text-gray-300">/</span>
-    <a href="{% url 'manage_course_modules' course.slug %}" class="hover:text-gray-800 transition">{{ course.title }}</a>
-    <span class="text-gray-300">/</span>
-    <span class="text-gray-800 font-medium">{{ module.title }}</span>
-  </c-slot>
+<c-layout.course_builder :course="course" active_tab="modules">
 
   {# ── Add lesson form ── #}
   <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-8">
@@ -66,5 +54,5 @@
     });
   </script>
 
-</c-layout.admin-card>
+</c-layout.course_builder>
 {% endblock %}

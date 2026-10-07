@@ -1,7 +1,7 @@
 <c-vars course="" show_progress="false" progress="0" />
 
 {# Format jaquette PS2 — ratio 7:10, image = tout #}
-<article class="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 aspect-[7/10]" {{ attrs }}>
+<article class="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 aspect-[7/10]" {{ attrs }}>
 
   {# ── Image plein cadre (la jaquette) ── #}
   <a href="{{ course.get_absolute_url }}" class="absolute inset-0 block">
@@ -54,13 +54,13 @@
     {# Barre de progression (dashboard) #}
     {% if show_progress == 'true' %}
       <div class="w-full h-1 bg-white/20 rounded-full overflow-hidden">
-        <div class="h-full bg-orange-400 rounded-full" style="width: {{ progress }}%"></div>
+        <div class="h-full bg-orange-300 rounded-full" style="width: {{ progress }}%"></div>
       </div>
     {% endif %}
 
     <a href="{{ course.get_absolute_url }}"
        class="w-full text-center px-3 py-1.5 text-xs font-semibold rounded-lg
-              bg-orange-500 text-white hover:bg-orange-400
+              bg-orange-500 text-white hover:bg-orange-600
               transition-all duration-200 shadow-md">
       Voir le cours
     </a>

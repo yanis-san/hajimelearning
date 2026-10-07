@@ -40,3 +40,8 @@ Thumbs.db
 # IDEs
 .vscode/
 .idea/
+
+.agent/
+.claude/
+.gemini/
+.impeccable/

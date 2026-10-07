@@ -3,6 +3,155 @@
 {% block title %}Hajime Learning — Formez-vous, concrètement.{% endblock %}
 {% block meta_description %}Des formations pratiques pour apprendre à votre rythme. Accès à vie, support inclus, paiement local.{% endblock %}
 
+{% block extra_head %}
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+  @keyframes float-delayed {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes slide-up-fade {
+    0% { opacity: 0; transform: translateY(15px); }
+    20% { opacity: 1; transform: translateY(0); }
+    80% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-15px); }
+  }
+  @keyframes fill-bar {
+    0% { width: 0%; }
+    40% { width: 100%; }
+    100% { width: 100%; }
+  }
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Course Builder Drag & Drop Animation */
+  @keyframes drop-in-1 {
+    0%, 5% { transform: translate(120px, 0px) scale(0.9); opacity: 0; }
+    10% { transform: translate(60px, -10px) scale(1.05); opacity: 1; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+    15% { transform: translate(0, 0) scale(1.05); opacity: 1; box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.2); }
+    18%, 95% { transform: translate(0, 0) scale(1); opacity: 1; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+    100% { transform: translate(0, 0); opacity: 0; }
+  }
+  @keyframes drop-in-2 {
+    0%, 30% { transform: translate(120px, -50px) scale(0.9); opacity: 0; }
+    35% { transform: translate(60px, -20px) scale(1.05); opacity: 1; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+    40% { transform: translate(0, 0) scale(1.05); opacity: 1; box-shadow: 0 20px 25px -5px rgba(168, 85, 247, 0.2); }
+    43%, 95% { transform: translate(0, 0) scale(1); opacity: 1; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+    100% { transform: translate(0, 0); opacity: 0; }
+  }
+  @keyframes drop-in-3 {
+    0%, 55% { transform: translate(120px, -100px) scale(0.9); opacity: 0; }
+    60% { transform: translate(60px, -50px) scale(1.05); opacity: 1; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+    65% { transform: translate(0, 0) scale(1.05); opacity: 1; box-shadow: 0 20px 25px -5px rgba(249, 115, 22, 0.2); }
+    68%, 95% { transform: translate(0, 0) scale(1); opacity: 1; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+    100% { transform: translate(0, 0); opacity: 0; }
+  }
+  
+  /* Product Tour Animations */
+  @keyframes pt-progress {
+    0% { width: 0%; }
+    100% { width: 66%; }
+  }
+  @keyframes pt-pop-in {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes pt-slide-up {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes pt-slide-down {
+    0% { transform: translateY(-20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+  /* Quiz Sequence Animations */
+  @keyframes pt-quiz-select-bg {
+    0%, 15% { border-color: #f3f4f6; background-color: #ffffff; transform: scale(1); }
+    18% { transform: scale(1.02); }
+    21%, 95% { border-color: #f97316; background-color: #fff7ed; transform: scale(1); }
+    100% { border-color: #f3f4f6; background-color: #ffffff; transform: scale(1); }
+  }
+  @keyframes pt-quiz-select-radio {
+    0%, 15% { border-width: 2px; border-color: #d1d5db; background-color: transparent; }
+    21%, 95% { border-width: 4px; border-color: #f97316; background-color: #ffffff; }
+    100% { border-width: 2px; border-color: #d1d5db; background-color: transparent; }
+  }
+  @keyframes pt-quiz-select-text {
+    0%, 15% { color: #111827; }
+    21%, 95% { color: #c2410c; }
+    100% { color: #111827; }
+  }
+  @keyframes pt-quiz-btn {
+    0%, 30% { background-color: #111827; transform: scale(1); }
+    32% { transform: scale(0.95); }
+    34%, 95% { background-color: #22c55e; transform: scale(1); }
+    100% { background-color: #111827; transform: scale(1); }
+  }
+  @keyframes pt-quiz-banner {
+    0%, 35% { opacity: 0; transform: translateY(10px); }
+    38%, 95% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(10px); }
+  }
+
+  /* Chat Sequence Animations (12s loop) */
+  @keyframes pt-chat-typing-1 {
+    0%, 8% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: scale(0.9); }
+    10%, 20% { opacity: 1; max-height: 60px; margin-top: 1rem; transform: scale(1); overflow: visible; }
+    22%, 100% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: scale(0.9); }
+  }
+  @keyframes pt-chat-answer-1 {
+    0%, 20% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: translateY(20px); }
+    22%, 95% { opacity: 1; max-height: 200px; margin-top: 1rem; transform: translateY(0); overflow: visible; }
+    100% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: translateY(20px); }
+  }
+  @keyframes pt-chat-typing-2 {
+    0%, 30% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: scale(0.9); }
+    32%, 42% { opacity: 1; max-height: 60px; margin-top: 1rem; transform: scale(1); overflow: visible; }
+    44%, 100% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: scale(0.9); }
+  }
+  @keyframes pt-chat-answer-2 {
+    0%, 42% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: translateY(20px); }
+    44%, 95% { opacity: 1; max-height: 200px; margin-top: 1rem; transform: translateY(0); overflow: visible; }
+    100% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: translateY(20px); }
+  }
+  @keyframes pt-chat-status {
+    0%, 52% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: scale(0.5); }
+    54%, 95% { opacity: 1; max-height: 40px; margin-top: 1rem; transform: scale(1); overflow: visible; }
+    100% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: scale(0.5); }
+  }
+  
+  /* Hero Window Animations */
+  @keyframes hero-scrub {
+    0% { width: 0%; }
+    100% { width: 100%; }
+  }
+  @keyframes pulse-play {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(249,115,22,0.3); }
+    50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(249,115,22,0.6); }
+  }
+  @keyframes pt-typing-dot {
+    0%, 100% { transform: translateY(0); opacity: 0.4; }
+    50% { transform: translateY(-4px); opacity: 1; }
+  }
+  
+  /* Stagger delay classes */
+  .delay-100 { transition-delay: 100ms; }
+  .delay-200 { transition-delay: 200ms; }
+  .delay-300 { transition-delay: 300ms; }
+</style>
+{% endblock %}
+
 {% block content %}
 
   {# ══ HERO ════════════════════════════════════════════════════════════════════ #}
@@ -13,9 +162,43 @@
         <span class="inline-block text-xs font-semibold tracking-widest text-orange-500 uppercase mb-5">
           Hajime Learning
         </span>
-        <h1 class="text-4xl sm:text-5xl font-medium text-gray-900 tracking-tight leading-[1.15] mb-5">
+        <h1 class="text-4xl sm:text-5xl font-medium text-gray-900 tracking-tight leading-[1.15] mb-5"
+            x-data="{
+                text: '',
+                phrases: ['À votre rythme.', 'En pratiquant.', 'Sans compromis.'],
+                currentPhraseIndex: 0,
+                charIndex: 0,
+                isDeleting: false,
+                typeSpeed: 80,
+                deleteSpeed: 40,
+                pauseTime: 2500,
+                init() { setTimeout(() => this.type(), 500); },
+                type() {
+                    const currentPhrase = this.phrases[this.currentPhraseIndex];
+                    if (this.isDeleting) {
+                        this.text = currentPhrase.substring(0, this.charIndex - 1);
+                        this.charIndex--;
+                    } else {
+                        this.text = currentPhrase.substring(0, this.charIndex + 1);
+                        this.charIndex++;
+                    }
+                    let speed = this.isDeleting ? this.deleteSpeed : this.typeSpeed;
+                    if (!this.isDeleting && this.charIndex === currentPhrase.length) {
+                        speed = this.pauseTime;
+                        this.isDeleting = true;
+                    } else if (this.isDeleting && this.charIndex === 0) {
+                        this.isDeleting = false;
+                        this.currentPhraseIndex = (this.currentPhraseIndex + 1) % this.phrases.length;
+                        speed = 500;
+                    }
+                    setTimeout(() => this.type(), speed);
+                }
+            }">
           Apprenez.<br>
-          <span class="text-orange-500">À votre rythme.</span>
+          <span class="text-orange-500 relative">
+            <span x-text="text" class="min-h-[1.2em] inline-block"></span>
+            <span class="absolute -right-2 top-0 bottom-0 w-[3px] bg-orange-500 animate-pulse"></span>
+          </span>
         </h1>
         <p class="text-lg text-gray-500 mb-8 leading-relaxed">
           Des formations conçues par des experts, du contenu pratique,
@@ -39,135 +222,420 @@
         </div>
       </div>
 
-      {# Illustration droite #}
-      <div class="flex-1 hidden lg:flex items-center justify-center">
-        <div class="relative w-80 h-80">
-          <div class="absolute top-4 right-4 w-48 h-48 rounded-full bg-orange-100"></div>
-          <div class="absolute top-12 left-0 bg-white rounded-2xl shadow-lg border border-gray-100 p-5 w-56">
-            <div class="flex items-center gap-3 mb-3">
-              <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center">
-                <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
-              </div>
-              <div>
-                <div class="h-2 w-20 bg-gray-200 rounded-full"></div>
-                <div class="h-2 w-14 bg-gray-100 rounded-full mt-1.5"></div>
-              </div>
+      {# High-Fidelity App UI (Pro Style) #}
+      <div class="flex-1 hidden lg:block relative z-10 w-full" style="perspective: 1200px;">
+        
+        <!-- Massive ambient glow -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-orange-400/20 via-amber-300/20 to-red-400/10 rounded-full blur-[80px] -z-10"></div>
+        
+        <!-- Isometric App Window -->
+        <div class="relative bg-white/80 backdrop-blur-2xl border border-white/60 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] rounded-[24px] overflow-hidden transition-transform duration-700 ease-out hover:rotate-0"
+             style="transform: rotateY(-12deg) rotateX(4deg) rotateZ(-1deg) scale(0.95); transform-style: preserve-3d; animation: float 8s ease-in-out infinite;">
+          
+          <!-- Mac OS style top bar -->
+          <div class="bg-gray-50/80 backdrop-blur-md border-b border-gray-200/50 px-4 py-3 flex items-center">
+            <div class="flex gap-2 w-1/3">
+              <div class="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]"></div>
+              <div class="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]"></div>
+              <div class="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29]"></div>
             </div>
-            <div class="w-full h-2 bg-gray-100 rounded-full">
-              <div class="h-2 w-3/5 bg-orange-400 rounded-full"></div>
+            <div class="w-1/3 flex justify-center">
+              <div class="w-32 h-4 bg-gray-200/60 rounded-full"></div>
             </div>
           </div>
-          <div class="absolute bottom-8 right-0 bg-white rounded-2xl shadow-lg border border-gray-100 p-4 w-48">
-            <div class="flex items-center gap-2 mb-2">
-              <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                <svg class="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-              </div>
-              <span class="text-xs font-medium text-gray-600">Leçon terminée</span>
-            </div>
-            <div class="space-y-1.5">
-              <div class="h-1.5 w-full bg-gray-100 rounded-full"></div>
-              <div class="h-1.5 w-4/5 bg-gray-100 rounded-full"></div>
-            </div>
+          
+          <!-- Dashboard Layout -->
+          <div class="p-6 grid grid-cols-12 gap-6 bg-gradient-to-b from-white/50 to-gray-50/30">
+             
+             <!-- Left Column: Video Player & Info -->
+             <div class="col-span-8 flex flex-col gap-5">
+                <!-- Video Player -->
+                <div class="w-full aspect-video bg-gray-900 rounded-xl relative overflow-hidden shadow-lg group">
+                  <div class="absolute inset-0 bg-gradient-to-tr from-orange-600/20 to-purple-900/40"></div>
+                  <!-- Play button -->
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 transition-transform group-hover:scale-110" style="animation: pulse-play 3s infinite;">
+                      <svg class="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"/></svg>
+                    </div>
+                  </div>
+                  <!-- Scrubber -->
+                  <div class="absolute bottom-4 inset-x-4 flex items-center gap-3">
+                    <span class="text-[10px] font-medium text-white/90 uppercase tracking-wider">En cours</span>
+                    <div class="flex-1 h-1.5 bg-white/20 rounded-full relative cursor-pointer">
+                      <div class="absolute left-0 top-0 bottom-0 bg-orange-500 rounded-full" style="animation: hero-scrub 20s linear infinite;">
+                        <div class="absolute right-0 top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-md scale-0 group-hover:scale-100 transition-transform"></div>
+                      </div>
+                    </div>
+                    <span class="text-xs font-medium text-white/50">12:45</span>
+                  </div>
+                </div>
+                
+                <!-- Lesson Info -->
+                <div>
+                  <h3 class="text-2xl font-bold text-gray-900 tracking-tight leading-tight">2. Méthodologie d'apprentissage</h3>
+                  <div class="flex items-center gap-3 mt-2">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-orange-100 text-orange-700 text-xs font-bold">
+                      Formation Complète
+                    </span>
+                    <span class="text-sm font-medium text-gray-500">Chapitre 1 : Introduction</span>
+                  </div>
+                </div>
+             </div>
+             
+             <!-- Right Column: Sidebar Syllabus -->
+             <div class="col-span-4 flex flex-col gap-2">
+               <!-- Progress Card -->
+               <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100 mb-2">
+                 <div class="flex justify-between items-end mb-2">
+                   <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Progression</span>
+                   <span class="text-sm font-black text-gray-900">33%</span>
+                 </div>
+                 <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                   <div class="bg-orange-500 h-full rounded-full w-1/3 relative">
+                     <div class="absolute inset-0 bg-white/20" style="animation: shimmer 2s infinite;"></div>
+                   </div>
+                 </div>
+               </div>
+               
+               <!-- Real Accordion Mockup -->
+               <div class="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm flex-1">
+                 <!-- Header -->
+                 <div class="w-full flex items-center justify-between px-3 py-2.5 bg-gray-50 border-b border-gray-100">
+                   <div class="flex items-center gap-2">
+                     <span class="flex items-center justify-center w-5 h-5 rounded-md bg-orange-100 text-orange-600 text-[10px] font-bold shrink-0">1</span>
+                     <span class="text-[11px] font-bold text-gray-800 truncate">Introduction</span>
+                   </div>
+                   <svg class="w-3 h-3 text-gray-400 rotate-180 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                 </div>
+                 
+                 <!-- Lessons -->
+                 <ul class="divide-y divide-gray-100">
+                   <!-- Lesson 1 (Completed) -->
+                   <li class="flex items-center justify-between px-3 py-2.5">
+                     <div class="flex items-center gap-2 min-w-0">
+                       <svg class="w-3.5 h-3.5 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                       <span class="text-[10px] font-medium text-gray-700 truncate">Bienvenue</span>
+                     </div>
+                   </li>
+                   
+                   <!-- Lesson 2 (Active/Animating) -->
+                   <li class="flex items-center justify-between px-3 py-2.5 bg-orange-50/80 relative overflow-hidden group">
+                     <div class="flex items-center gap-2 min-w-0">
+                       <span class="w-3.5 h-3.5 flex items-center justify-center shrink-0 rounded-full border border-orange-400 bg-orange-100 text-[8px] text-orange-600 font-bold">2</span>
+                       <span class="text-[10px] font-bold text-orange-700 truncate">Méthodologie</span>
+                     </div>
+                     <div class="flex gap-1 items-center justify-center shrink-0 h-3">
+                       <div class="w-0.5 h-full bg-orange-500 rounded-full animate-pulse" style="animation-duration: 0.8s;"></div>
+                       <div class="w-0.5 h-2/3 bg-orange-500 rounded-full animate-pulse" style="animation-duration: 1s;"></div>
+                       <div class="w-0.5 h-full bg-orange-500 rounded-full animate-pulse" style="animation-duration: 0.6s;"></div>
+                     </div>
+                   </li>
+
+                   <!-- Lesson 3 (Locked/Unplayed) -->
+                   <li class="flex items-center justify-between px-3 py-2.5 opacity-60">
+                     <div class="flex items-center gap-2 min-w-0">
+                       <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                       <span class="text-[10px] font-medium text-gray-500 truncate">Exercice</span>
+                     </div>
+                   </li>
+                 </ul>
+               </div>
+             </div>
+             
           </div>
         </div>
+        
+        <!-- Floating decorative element (Badge) -->
+        <div class="absolute -right-6 bottom-12 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100/50 p-4 flex items-center gap-3 z-20 transition-transform hover:scale-105"
+             style="transform: translateZ(50px); animation: float-delayed 5s ease-in-out infinite;">
+          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shrink-0 shadow-lg shadow-green-500/30">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-gray-900 mb-0.5">Module validé !</div>
+            <div class="text-[11px] font-medium text-gray-500">Vous avancez bien</div>
+          </div>
+        </div>
+        
       </div>
 
     </div>
   </section>
 
-  {# ══ FONCTIONNALITÉS ÉTUDIANT ════════════════════════════════════════════════ #}
-  <section class="bg-gray-50/70 border-y border-gray-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-
-      <div class="max-w-xl mb-14">
-        <h2 class="text-2xl sm:text-3xl font-medium text-gray-900 tracking-tight mb-3">
-          Tout pour apprendre efficacement.
+  {# ══ FONCTIONNALITÉS ÉTUDIANT (Product Tour Interactif) ════════════════════════ #}
+  <section class="bg-transparent border-y border-stone-200/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24" x-data="{ activeFeature: 1 }">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16 reveal">
+        <h2 class="text-3xl sm:text-4xl font-semibold text-stone-900 tracking-tight mb-4">
+          Tout pour apprendre <span class="text-orange-500">efficacement.</span>
         </h2>
-        <p class="text-gray-500">
-          Chaque formation est pensée pour vous faire progresser, pas vous noyer dans la théorie.
+        <p class="text-gray-500 text-lg">
+          Chaque formation est pensée pour vous faire progresser, pas vous noyer dans la théorie. Découvrez l'expérience étudiant.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="flex flex-col lg:flex-row gap-12 lg:gap-8 items-start reveal delay-100">
+        
+        {# Liste des fonctionnalités (Navigation) #}
+        <div class="w-full lg:w-5/12 space-y-2">
+          
+          <!-- Tab 1 -->
+          <button @click="activeFeature = 1" type="button" 
+                  class="w-full text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer"
+                  :class="activeFeature === 1 ? 'bg-white border-orange-200 shadow-md ring-1 ring-orange-100' : 'bg-transparent border-transparent hover:bg-white/60'">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+                   :class="activeFeature === 1 ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-500'">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              </div>
+              <div>
+                <h3 class="text-base font-semibold transition-colors" :class="activeFeature === 1 ? 'text-gray-900' : 'text-gray-600'">Progression claire</h3>
+                <p class="text-sm text-gray-500 mt-1 leading-relaxed" x-show="activeFeature === 1" x-collapse>Chaque leçon validée est enregistrée. Reprenez exactement là où vous vous étiez arrêté sans jamais vous perdre.</p>
+              </div>
+            </div>
+          </button>
 
-        {# Progression #}
-        <div class="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-sm transition">
-          <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mb-5">
-            <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-            </svg>
+          <!-- Tab 2 -->
+          <button @click="activeFeature = 2" type="button" 
+                  class="w-full text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer"
+                  :class="activeFeature === 2 ? 'bg-white border-orange-200 shadow-md ring-1 ring-orange-100' : 'bg-transparent border-transparent hover:bg-white/60'">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+                   :class="activeFeature === 2 ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-500'">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              </div>
+              <div>
+                <h3 class="text-base font-semibold transition-colors" :class="activeFeature === 2 ? 'text-gray-900' : 'text-gray-600'">Questions & Support</h3>
+                <p class="text-sm text-gray-500 mt-1 leading-relaxed" x-show="activeFeature === 2" x-collapse>Posez vos questions directement dans la leçon. L'instructeur vous répond de façon contextuelle.</p>
+              </div>
+            </div>
+          </button>
+
+          <!-- Tab 3 -->
+          <button @click="activeFeature = 3" type="button" 
+                  class="w-full text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer"
+                  :class="activeFeature === 3 ? 'bg-white border-orange-200 shadow-md ring-1 ring-orange-100' : 'bg-transparent border-transparent hover:bg-white/60'">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+                   :class="activeFeature === 3 ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-500'">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              </div>
+              <div>
+                <h3 class="text-base font-semibold transition-colors" :class="activeFeature === 3 ? 'text-gray-900' : 'text-gray-600'">Quiz & Validation</h3>
+                <p class="text-sm text-gray-500 mt-1 leading-relaxed" x-show="activeFeature === 3" x-collapse>Des exercices intégrés pour tester vos connaissances à chaque étape. Vous savez exactement ce que vous maîtrisez.</p>
+              </div>
+            </div>
+          </button>
+
+          <!-- Tab 4 -->
+          <button @click="activeFeature = 4" type="button" 
+                  class="w-full text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer"
+                  :class="activeFeature === 4 ? 'bg-white border-orange-200 shadow-md ring-1 ring-orange-100' : 'bg-transparent border-transparent hover:bg-white/60'">
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+                   :class="activeFeature === 4 ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-500'">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+              </div>
+              <div>
+                <h3 class="text-base font-semibold transition-colors" :class="activeFeature === 4 ? 'text-gray-900' : 'text-gray-600'">Notifications</h3>
+                <p class="text-sm text-gray-500 mt-1 leading-relaxed" x-show="activeFeature === 4" x-collapse>Soyez alerté dès qu'une réponse arrive. Restez dans le flux sans effort.</p>
+              </div>
+            </div>
+          </button>
+          
+          <div class="flex flex-col sm:flex-row gap-4 mt-8 p-5">
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              <span class="text-sm font-medium text-gray-600">Accès à vie</span>
+            </div>
+            <div class="hidden sm:block w-px h-5 bg-gray-200"></div>
+            <div class="flex items-center gap-3">
+              <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+              <span class="text-sm font-medium text-gray-600">Paiement local (DA)</span>
+            </div>
           </div>
-          <h3 class="text-base font-semibold text-gray-900 mb-2">Progression claire</h3>
-          <p class="text-sm text-gray-500 leading-relaxed">
-            Chaque leçon validée est enregistrée. Reprenez exactement là où vous vous étiez arrêté.
-          </p>
         </div>
 
-        {# Support #}
-        <div class="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-sm transition">
-          <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mb-5">
-            <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-            </svg>
+        {# Vitrine Visuelle (Affichage dynamique) #}
+        <div class="w-full lg:w-7/12 relative aspect-square sm:aspect-video lg:aspect-square bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex items-center justify-center p-8">
+          
+          <!-- Background Decoration -->
+          <div class="absolute inset-0 bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:2rem_2rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30"></div>
+          
+          <!-- VISUAL 1: Progression -->
+          <div x-show="activeFeature === 1" x-transition:enter="transition ease-out duration-500 delay-100" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="w-full max-w-sm absolute z-10">
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-5 space-y-4">
+              <div>
+                <div class="text-xs font-semibold text-orange-500 uppercase tracking-wider mb-1">Japonais Débutant (JLPT N5)</div>
+                <div class="text-base font-bold text-gray-900 mb-2">基礎語彙と文法 <span class="font-medium opacity-75 ml-1 text-xs text-gray-500">(Vocabulaire & Grammaire)</span></div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-medium text-gray-500">2/3 Leçons complétées</span>
+                  <span class="text-xs font-bold text-gray-900">66%</span>
+                </div>
+                <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                  <div class="bg-orange-500 h-2 rounded-full" style="width: 66%; animation: pt-progress 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;"></div>
+                </div>
+              </div>
+              <div class="space-y-1 mt-4">
+                <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div class="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white shrink-0" style="opacity:0; animation: pt-pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s forwards;"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+                  <div class="flex-1"><div class="text-sm font-medium text-gray-900">1. Salutations et politesse</div></div>
+                  <div class="text-xs text-gray-400">03:20</div>
+                </div>
+                <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div class="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white shrink-0" style="opacity:0; animation: pt-pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s forwards;"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+                  <div class="flex-1"><div class="text-sm font-medium text-gray-900">2. Particules は et が</div></div>
+                  <div class="text-xs text-gray-400">05:45</div>
+                </div>
+                <div class="flex items-center gap-3 p-2 bg-orange-50 border border-orange-100 rounded-lg shadow-sm">
+                  <div class="w-5 h-5 rounded-full border-2 border-orange-500 shrink-0 flex items-center justify-center text-orange-500">
+                    <svg class="w-2.5 h-2.5 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
+                  </div>
+                  <div class="flex-1"><div class="text-sm font-bold text-orange-700">3. Compter jusqu'à 100</div></div>
+                  <div class="text-xs font-semibold text-orange-500">En cours</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <h3 class="text-base font-semibold text-gray-900 mb-2">Questions & support</h3>
-          <p class="text-sm text-gray-500 leading-relaxed">
-            Posez vos questions directement dans la leçon. L'instructeur vous répond et marque la question comme résolue.
-          </p>
-        </div>
 
-        {# Quiz #}
-        <div class="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-sm transition">
-          <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mb-5">
-            <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-            </svg>
+          <!-- VISUAL 2: Support -->
+          <div x-show="activeFeature === 2" x-cloak x-transition:enter="transition ease-out duration-500 delay-100" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="w-full max-w-sm absolute z-10">
+            <div>
+              <!-- Student question -->
+              <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-full bg-blue-100 shrink-0 flex items-center justify-center text-blue-600 font-bold text-xs">AM</div>
+                <div class="bg-white rounded-2xl rounded-tl-none shadow-md border border-gray-100 p-4 w-full">
+                  <div class="flex justify-between items-end mb-2">
+                    <span class="text-xs font-bold text-gray-900">Amine</span>
+                    <span class="text-[10px] text-gray-400">10:42</span>
+                  </div>
+                  <p class="text-sm text-gray-600 leading-snug">Salut ! J'ai du mal à différencier "Shi" (シ) et "Tsu" (ツ) en Katakana, ils se ressemblent trop. Une astuce ?</p>
+                </div>
+              </div>
+
+              <!-- Typing Indicator 1 (Instructor) -->
+              <div class="flex gap-3 flex-row-reverse origin-bottom-right" style="animation: pt-chat-typing-1 12s infinite;">
+                <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0 border border-orange-200">
+                  <svg class="w-4 h-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                </div>
+                <div class="bg-gray-100 rounded-2xl rounded-tr-none px-4 py-3 flex items-center gap-1.5 mt-2 h-9">
+                  <div class="w-1.5 h-1.5 bg-gray-500 rounded-full" style="animation: pt-typing-dot 1.2s infinite 0s;"></div>
+                  <div class="w-1.5 h-1.5 bg-gray-500 rounded-full" style="animation: pt-typing-dot 1.2s infinite 0.2s;"></div>
+                  <div class="w-1.5 h-1.5 bg-gray-500 rounded-full" style="animation: pt-typing-dot 1.2s infinite 0.4s;"></div>
+                </div>
+              </div>
+
+              <!-- Instructor Answer -->
+              <div class="flex gap-3 flex-row-reverse origin-bottom-right" style="animation: pt-chat-answer-1 12s infinite;">
+                <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0 border border-orange-200">
+                  <svg class="w-4 h-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                </div>
+                <div class="bg-gray-900 rounded-2xl rounded-tr-none shadow-md p-4 w-full text-white">
+                  <div class="flex justify-between items-end mb-2">
+                    <span class="text-xs font-bold text-white">Yanis (Instructeur)</span>
+                    <span class="text-[10px] text-gray-400">10:45</span>
+                  </div>
+                  <p class="text-sm text-gray-300 leading-snug">Hello Amine 👋 C'est normal ! Regarde l'inclinaison : les traits de Shi (シ) partent plus à l'horizontale, ceux de Tsu (ツ) tombent du haut à la verticale.</p>
+                </div>
+              </div>
+              
+              <!-- Typing Indicator 2 (Student) -->
+              <div class="flex gap-3 origin-top-left" style="animation: pt-chat-typing-2 12s infinite;">
+                <div class="w-8 h-8 rounded-full bg-blue-100 shrink-0 flex items-center justify-center text-blue-600 font-bold text-xs">AM</div>
+                <div class="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3 flex items-center gap-1.5 h-9 mt-2">
+                  <div class="w-1.5 h-1.5 bg-gray-500 rounded-full" style="animation: pt-typing-dot 1.2s infinite 0s;"></div>
+                  <div class="w-1.5 h-1.5 bg-gray-500 rounded-full" style="animation: pt-typing-dot 1.2s infinite 0.2s;"></div>
+                  <div class="w-1.5 h-1.5 bg-gray-500 rounded-full" style="animation: pt-typing-dot 1.2s infinite 0.4s;"></div>
+                </div>
+              </div>
+              
+              <!-- Student Reply -->
+              <div class="flex gap-3 origin-top-left" style="animation: pt-chat-answer-2 12s infinite;">
+                <div class="w-8 h-8 rounded-full bg-blue-100 shrink-0 flex items-center justify-center text-blue-600 font-bold text-xs">AM</div>
+                <div class="bg-white rounded-2xl rounded-tl-none shadow-md border border-gray-100 p-4 w-full">
+                  <div class="flex justify-between items-end mb-2">
+                    <span class="text-xs font-bold text-gray-900">Amine</span>
+                    <span class="text-[10px] text-gray-400">10:48</span>
+                  </div>
+                  <p class="text-sm text-gray-600 leading-snug">Ah super, je vois beaucoup mieux la différence maintenant, merci beaucoup ! 🙏</p>
+                </div>
+              </div>
+
+              <!-- Status -->
+              <div class="flex justify-center" style="animation: pt-chat-status 12s infinite;">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 border border-green-200 text-xs font-medium text-green-700 shadow-sm h-[30px]">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  Question résolue
+                </span>
+              </div>
+            </div>
           </div>
-          <h3 class="text-base font-semibold text-gray-900 mb-2">Quiz de validation</h3>
-          <p class="text-sm text-gray-500 leading-relaxed">
-            Des exercices intégrés pour tester vos connaissances à chaque étape. Vous savez exactement ce que vous maîtrisez.
-          </p>
-        </div>
 
-        {# Notifications #}
-        <div class="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-sm transition">
-          <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mb-5">
-            <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-            </svg>
+          <!-- VISUAL 3: Quiz -->
+          <div x-show="activeFeature === 3" x-cloak x-transition:enter="transition ease-out duration-500 delay-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="w-full max-w-sm absolute z-10">
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 relative overflow-hidden">
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-orange-50 text-orange-600 text-xs font-bold mb-4 uppercase tracking-wider">
+                Question 3/5
+              </div>
+              <h4 class="text-base font-bold text-gray-900 mb-6">Quelle est la traduction correcte pour "Bonjour" (le matin) ?</h4>
+              
+              <div class="space-y-3">
+                <div class="p-3 rounded-xl border-2 border-gray-100 flex items-center gap-3 transition-colors hover:bg-gray-50 cursor-pointer">
+                  <div class="w-5 h-5 rounded-full border-2 border-gray-300 shrink-0"></div>
+                  <div class="text-sm font-medium text-gray-700">こんにちは (Konnichiwa)</div>
+                </div>
+                <div class="p-3 rounded-xl border-2 flex items-center gap-3 relative" style="animation: pt-quiz-select-bg 8s infinite;">
+                  <div class="w-5 h-5 rounded-full shrink-0" style="animation: pt-quiz-select-radio 8s infinite;"></div>
+                  <div class="text-sm font-medium text-gray-900" style="animation: pt-quiz-select-text 8s infinite;">おはようございます (Ohayou)</div>
+                </div>
+                <div class="p-3 rounded-xl border-2 border-gray-100 flex items-center gap-3 transition-colors hover:bg-gray-50 cursor-pointer">
+                  <div class="w-5 h-5 rounded-full border-2 border-gray-300 shrink-0"></div>
+                  <div class="text-sm font-medium text-gray-700">こんばんは (Konbanwa)</div>
+                </div>
+              </div>
+              <div class="mt-6 flex justify-between items-center border-t border-gray-100 pt-4">
+                <span class="text-xs font-medium text-gray-400">QCM Vocabulaire</span>
+                <div class="px-4 py-2 text-white text-xs font-bold rounded-lg cursor-pointer" style="animation: pt-quiz-btn 8s infinite;">Valider</div>
+              </div>
+
+              <!-- Success Banner -->
+              <div class="absolute inset-x-0 bottom-0 bg-green-500 text-white px-5 py-3.5 flex justify-center items-center shadow-lg" style="animation: pt-quiz-banner 8s infinite;">
+                <div class="flex items-center gap-2.5">
+                  <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                  <span class="font-bold text-sm">Bonne réponse !</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <h3 class="text-base font-semibold text-gray-900 mb-2">Notifications en temps réel</h3>
-          <p class="text-sm text-gray-500 leading-relaxed">
-            Soyez alerté dès qu'une réponse arrive ou qu'une leçon est validée. Restez dans le flux sans effort.
-          </p>
-        </div>
 
-        {# Accès à vie #}
-        <div class="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-sm transition">
-          <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mb-5">
-            <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-            </svg>
+          <!-- VISUAL 4: Notifications -->
+          <div x-show="activeFeature === 4" x-cloak x-transition:enter="transition ease-out duration-500 delay-100" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" class="w-full max-w-sm absolute z-10">
+            <div class="flex justify-end mb-4">
+              <div class="w-12 h-12 rounded-xl bg-white shadow-md border border-gray-100 flex items-center justify-center relative cursor-pointer hover:bg-gray-50">
+                <svg class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                <div class="absolute top-2.5 right-2.5 w-3 h-3 rounded-full bg-orange-500 ring-2 ring-white animate-pulse"></div>
+              </div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-0 w-full ml-auto overflow-hidden" style="opacity:0; animation: pt-slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;">
+              <div class="bg-gray-50 border-b border-gray-100 px-4 py-2.5 flex justify-between items-center">
+                <span class="text-xs font-bold text-gray-600 uppercase tracking-wide">Notifications</span>
+                <span class="text-xs font-medium text-orange-500 hover:text-orange-600 cursor-pointer">Tout marquer lu</span>
+              </div>
+              <div class="p-3 hover:bg-orange-50/30 flex items-start gap-3 border-l-4 border-orange-500 bg-white transition-colors cursor-pointer">
+                <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center shrink-0 border border-orange-200 overflow-hidden">
+                  <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                </div>
+                <div>
+                  <div class="text-sm font-semibold text-gray-900 mb-0.5">Nouvelle réponse de Yanis</div>
+                  <div class="text-xs text-gray-600 leading-tight">L'instructeur a répondu à votre question sur la leçon "Lire l'heure en japonais".</div>
+                  <div class="text-[10px] text-orange-500 font-bold mt-1.5">À l'instant</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <h3 class="text-base font-semibold text-gray-900 mb-2">Accès à vie</h3>
-          <p class="text-sm text-gray-500 leading-relaxed">
-            Payez une fois, accédez pour toujours. Les mises à jour du cours sont incluses sans frais supplémentaires.
-          </p>
+          
         </div>
-
-        {# Paiement local #}
-        <div class="bg-white rounded-2xl border border-gray-100 p-7 hover:shadow-sm transition">
-          <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center mb-5">
-            <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-            </svg>
-          </div>
-          <h3 class="text-base font-semibold text-gray-900 mb-2">Paiement local (DA)</h3>
-          <p class="text-sm text-gray-500 leading-relaxed">
-            Payez en dinars algériens, sans carte internationale. C'est simple, rapide et sécurisé.
-          </p>
-        </div>
-
       </div>
     </div>
   </section>
@@ -178,7 +646,7 @@
       <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
 
         {# Texte #}
-        <div class="flex-1 max-w-lg">
+        <div class="reveal flex-1 max-w-lg">
           <span class="inline-block text-xs font-semibold tracking-widest text-orange-500 uppercase mb-4">
             Pour les experts
           </span>
@@ -222,37 +690,88 @@
           </p>
         </div>
 
-        {# Visuel dashboard instructeur #}
-        <div class="flex-1 hidden lg:block">
-          <div class="bg-gray-50 rounded-2xl border border-gray-100 p-6 space-y-4">
-            <div class="flex items-center justify-between">
-              <span class="text-sm font-semibold text-gray-700">Tableau de bord</span>
-              <span class="text-xs text-gray-400">Espace instructeur</span>
+        {# Visuel dashboard instructeur (Builder Drag & Drop) #}
+        <div class="reveal delay-200 flex-1 hidden lg:block">
+          <div class="relative w-full max-w-lg ml-auto h-[340px]">
+            <!-- Palette d'outils (droite) -->
+            <div class="absolute right-0 top-6 w-28 bg-white rounded-2xl shadow-xl border border-gray-100 p-3 space-y-2.5 z-20">
+              <div class="text-[9px] uppercase font-bold text-gray-400 tracking-wider text-center mb-1">Éléments</div>
+              
+              <!-- Video Tool -->
+              <div class="flex flex-col items-center justify-center py-2.5 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 transition hover:bg-blue-100 cursor-pointer">
+                <svg class="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="text-[10px] font-semibold">Vidéo</span>
+              </div>
+          
+              <!-- Audio Tool -->
+              <div class="flex flex-col items-center justify-center py-2.5 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 transition hover:bg-purple-100 cursor-pointer">
+                <svg class="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+                <span class="text-[10px] font-semibold">Audio</span>
+              </div>
+          
+              <!-- Quiz Tool -->
+              <div class="flex flex-col items-center justify-center py-2.5 rounded-xl bg-orange-50 border border-orange-100 text-orange-600 transition hover:bg-orange-100 cursor-pointer">
+                <svg class="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                <span class="text-[10px] font-semibold">Quiz</span>
+              </div>
             </div>
-            <div class="grid grid-cols-3 gap-3">
-              <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
-                <p class="text-xl font-bold text-gray-900">3</p>
-                <p class="text-xs text-gray-400 mt-1">Formations</p>
+            
+            <!-- Canvas (gauche) -->
+            <div class="absolute left-0 top-0 right-14 bottom-0 bg-gray-50/80 rounded-2xl border border-gray-200 p-5 overflow-hidden z-10 shadow-inner flex flex-col">
+              <div class="flex items-center gap-3 mb-5 border-b border-gray-200 pb-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-orange-500"></div>
+                <div class="h-3 w-40 bg-gray-300 rounded-full"></div>
               </div>
-              <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
-                <p class="text-xl font-bold text-gray-900">47</p>
-                <p class="text-xs text-gray-400 mt-1">Étudiants</p>
+              
+              <div class="flex-1 space-y-3 relative">
+                 <!-- Drop Zone indicator -->
+                 <div class="absolute inset-0 border-2 border-dashed border-gray-200 rounded-xl"></div>
+
+                 <!-- Item 1: Video -->
+                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex items-center gap-3 relative z-20"
+                      style="animation: drop-in-1 9s infinite both;">
+                    <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">
+                       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
+                    </div>
+                    <div class="flex-1">
+                       <div class="flex justify-between items-center mb-1.5">
+                         <div class="h-2 w-24 bg-gray-300 rounded-full"></div>
+                         <div class="text-[9px] font-bold text-gray-400">05:20</div>
+                       </div>
+                       <div class="h-1.5 w-16 bg-gray-100 rounded-full"></div>
+                    </div>
+                 </div>
+          
+                 <!-- Item 2: Audio -->
+                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex items-center gap-3 relative z-20"
+                      style="animation: drop-in-2 9s infinite both;">
+                    <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500 shrink-0">
+                       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+                    </div>
+                    <div class="flex-1">
+                       <div class="flex justify-between items-center mb-1.5">
+                         <div class="h-2 w-28 bg-gray-300 rounded-full"></div>
+                         <div class="text-[9px] font-bold text-gray-400">12:10</div>
+                       </div>
+                       <div class="h-1.5 w-20 bg-gray-100 rounded-full"></div>
+                    </div>
+                 </div>
+          
+                 <!-- Item 3: Quiz -->
+                 <div class="bg-white rounded-xl shadow-sm border border-orange-200 p-3 flex items-center gap-3 relative z-20"
+                      style="animation: drop-in-3 9s infinite both;">
+                    <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">
+                       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                    </div>
+                    <div class="flex-1">
+                       <div class="flex justify-between items-center mb-1.5">
+                         <div class="h-2 w-20 bg-gray-300 rounded-full"></div>
+                         <div class="text-[9px] font-bold text-orange-400">5 QUESTIONS</div>
+                       </div>
+                       <div class="h-1.5 w-12 bg-gray-100 rounded-full"></div>
+                    </div>
+                 </div>
               </div>
-              <div class="bg-white rounded-xl p-4 border border-gray-100 text-center">
-                <p class="text-xl font-bold text-orange-500">2</p>
-                <p class="text-xs text-gray-400 mt-1">Questions</p>
-              </div>
-            </div>
-            <div class="space-y-2">
-              {% for i in "12"|make_list %}
-                <div class="bg-white rounded-xl border border-gray-100 px-4 py-3 flex items-center justify-between">
-                  <div class="flex items-center gap-3">
-                    <div class="w-2 h-2 rounded-full bg-orange-300"></div>
-                    <div class="h-2 {% if forloop.first %}w-28{% else %}w-20{% endif %} bg-gray-200 rounded-full"></div>
-                  </div>
-                  <div class="h-2 w-10 bg-gray-100 rounded-full"></div>
-                </div>
-              {% endfor %}
             </div>
           </div>
         </div>
@@ -261,9 +780,9 @@
     </div>
   </section>
 
-  {# ══ CATALOGUE ════════════════════════════════════════════════════════════════ #}
-  <section id="catalogue" class="bg-gray-50/70 border-t border-gray-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+  {# ══ CATALOGUE ════════════════════════════════════════════════════════════ #}
+  <section id="catalogue" class="bg-transparent border-t border-stone-200/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20"
          x-data="{ active: 'all' }">
 
       <c-ui.page-header title="Formations" subtitle="Toutes nos formations disponibles">
@@ -282,7 +801,7 @@
                   hx-target="#index-grid"
                   hx-swap="innerHTML"
                   hx-indicator="#index-grid"
-                  class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition cursor-pointer"
+                  class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-1"
                   :class="active === 'all'
                     ? 'bg-orange-500 border-orange-500 text-white'
                     : 'bg-white border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600'">
@@ -296,7 +815,7 @@
                     hx-target="#index-grid"
                     hx-swap="innerHTML"
                     hx-indicator="#index-grid"
-                    class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition cursor-pointer"
+                    class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-1"
                     :class="active === '{{ cat.slug }}'
                       ? 'bg-orange-500 border-orange-500 text-white'
                       : 'bg-white border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600'">
@@ -312,7 +831,9 @@
         {% if courses %}
           <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
             {% for course in courses %}
-              <c-course.card :course="course" />
+              <div class="reveal delay-{{ forloop.counter|default_if_none:'1'|add:0|slugify|add:'00' }}">
+                <c-course.card :course="course" />
+              </div>
             {% endfor %}
           </div>
         {% else %}
@@ -331,7 +852,7 @@
 
   {# ══ CTA FINAL ════════════════════════════════════════════════════════════════ #}
   {% if not user.is_authenticated %}
-  <section class="bg-white border-t border-gray-100">
+  <section class="bg-white border-t border-gray-100 reveal">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
       <h2 class="text-2xl sm:text-3xl font-medium text-gray-900 tracking-tight mb-3">
         Prêt à commencer ?
@@ -347,4 +868,21 @@
   </section>
   {% endif %}
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  });
+</script>
 {% endblock %}

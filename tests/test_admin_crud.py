@@ -83,6 +83,40 @@ class TestManageCourseEdit:
         assert course.title == 'Nouveau Titre'
         assert course.price == 9000
 
+    def test_edit_saves_htmx_autosave(self, client, admin_user, course):
+        client.force_login(admin_user)
+        data = {
+            'title': 'Titre Autosave',
+            'slug': course.slug,
+            'short_description': 'Sauvegarde auto',
+            'description': 'Contenu',
+            'price': 4000,
+        }
+        resp = client.post(
+            reverse('manage_course_edit', args=[course.slug]), 
+            data, 
+            HTTP_HX_REQUEST='true'
+        )
+        assert resp.status_code == 200
+        assert 'Sauvegardé' in resp.content.decode()
+        course.refresh_from_db()
+        assert course.title == 'Titre Autosave'
+        assert course.price == 4000
+
+    def test_edit_htmx_error(self, client, admin_user, course):
+        client.force_login(admin_user)
+        data = {
+            'title': '', # Title is required, should trigger error
+            'slug': course.slug,
+        }
+        resp = client.post(
+            reverse('manage_course_edit', args=[course.slug]), 
+            data, 
+            HTTP_HX_REQUEST='true'
+        )
+        assert resp.status_code == 400
+        assert 'Erreur' in resp.content.decode()
+
 
 @pytest.mark.django_db
 class TestManageCourseDelete:
