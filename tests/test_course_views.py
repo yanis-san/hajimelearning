@@ -124,3 +124,26 @@ class TestHomepageCategories:
         content = resp.content.decode()
         assert '<html' not in content.lower()
         assert "Cours Python" in content
+
+
+@pytest.mark.django_db
+class TestHomepageVideoOptimization:
+
+    def test_homepage_videos_have_performance_attributes(self, client):
+        """Les vidéos de la homepage doivent être optimisées pour le chargement et le réseau."""
+        resp = client.get(reverse('course_list'))
+        assert resp.status_code == 200
+        content = resp.content.decode()
+
+        # 1. hero.mp4 : au-dessus de la ligne de flottaison, préchargement allégé des métadonnées
+        assert 'videos/hero.mp4' in content
+        assert 'preload="metadata"' in content
+
+        # 2. other.mp4 et presentation.mp4 : sous la ligne de flottaison, différées avec preload="none"
+        assert 'videos/other.mp4' in content
+        assert 'videos/presentation.mp4' in content
+        # Au moins deux vidéos ont preload="none"
+        assert content.count('preload="none"') >= 2
+
+        # 3. Observateur d'intersection pour lancer/mettre en pause au scroll
+        assert 'IntersectionObserver' in content or 'x-intersect' in content
