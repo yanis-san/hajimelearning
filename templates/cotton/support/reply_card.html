@@ -9,9 +9,13 @@
       <c-ui.avatar :user="response.author" size="sm" />
       <div class="flex items-center gap-2">
         {% if response.is_instructor %}
-          <span class="text-sm font-semibold text-orange-600">🎓 Équipe Hajime</span>
+          <span class="text-sm font-semibold text-orange-600 flex items-center gap-1">🎓 Sensei / Équipe</span>
+        {% elif response.author == response.question.student %}
+          <span class="text-sm font-medium text-gray-800">{{ response.author.first_name|default:response.author.email }}</span>
+          <span class="text-[11px] bg-gray-100 text-gray-600 font-semibold px-2 py-0.5 rounded-md">Auteur</span>
         {% else %}
           <span class="text-sm font-medium text-gray-800">{{ response.author.first_name|default:response.author.email }}</span>
+          <span class="text-[11px] bg-blue-50 text-blue-700 border border-blue-200 font-semibold px-2 py-0.5 rounded-md">Camarade</span>
         {% endif %}
       </div>
     </div>

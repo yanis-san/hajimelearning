@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.conf import settings
 
 from courses.models import Lesson, Course
-from access.models import AccessRequest, Enrollment, ActivationCode
+from access.models import AccessRequest, Enrollment, ActivationCode, user_has_access
 from .forms import QuestionForm, ResponseForm
 from .models import Question, Response
 
@@ -48,8 +48,16 @@ def question_detail(request, question_id):
     is_author = request.user == question.student
     is_staff = request.user.is_staff
     is_course_instructor = _is_course_instructor(request.user, question.course)
-    allow_others = getattr(settings, 'ALLOW_STUDENT_REPLIES', False)
-    can_reply = is_author or is_staff or is_course_instructor or allow_others
+    has_course_access = user_has_access(request.user, question.course)
+
+    # ── Sécurité d'accès ──
+    # Seuls l'auteur, le staff, l'instructeur du cours ou un élève inscrit au cours peuvent accéder
+    if not (is_author or is_staff or is_course_instructor or has_course_access):
+        messages.error(request, "Vous devez être inscrit à ce cours pour accéder à cette discussion.")
+        return redirect('user_dashboard')
+
+    allow_others = getattr(settings, 'ALLOW_STUDENT_REPLIES', True)
+    can_reply = is_author or is_staff or is_course_instructor or (allow_others and has_course_access)
 
     # Gestion de la réponse
     if request.method == 'POST':
@@ -71,6 +79,7 @@ def question_detail(request, question_id):
                 return redirect('question_detail', question_id=question.id)
         else:
             messages.error(request, "Les réponses sont désactivées pour les autres étudiants.")
+            form = ResponseForm()
 
     else:
         form = ResponseForm()

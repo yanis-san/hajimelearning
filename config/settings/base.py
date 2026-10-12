@@ -192,7 +192,8 @@ PROTECTED_MEDIA_ROOT = BASE_DIR / 'protected_media'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-ALLOW_STUDENT_REPLIES = False
+# Entraide entre étudiants dans le support (Peer-to-peer discussions)
+ALLOW_STUDENT_REPLIES = True
 
 # --- CONFIGURATION CELERY (Asynchrone) ---
 # Surcharge dans dev.py / prod.py via variable d'env CELERY_BROKER_URL
