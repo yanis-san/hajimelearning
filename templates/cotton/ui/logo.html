@@ -12,32 +12,23 @@
    class="inline-flex items-center gap-2.5 font-bold tracking-tight group transition-all duration-200 {{ class }}">
   
   {# Sceau Hanko rouge classique #}
-  {% if size == 'sm' %}
-    <div class="w-7 h-7 bg-white rounded-lg border border-red-100 p-0.5 flex items-center justify-center shadow-sm group-hover:scale-105 group-hover:rotate-[-2deg] transition-all duration-200 shrink-0">
+  <div class="{% if size == 'sm' %}w-7 h-7{% elif size == 'lg' %}w-11 h-11{% else %}w-9 h-9 sm:w-10 sm:h-10{% endif %} shrink-0 flex items-center justify-center group-hover:scale-105 group-hover:rotate-[-2deg] transition-all duration-200">
+    {% if dark == 'true' or dark is True or dark == 'True' %}
+      <div class="w-full h-full {% if shape == 'square' %}rounded-xl{% else %}rounded-full{% endif %} bg-white p-0.5 shadow-sm flex items-center justify-center">
+        {% if shape == 'square' %}
+          <img src="{% static 'img/hanko_square.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
+        {% else %}
+          <img src="{% static 'img/hanko_round.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
+        {% endif %}
+      </div>
+    {% else %}
       {% if shape == 'square' %}
-        <img src="{% static 'img/hanko_square.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
+        <img src="{% static 'img/hanko_square.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain drop-shadow-sm">
       {% else %}
-        <img src="{% static 'img/hanko_round.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
+        <img src="{% static 'img/hanko_round.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain drop-shadow-sm">
       {% endif %}
-    </div>
-  {% elif size == 'lg' %}
-    <div class="w-12 h-12 bg-white rounded-2xl border-2 border-red-100 p-1 flex items-center justify-center shadow-md group-hover:scale-105 group-hover:rotate-[-2deg] transition-all duration-200 shrink-0">
-      {% if shape == 'square' %}
-        <img src="{% static 'img/hanko_square.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
-      {% else %}
-        <img src="{% static 'img/hanko_round.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
-      {% endif %}
-    </div>
-  {% else %}
-    {# md par défaut #}
-    <div class="w-9 h-9 bg-white rounded-xl border border-red-100/80 p-0.5 flex items-center justify-center shadow-sm group-hover:scale-105 group-hover:rotate-[-2deg] transition-all duration-200 shrink-0">
-      {% if shape == 'square' %}
-        <img src="{% static 'img/hanko_square.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
-      {% else %}
-        <img src="{% static 'img/hanko_round.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
-      {% endif %}
-    </div>
-  {% endif %}
+    {% endif %}
+  </div>
 
   {# Texte Marque #}
   {% if text != 'false' and text != False %}
