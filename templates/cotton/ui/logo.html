@@ -40,13 +40,13 @@
   {% endif %}
 
   {# Texte Marque #}
-  {% if text %}
+  {% if text != 'false' and text != False %}
     <div class="flex flex-col">
-      <span class="{% if dark %}text-white{% else %}text-gray-900{% endif %} font-black {% if size == 'sm' %}text-base{% elif size == 'lg' %}text-2xl{% else %}text-xl{% endif %} tracking-tight leading-none group-hover:text-red-600 transition-colors">
+      <span class="{% if dark == 'true' or dark is True or dark == 'True' %}text-white{% else %}text-gray-900{% endif %} font-black {% if size == 'sm' %}text-base{% elif size == 'lg' %}text-2xl{% else %}text-xl{% endif %} tracking-tight leading-none group-hover:text-red-600 transition-colors">
         Hajime Learning
       </span>
-      {% if subtitle %}
-        <span class="text-[10px] font-bold text-gray-400 tracking-widest uppercase mt-1">
+      {% if subtitle == 'true' or subtitle is True or subtitle == 'True' %}
+        <span class="text-[10px] font-bold {% if dark == 'true' or dark is True or dark == 'True' %}text-gray-400{% else %}text-gray-500{% endif %} tracking-widest uppercase mt-1">
           はじめ • Apprendre le japonais
         </span>
       {% endif %}
