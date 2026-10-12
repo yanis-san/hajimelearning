@@ -1,0 +1,53 @@
+<c-vars block course_slug csrf_token="" />
+{# Note personnelle d'un étudiant sur un bloc — sauvegarde AJAX, visible uniquement par lui #}
+<div x-data="{
+       open: false,
+       saved: {{ block.my_note|yesno:'true,false' }},
+       saving: false,
+       status: '',
+       async save() {
+         this.saving = true; this.status = '';
+         try {
+           const res = await fetch('{% url 'save_block_note' course_slug block.id %}', {
+             method: 'POST',
+             headers: { 'X-CSRFToken': '{{ csrf_token }}', 'X-Requested-With': 'XMLHttpRequest' },
+             body: new FormData(this.$refs.form),
+           });
+           const data = await res.json();
+           if (!res.ok || !data.ok) throw new Error();
+           this.saved = data.content.length > 0;
+           this.open = false;
+           this.status = 'ok';
+           setTimeout(() => this.status = '', 2000);
+         } catch (e) { this.status = 'error'; }
+         this.saving = false;
+       }
+     }"
+     class="mt-3" id="block-note-{{ block.id }}">
+
+  <div class="flex items-center gap-3">
+    <button type="button" x-on:click="open = !open"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold border-2 border-gray-900 rounded-lg shadow-[2px_2px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_#111827] active:translate-y-0 active:shadow-none transition cursor-pointer"
+            :class="saved ? 'bg-yellow-100 text-gray-900 hover:bg-yellow-200' : 'bg-white text-gray-600 hover:text-gray-900'">
+      <span>📝</span>
+      <span x-text="open ? 'Fermer' : (saved ? 'Ma note' : 'Ajouter une note')"></span>
+    </button>
+    <span x-show="status === 'ok'" x-transition.opacity x-cloak class="text-xs font-bold text-green-600">✓ Enregistré</span>
+  </div>
+
+  <form x-ref="form" x-show="open" x-collapse x-cloak x-on:submit.prevent="save()"
+        class="mt-2 bg-yellow-50 border-2 border-gray-900 rounded-xl p-3 shadow-[3px_3px_0_0_#111827]">
+    <textarea name="note_content" rows="4"
+              x-on:keydown.ctrl.enter.prevent="save()"
+              placeholder="Ma note perso sur ce bloc (visible uniquement par moi)…"
+              class="w-full bg-white border-2 border-gray-300 focus:border-gray-900 rounded-lg p-2 text-sm font-medium focus:outline-none resize-y">{{ block.my_note }}</textarea>
+    <div class="flex items-center gap-3 mt-2">
+      <button type="submit" :disabled="saving"
+              class="px-3 py-1.5 text-xs font-bold text-white bg-gray-900 rounded-lg hover:bg-primary transition cursor-pointer disabled:opacity-50">
+        <span x-text="saving ? 'Enregistrement…' : '💾 Enregistrer'"></span>
+      </button>
+      <span class="text-[11px] text-gray-400 hidden sm:inline">Ctrl + Entrée</span>
+      <span x-show="status === 'error'" x-transition class="text-xs font-bold text-red-600">Erreur, réessayez</span>
+    </div>
+  </form>
+</div>

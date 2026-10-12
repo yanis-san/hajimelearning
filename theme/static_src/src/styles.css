@@ -3,3 +3,106 @@
 
 @source "../../../templates/**/*.html";
 @source "../../../**/templates/**/*.html";
+
+@theme {
+  --color-primary: #FF003C; /* Persona Manga Red */
+  --color-primary-dark: #CC0030;
+  --color-secondary: #00E5FF; /* Electric Cyan */
+  --color-dark: #09090B; /* Deep contrast black */
+
+  --animate-sakura-fall: sakura-fall linear infinite;
+  --animate-sakura-sway: sakura-sway ease-in-out infinite;
+  --animate-fade-in-up: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-fade-in: fade-in 0.6s ease-out forwards;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-anime-lines-jitter: anime-lines-jitter 0.1s infinite;
+}
+
+@keyframes anime-lines-jitter {
+    0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+    25% { transform: scale(1.02) rotate(0.5deg); opacity: 1; }
+    50% { transform: scale(1.01) rotate(-0.5deg); opacity: 0.7; }
+    75% { transform: scale(1.03) rotate(0.2deg); opacity: 0.9; }
+}
+
+.speed-lines {
+    position: absolute;
+    inset: -50%;
+    background: repeating-conic-gradient(
+        from 0deg at 50% 50%,
+        transparent 0deg 2deg,
+        rgba(255, 255, 255, 0.9) 2deg 2.5deg,
+        transparent 2.5deg 5deg,
+        rgba(255, 255, 255, 0.6) 5deg 6deg,
+        transparent 6deg 9deg,
+        rgba(255, 255, 255, 0.8) 9deg 9.5deg,
+        transparent 9.5deg 14deg,
+        rgba(255, 255, 255, 0.7) 14deg 15deg
+    );
+    mask-image: radial-gradient(circle at center, transparent 20%, black 70%);
+    -webkit-mask-image: radial-gradient(circle at center, transparent 20%, black 70%);
+    pointer-events: none;
+    z-index: 0;
+    animation: anime-lines-jitter 0.1s infinite;
+}
+
+@keyframes sakura-fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes sakura-sway {
+  0%, 100% { transform: translateX(0px); }
+  50% { transform: translateX(80px); }
+}
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+/* ── Furigana / Ruby Typography ── */
+ruby {
+  ruby-position: over;
+  -webkit-ruby-position: over;
+  ruby-align: center;
+  line-height: 1.85;
+}
+
+rt {
+  font-size: 0.58em;
+  line-height: 1.1;
+  font-weight: 600;
+  text-align: center;
+  color: #000000;
+  opacity: 1;
+  letter-spacing: 0.02em;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  font-family: 'Klee One', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+}
+
+:is(.text-white, .text-gray-100, .text-gray-200, .text-gray-300, .bg-gray-900, .bg-gray-950, .bg-black, [class*="bg-gray-900"], [class*="bg-gray-950"], [class*="bg-dark"]) rt {
+  color: #ffffff;
+}
+
+:where(p, li, h1, h2, h3, h4, h5, td, th, blockquote):has(ruby) {
+  line-height: 2.2 !important;
+}
+
+.prose :where(p, li, h1, h2, h3, h4):has(ruby) {
+  line-height: 2.25 !important;
+}

@@ -1,23 +1,31 @@
+{% load md %}
 <c-vars module="" index="0" has_access="false" completed_ids="" is_manager="false" />
 
 <div x-data="{ open: {{ index }} === 0 }"
-     class="border border-gray-200 rounded-xl overflow-hidden bg-white">
+     class="border-2 border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-[3px_3px_0_0_#111827] relative z-10 transition-shadow duration-200 overflow-hidden manga-drawn-alt">
 
   {# ── Header du module (clickable) ── #}
   <button x-on:click="open = !open"
-          class="w-full flex items-center justify-between px-5 py-4 bg-gray-50 hover:bg-gray-100 transition text-left cursor-pointer focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-400">
-    <div class="flex items-center gap-3 min-w-0">
-      <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-orange-100 text-orange-600 text-sm font-bold shrink-0">
+          class="w-full flex items-center justify-between px-6 py-5 bg-white hover:bg-gray-50 transition-colors text-left cursor-pointer group">
+    <div class="flex items-center gap-4 min-w-0">
+      <span class="flex items-center justify-center w-10 h-10 border-2 border-gray-900 rounded-lg bg-primary text-white text-lg font-bold shrink-0 shadow-sm">
         {{ module.order }}
       </span>
-      <span class="font-semibold text-gray-800 truncate">{{ module.title }}</span>
+      <span class="font-extrabold text-gray-900 text-lg tracking-tight truncate">{{ module.title }}</span>
       {% if is_manager == 'true' and not module.is_published %}
         <c-ui.badge variant="yellow">Brouillon</c-ui.badge>
       {% endif %}
     </div>
     <div class="flex items-center gap-3 shrink-0">
-      <span class="text-xs text-gray-400">{{ module.lessons.count }} leçon{{ module.lessons.count|pluralize }}</span>
-      <svg class="w-4 h-4 text-gray-400 transition-transform duration-200"
+      {% if is_manager == 'true' %}
+        <span onclick="event.stopPropagation(); window.location.href='{% url 'manage_module_lessons' module.course.slug module.id %}';"
+              class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 transition cursor-pointer"
+              title="Gérer les leçons de ce module">
+          ⚙️ Gérer le module
+        </span>
+      {% endif %}
+      <span class="text-sm font-medium text-gray-500">{{ module.lessons.count }} leçon{{ module.lessons.count|pluralize }}</span>
+      <svg class="w-6 h-6 transition-transform duration-200 text-gray-400 group-hover:text-gray-900"
            :class="open && 'rotate-180'"
            fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -26,54 +34,73 @@
   </button>
 
   {# ── Liste des leçons ── #}
-  <ul x-show="open" x-collapse class="divide-y divide-gray-100">
+  <ul x-show="open" x-collapse class="divide-y divide-gray-100 border-t border-gray-100">
     {% for lesson in module.lessons.all %}
-      <li class="group hover:bg-orange-50/50 transition-colors duration-150">
+      <li class="group hover:bg-gray-50 transition-colors duration-200">
         {% if lesson.is_free or has_access == 'true' %}
           <a href="{% url 'lesson_detail' module.course.slug lesson.slug %}"
-             class="flex items-center justify-between px-5 py-3.5 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-400">
-            <div class="flex items-center gap-3 min-w-0">
+             class="flex items-center justify-between px-6 py-4 focus:outline-none focus:bg-gray-50">
+            <div class="flex items-center gap-4 min-w-0">
               {# Icône statut #}
               {% if lesson.id in completed_ids %}
-                <svg class="w-5 h-5 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
+                <span class="flex items-center justify-center w-6 h-6 border-2 border-green-500 rounded-full bg-green-50 text-green-600 shrink-0">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </span>
               {% else %}
-                <span class="w-5 h-5 flex items-center justify-center shrink-0 rounded-full border-2 border-gray-200 text-xs text-gray-400">
+                <span class="flex items-center justify-center w-6 h-6 border-2 border-gray-300 rounded-full text-xs font-bold text-gray-500 shrink-0 group-hover:border-gray-900 group-hover:text-gray-900 transition-colors">
                   {{ lesson.order }}
                 </span>
               {% endif %}
-              <span class="text-sm font-medium text-gray-700 group-hover:text-orange-700 truncate">
-                {{ lesson.title }}
+              <span class="text-base font-medium text-gray-700 group-hover:text-gray-900 truncate transition-colors">
+                {{ lesson.title|furigana }}
               </span>
             </div>
 
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex items-center gap-2.5 shrink-0">
+              {% if is_manager == 'true' %}
+                <span onclick="event.preventDefault(); event.stopPropagation(); window.location.href='{% url 'manage_lesson_content' module.course.slug lesson.slug %}';"
+                      class="px-2.5 py-1 text-xs font-bold rounded-lg bg-gray-900 text-white hover:bg-primary transition shadow-sm cursor-pointer"
+                      title="Modifier le contenu de cette leçon (Builder)">
+                  ✏️ Builder
+                </span>
+              {% endif %}
               {% if lesson.is_free %}
                 <c-ui.badge variant="green">Gratuit</c-ui.badge>
               {% endif %}
               {% if is_manager == 'true' and not lesson.is_published %}
                 <c-ui.badge variant="yellow">Brouillon</c-ui.badge>
               {% endif %}
-              <svg class="w-4 h-4 text-gray-300 group-hover:text-orange-400 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-900 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
               </svg>
             </div>
           </a>
         {% else %}
-          <div class="flex items-center justify-between px-5 py-3.5 opacity-60">
-            <div class="flex items-center gap-3 min-w-0">
-              <svg class="w-5 h-5 text-gray-300 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-              </svg>
-              <span class="text-sm text-gray-500 truncate">{{ lesson.title }}</span>
+          <div class="flex items-center justify-between px-6 py-4 bg-gray-50">
+            <div class="flex items-center gap-4 min-w-0">
+              <span class="flex items-center justify-center w-6 h-6 border-2 border-gray-300 rounded-full text-gray-400 shrink-0">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+              </span>
+              <span class="text-base font-medium text-gray-400 truncate">{{ lesson.title|furigana }}</span>
             </div>
-            <svg class="w-4 h-4 text-gray-200 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            <svg class="w-5 h-5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
             </svg>
           </div>
         {% endif %}
       </li>
     {% endfor %}
+    {% if is_manager == 'true' %}
+      <li class="p-3 bg-gray-50/80 border-t border-dashed border-gray-200 text-center">
+        <a href="{% url 'manage_module_lessons' module.course.slug module.id %}"
+           class="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary-dark transition">
+          ➕ Ajouter ou réorganiser des leçons dans ce module
+        </a>
+      </li>
+    {% endif %}
   </ul>
 </div>

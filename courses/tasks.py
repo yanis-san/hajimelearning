@@ -16,7 +16,7 @@ def generate_certificate_pdf(completion_id):
     Déclenché par le signal post_save de CourseCompletion.
     """
     try:
-        from weasyprint import HTML
+        from xhtml2pdf import pisa
         from .models import CourseCompletion
 
         completion = CourseCompletion.objects.select_related('student', 'course').get(id=completion_id)
@@ -28,11 +28,12 @@ def generate_certificate_pdf(completion_id):
         })
 
         pdf_bytes = BytesIO()
-        HTML(string=html_string).write_pdf(target=pdf_bytes)
-        pdf_bytes.seek(0)
-
-        filename = f"certificat_{completion.student.id}_{completion.course.slug}.pdf"
-        completion.certificate_pdf.save(filename, pdf_bytes, save=True)
+        pisa_status = pisa.CreatePDF(html_string, dest=pdf_bytes)
+        
+        if not pisa_status.err:
+            pdf_bytes.seek(0)
+            filename = f"certificat_{completion.student.id}_{completion.course.slug}.pdf"
+            completion.certificate_pdf.save(filename, pdf_bytes, save=True)
 
         logger.info(
             "Certificat généré : complétion #%s (%s - %s)",

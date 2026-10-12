@@ -6,12 +6,75 @@ import re
 register = template.Library()
 
 
-@register.filter(name="md")
-def render_markdown(value):
-    """Convertit du texte Markdown en HTML sécurisé."""
+def convert_furigana(text):
+    """
+    Convertit différentes syntaxes de furigana en balises HTML <ruby><rt>...</rt></ruby>.
+    Prend en charge :
+    1. {漢字|かんじ}              -> <ruby>漢字<rt>かんじ</rt></ruby>
+    2. {日本語|に|ほん|ご}         -> <ruby>日<rt>に</rt></ruby><ruby>本<rt>ほん</rt></ruby><ruby>語<rt>ご</rt></ruby> (distribution par kanji)
+    3. [漢字]{かんじ}              -> <ruby>漢字<rt>かんじ</rt></ruby>
+    4. [日本語]{に|ほん|ご}         -> <ruby>日<rt>に</rt></ruby><ruby>本<rt>ほん</rt></ruby><ruby>語<rt>ご</rt></ruby>
+    5. ｜漢字《かんじ》             -> <ruby>漢字<rt>かんじ</rt></ruby> (Standard Aozora Bunko avec séparateur | ou ｜)
+    6. 漢字《かんじ》              -> <ruby>漢字<rt>かんじ</rt></ruby> (Raccourci kanji + double chevrons 《》)
+    """
+    if not text:
+        return ""
+
+    def _replace_split(base, reading):
+        base = base.strip()
+        reading = reading.strip()
+        if '|' in reading:
+            parts = [p.strip() for p in reading.split('|')]
+            if len(base) == len(parts):
+                return ''.join(f'<ruby>{k}<rt>{r}</rt></ruby>' for k, r in zip(base, parts))
+        return f'<ruby>{base}<rt>{reading}</rt></ruby>'
+
+    # 1. Syntaxe {kanji|furigana}
+    text = re.sub(
+        r'\{([^{|\n]+)\|([^{}\n]+)\}',
+        lambda m: _replace_split(m.group(1), m.group(2)),
+        text
+    )
+
+    # 2. Syntaxe [kanji]{furigana}
+    text = re.sub(
+        r'\[([^\]\n]+)\]\{([^{}\n]+)\}',
+        lambda m: _replace_split(m.group(1), m.group(2)),
+        text
+    )
+
+    # 3. Syntaxe Aozora Bunko avec pipe: ｜base《reading》 ou |base《reading》
+    text = re.sub(
+        r'[｜\|]([^《\n]+)《([^》\n]+)》',
+        lambda m: _replace_split(m.group(1), m.group(2)),
+        text
+    )
+
+    # 4. Syntaxe directe Kanji《furigana》
+    text = re.sub(
+        r'([\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff々〆ヵヶ]+)《([^》\n]+)》',
+        lambda m: _replace_split(m.group(1), m.group(2)),
+        text
+    )
+
+    return text
+
+
+@register.filter(name="furigana")
+def furigana_filter(value):
+    """Convertit les annotations furigana en HTML sécurisé."""
     if not value:
         return ""
-    return mark_safe(markdownify(value))
+    return mark_safe(convert_furigana(str(value)))
+
+
+@register.filter(name="md")
+def render_markdown(value):
+    """Convertit du texte Markdown avec furigana en HTML sécurisé."""
+    if not value:
+        return ""
+    processed = convert_furigana(str(value))
+    return mark_safe(markdownify(processed))
 
 
 @register.filter(name="first_heading")
@@ -63,10 +126,10 @@ def faq_items(value):
         if not part:
             continue
         lines = part.split('\n', 1)
-        question = lines[0].strip()
+        question = convert_furigana(lines[0].strip())
         answer_md = lines[1].strip() if len(lines) > 1 else ''
-        answer_html = markdownify(answer_md) if answer_md else ''
-        items.append((question, mark_safe(answer_html)))
+        answer_html = markdownify(convert_furigana(answer_md)) if answer_md else ''
+        items.append((mark_safe(question), mark_safe(answer_html)))
     return items
 
 
@@ -92,7 +155,7 @@ def testimonial_items(value):
         lines = part.split('\n', 1)
         header = lines[0].strip()
         text_md = lines[1].strip() if len(lines) > 1 else ''
-        text_html = markdownify(text_md) if text_md else ''
+        text_html = markdownify(convert_furigana(text_md)) if text_md else ''
 
         # Parse "★★★★★ | Nom Prénom" or just "Nom Prénom"
         if '|' in header:
@@ -105,7 +168,7 @@ def testimonial_items(value):
 
         items.append({
             'stars': stars,
-            'name': name,
+            'name': mark_safe(convert_furigana(name)),
             'text_html': mark_safe(text_html),
         })
     return items

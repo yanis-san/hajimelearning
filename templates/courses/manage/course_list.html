@@ -8,6 +8,13 @@
   subtitle="Créez, éditez et organisez vos cours">
 
   <c-slot name="actions">
+    <button type="button"
+            x-data
+            x-on:click="$dispatch('open-furigana-guide')"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-gray-950 font-bold rounded-xl transition shadow-sm cursor-pointer text-xs"
+            title="Consulter le guide et copier des modèles furigana">
+      💡 Guide Furigana
+    </button>
     <c-ui.btn variant="primary" href="{% url 'manage_course_create' %}">
       ➕ Nouveau cours
     </c-ui.btn>
@@ -81,4 +88,6 @@
   {% endif %}
 
 </c-layout.admin-card>
+
+<c-manage.furigana-guide />
 {% endblock %}

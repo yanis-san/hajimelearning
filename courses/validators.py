@@ -31,3 +31,6 @@ DOC_EXTENSIONS = ['pdf', 'doc', 'docx', 'zip', 'rar', 'xls', 'xlsx', 'ppt', 'ppt
 
 # Audio (Dictées, sons de complétion)
 AUDIO_EXTENSIONS = ['mp3', 'wav', 'm4a', 'ogg']
+
+# Decks Anki (bloc « Deck Anki »)
+ANKI_EXTENSIONS = ['apkg']

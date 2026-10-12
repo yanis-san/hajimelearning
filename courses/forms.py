@@ -45,10 +45,22 @@ class QuizQuestionForm(forms.ModelForm):
 
 # ── Formulaires Admin CRUD ──────────────────────────
 
-TAILWIND_INPUT = 'w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition text-sm'
-TAILWIND_TEXTAREA = TAILWIND_INPUT + ' resize-y'
-TAILWIND_CHECKBOX = 'rounded border-gray-300 text-orange-500 focus:ring-orange-400'
-TAILWIND_FILE = 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100'
+TAILWIND_INPUT = (
+    'w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl bg-stone-50/80 text-gray-900 '
+    'placeholder-gray-400 focus:bg-white focus:outline-none focus:border-gray-900 '
+    'focus:ring-2 focus:ring-gray-900/10 transition-all text-sm font-medium shadow-2xs hover:border-gray-400'
+)
+TAILWIND_TEXTAREA = (
+    'w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-stone-50/80 text-gray-900 '
+    'placeholder-gray-400 focus:bg-white focus:outline-none focus:border-gray-900 '
+    'focus:ring-2 focus:ring-gray-900/10 transition-all text-sm resize-y shadow-2xs hover:border-gray-400'
+)
+TAILWIND_CHECKBOX = 'w-5 h-5 rounded-md border-2 border-gray-300 text-gray-900 focus:ring-gray-900/20 transition cursor-pointer'
+TAILWIND_FILE = (
+    'block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-2 '
+    'file:border-gray-900 file:text-xs file:font-bold file:bg-yellow-300 file:text-gray-950 '
+    'hover:file:bg-yellow-400 file:cursor-pointer file:transition file:shadow-xs'
+)
 
 
 class CourseForm(forms.ModelForm):
@@ -60,31 +72,19 @@ class CourseForm(forms.ModelForm):
             'meta_description', 'keywords', 'price', 'thumbnail', 'cover_image',
             'is_published', 'is_featured', 'hide_title_on_card',
         ]
+        widgets = {
+            'description': forms.Textarea(),
+            'what_you_will_learn': forms.Textarea(),
+            'prerequisites': forms.Textarea(),
+            'short_description': forms.Textarea(),
+            'meta_description': forms.Textarea(),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['slug'].required = False
         self.fields['slug'].help_text = 'URL du cours. Généré automatiquement si vide.'
 
-    def clean_slug(self):
-        slug = self.cleaned_data.get('slug')
-        if not slug:
-            slug = slugify(self.cleaned_data.get('title', ''))
-        return slug
-
-
-class InstructorCourseForm(CourseForm):
-    """Formulaire cours pour instructeurs : pas de mise en avant ni d'options admin."""
-    class Meta(CourseForm.Meta):
-        fields = [
-            'title', 'slug', 'short_description', 'description',
-            'what_you_will_learn', 'prerequisites', 'trailer_video_id',
-            'meta_description', 'keywords', 'price', 'thumbnail', 'cover_image',
-            'is_published',
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
             widget = field.widget
             if isinstance(widget, forms.CheckboxInput):
@@ -99,10 +99,97 @@ class InstructorCourseForm(CourseForm):
             else:
                 widget.attrs['class'] = TAILWIND_INPUT
 
-        self.fields['description'].widget.attrs['rows'] = 10
-        self.fields['short_description'].widget = forms.Textarea(attrs={
-            'class': TAILWIND_TEXTAREA, 'rows': 3,
-        })
+        # Personnalisations précises et délimitées de chaque champ
+        if 'title' in self.fields:
+            self.fields['title'].widget.attrs.update({
+                'class': TAILWIND_INPUT + ' font-bold text-base',
+                'placeholder': 'Ex: Japonais Débutant - JLPT N5',
+            })
+        if 'slug' in self.fields:
+            self.fields['slug'].widget.attrs.update({
+                'class': TAILWIND_INPUT + ' font-mono text-sm',
+                'placeholder': 'japonais-n5',
+            })
+        if 'price' in self.fields:
+            self.fields['price'].widget.attrs.update({
+                'class': TAILWIND_INPUT + ' font-bold text-base',
+                'placeholder': '0',
+            })
+        if 'short_description' in self.fields:
+            self.fields['short_description'].widget.attrs.update({
+                'class': TAILWIND_TEXTAREA,
+                'rows': 3,
+                'placeholder': 'Courte phrase d\'accroche (visible sur la carte du cours en page d\'accueil)...',
+            })
+        if 'description' in self.fields:
+            self.fields['description'].widget.attrs.update({
+                'class': TAILWIND_TEXTAREA + ' font-mono text-sm leading-relaxed',
+                'rows': 12,
+                'placeholder': 'Description complète et détaillée de la formation (Markdown supporté)...',
+            })
+        if 'what_you_will_learn' in self.fields:
+            self.fields['what_you_will_learn'].widget.attrs.update({
+                'class': TAILWIND_TEXTAREA + ' font-mono text-sm leading-relaxed',
+                'rows': 6,
+                'placeholder': '- Première compétence ou acquis\n- Deuxième compétence\n- Troisième point fort...',
+            })
+        if 'prerequisites' in self.fields:
+            self.fields['prerequisites'].widget.attrs.update({
+                'class': TAILWIND_TEXTAREA + ' font-mono text-sm leading-relaxed',
+                'rows': 4,
+                'placeholder': 'Ex: Aucun prérequis, idéal pour débutant complet.',
+            })
+        if 'trailer_video_id' in self.fields:
+            self.fields['trailer_video_id'].widget.attrs.update({
+                'class': TAILWIND_INPUT + ' font-mono text-sm',
+                'placeholder': 'Ex: dQw4w9WgXcQ (ID YouTube ou lien)',
+            })
+        if 'meta_description' in self.fields:
+            self.fields['meta_description'].widget.attrs.update({
+                'class': TAILWIND_TEXTAREA,
+                'rows': 3,
+                'maxlength': '160',
+                'placeholder': 'Résumé percutant pour Google et les moteurs de recherche (max 160 caractères)...',
+            })
+        if 'keywords' in self.fields:
+            self.fields['keywords'].widget.attrs.update({
+                'class': TAILWIND_INPUT,
+                'placeholder': 'japonais, n5, jlpt, vocabulaire, kanji, cours',
+            })
+
+    def clean_slug(self):
+        slug = self.cleaned_data.get('slug')
+        if not slug:
+            slug = slugify(self.cleaned_data.get('title', ''))
+        return slug
+
+    def clean_trailer_video_id(self):
+        val = self.cleaned_data.get('trailer_video_id', '')
+        if val:
+            val = val.strip()
+            import re
+            m = re.search(r'(?:v=|\/|youtu\.be\/)([a-zA-Z0-9_-]{11})', val)
+            if m:
+                return m.group(1)
+        return val
+
+
+class InstructorCourseForm(CourseForm):
+    """Formulaire cours pour instructeurs : pas de mise en avant ni d'options admin."""
+    class Meta(CourseForm.Meta):
+        fields = [
+            'title', 'slug', 'short_description', 'description',
+            'what_you_will_learn', 'prerequisites', 'trailer_video_id',
+            'meta_description', 'keywords', 'price', 'thumbnail', 'cover_image',
+            'is_published',
+        ]
+        widgets = {
+            'description': forms.Textarea(),
+            'what_you_will_learn': forms.Textarea(),
+            'prerequisites': forms.Textarea(),
+            'short_description': forms.Textarea(),
+            'meta_description': forms.Textarea(),
+        }
 
 
 class ModuleForm(forms.ModelForm):

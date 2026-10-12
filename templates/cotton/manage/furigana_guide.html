@@ -1,0 +1,222 @@
+<div x-data="{
+       open: false,
+       copiedIndex: null,
+       copyText(text, index) {
+         navigator.clipboard.writeText(text).then(() => {
+           this.copiedIndex = index;
+           setTimeout(() => { this.copiedIndex = null; }, 1800);
+         });
+       }
+     }"
+     @open-furigana-guide.window="open = true"
+     @keydown.escape.window="open = false">
+
+  {# ── Overlay & Backdrop ── #}
+  <div x-show="open"
+       x-transition:enter="transition-opacity ease-out duration-200"
+       x-transition:enter-start="opacity-0"
+       x-transition:enter-end="opacity-100"
+       x-transition:leave="transition-opacity ease-in duration-150"
+       x-transition:leave-start="opacity-100"
+       x-transition:leave-end="opacity-0"
+       class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 sm:p-6"
+       x-cloak>
+
+    {# ── Modal Box ── #}
+    <div x-show="open"
+         x-on:click.outside="open = false"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+         x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+         class="bg-white border-2 border-gray-900 rounded-2xl shadow-[8px_8px_0_0_#111827] w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden manga-drawn">
+
+      {# ── Header ── #}
+      <div class="px-6 py-4 bg-gray-950 text-white border-b-2 border-primary flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white text-base font-black shadow-sm">
+            振
+          </span>
+          <div>
+            <h3 class="text-lg font-black tracking-tight text-white flex items-center gap-2">
+              Guide & Modèles Furigana
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">振仮名</span>
+            </h3>
+            <p class="text-xs text-gray-400">Cliquez pour copier un modèle et collez-le directement dans vos cours.</p>
+          </div>
+        </div>
+
+        <button type="button"
+                x-on:click="open = false"
+                class="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition cursor-pointer"
+                title="Fermer (Échap)">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      {# ── Body (Scrollable) ── #}
+      <div class="p-6 overflow-y-auto space-y-6">
+
+        {# Intro note #}
+        <div class="p-4 bg-orange-50 border-2 border-orange-200 rounded-xl text-xs text-orange-950 flex items-start gap-3">
+          <span class="text-xl shrink-0">💡</span>
+          <div>
+            <span class="font-bold">Comment ça marche ?</span> Vous n'avez pas besoin d'écrire de balises HTML. Écrivez simplement vos kanjis et prononciations entre accolades ou chevrons, la plateforme s'occupe de la typographie et de la disposition exacte au-dessus des caractères.
+          </div>
+        </div>
+
+        {# ── Tableau des modèles à copier ── #}
+        <div class="space-y-3">
+          <h4 class="text-xs font-extrabold uppercase tracking-widest text-gray-400">Modèles de base</h4>
+
+          {# Modèle 1 #}
+          <div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-gray-900 transition group">
+            <div class="space-y-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-primary text-white">Recommandé</span>
+                <span class="text-sm font-bold text-gray-900">Mot complet standard</span>
+              </div>
+              <p class="text-xs text-gray-500">Pour annoter un mot ou une expression complète.</p>
+              <div class="flex items-center gap-3 pt-1">
+                <code class="px-2.5 py-1 bg-white border border-gray-300 rounded-md font-mono text-xs text-gray-800 font-bold select-all">{日本語|にほんご}</code>
+                <span class="text-gray-400 text-xs">➔</span>
+                <span class="text-base text-gray-900 font-medium"><ruby>日本語<rt>にほんご</rt></ruby></span>
+              </div>
+            </div>
+            <button type="button"
+                    x-on:click="copyText('{日本語|にほんご}', 1)"
+                    class="px-3.5 py-2 text-xs font-bold rounded-lg border-2 border-gray-900 transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-[2px_2px_0_0_#111827] active:translate-y-0.5"
+                    :class="copiedIndex === 1 ? 'bg-green-500 text-white border-green-600 shadow-none' : 'bg-white text-gray-900 hover:bg-gray-100'">
+              <span x-text="copiedIndex === 1 ? '✓ Copié !' : '📋 Copier'"></span>
+            </button>
+          </div>
+
+          {# Modèle 2 #}
+          <div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-gray-900 transition group">
+            <div class="space-y-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-blue-600 text-white">Précision</span>
+                <span class="text-sm font-bold text-gray-900">Kanji par kanji (distribution 1:1)</span>
+              </div>
+              <p class="text-xs text-gray-500">Aligne chaque syllabe exactement au-dessus de chaque kanji.</p>
+              <div class="flex items-center gap-3 pt-1">
+                <code class="px-2.5 py-1 bg-white border border-gray-300 rounded-md font-mono text-xs text-gray-800 font-bold select-all">{日本語|に|ほん|ご}</code>
+                <span class="text-gray-400 text-xs">➔</span>
+                <span class="text-base text-gray-900 font-medium"><ruby>日<rt>に</rt></ruby><ruby>本<rt>ほん</rt></ruby><ruby>語<rt>ご</rt></ruby></span>
+              </div>
+            </div>
+            <button type="button"
+                    x-on:click="copyText('{日本語|に|ほん|ご}', 2)"
+                    class="px-3.5 py-2 text-xs font-bold rounded-lg border-2 border-gray-900 transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-[2px_2px_0_0_#111827] active:translate-y-0.5"
+                    :class="copiedIndex === 2 ? 'bg-green-500 text-white border-green-600 shadow-none' : 'bg-white text-gray-900 hover:bg-gray-100'">
+              <span x-text="copiedIndex === 2 ? '✓ Copié !' : '📋 Copier'"></span>
+            </button>
+          </div>
+
+          {# Modèle 3 #}
+          <div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-gray-900 transition group">
+            <div class="space-y-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-emerald-600 text-white">Verbes</span>
+                <span class="text-sm font-bold text-gray-900">Verbes & Adjectifs (Okurigana)</span>
+              </div>
+              <p class="text-xs text-gray-500">Seul le kanji est annoté, la terminaison reste normale.</p>
+              <div class="flex items-center gap-3 pt-1">
+                <code class="px-2.5 py-1 bg-white border border-gray-300 rounded-md font-mono text-xs text-gray-800 font-bold select-all">{食|た}べる</code>
+                <span class="text-gray-400 text-xs">➔</span>
+                <span class="text-base text-gray-900 font-medium"><ruby>食<rt>た</rt></ruby>べる</span>
+              </div>
+            </div>
+            <button type="button"
+                    x-on:click="copyText('{食|た}べる', 3)"
+                    class="px-3.5 py-2 text-xs font-bold rounded-lg border-2 border-gray-900 transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-[2px_2px_0_0_#111827] active:translate-y-0.5"
+                    :class="copiedIndex === 3 ? 'bg-green-500 text-white border-green-600 shadow-none' : 'bg-white text-gray-900 hover:bg-gray-100'">
+              <span x-text="copiedIndex === 3 ? '✓ Copié !' : '📋 Copier'"></span>
+            </button>
+          </div>
+
+          {# Modèle 4 #}
+          <div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-gray-900 transition group">
+            <div class="space-y-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-purple-600 text-white">Aozora</span>
+                <span class="text-sm font-bold text-gray-900">Style Chevrons (Standard Japonais)</span>
+              </div>
+              <p class="text-xs text-gray-500">Format d'édition traditionnel japonais sans accolades.</p>
+              <div class="flex items-center gap-3 pt-1">
+                <code class="px-2.5 py-1 bg-white border border-gray-300 rounded-md font-mono text-xs text-gray-800 font-bold select-all">漢字《かんじ》</code>
+                <span class="text-gray-400 text-xs">➔</span>
+                <span class="text-base text-gray-900 font-medium"><ruby>漢字<rt>かんじ</rt></ruby></span>
+              </div>
+            </div>
+            <button type="button"
+                    x-on:click="copyText('漢字《かんじ》', 4)"
+                    class="px-3.5 py-2 text-xs font-bold rounded-lg border-2 border-gray-900 transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-[2px_2px_0_0_#111827] active:translate-y-0.5"
+                    :class="copiedIndex === 4 ? 'bg-green-500 text-white border-green-600 shadow-none' : 'bg-white text-gray-900 hover:bg-gray-100'">
+              <span x-text="copiedIndex === 4 ? '✓ Copié !' : '📋 Copier'"></span>
+            </button>
+          </div>
+        </div>
+
+        {# ── Exemples de phrases réelles ── #}
+        <div class="space-y-3 pt-2">
+          <h4 class="text-xs font-extrabold uppercase tracking-widest text-gray-400">Phrases prêtes à l'emploi</h4>
+
+          <div class="bg-gray-900 text-white rounded-xl p-4 space-y-3 font-mono text-xs">
+            <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+              <span class="text-gray-400 font-sans text-xs">Phrase d'apprentissage</span>
+              <button type="button"
+                      x-on:click="copyText('{私|わたし}は{日本語|にほんご}を{勉強|べんきょう}しています。', 5)"
+                      class="text-xs px-2.5 py-1 rounded bg-gray-800 hover:bg-primary text-white transition flex items-center gap-1 cursor-pointer"
+                      :class="copiedIndex === 5 && 'bg-green-600'">
+                <span x-text="copiedIndex === 5 ? '✓ Copié' : '📋 Copier'"></span>
+              </button>
+            </div>
+            <p class="text-gray-200 select-all">{私|わたし}は{日本語|にほんご}を{勉強|べんきょう}しています。</p>
+            <p class="text-sm font-sans text-white border-t border-gray-800/80 pt-2"><ruby>私<rt>わたし</rt></ruby>は<ruby>日本語<rt>にほんご</rt></ruby>を<ruby>勉強<rt>べんきょう</rt></ruby>しています。</p>
+          </div>
+
+          <div class="bg-gray-900 text-white rounded-xl p-4 space-y-3 font-mono text-xs">
+            <div class="flex items-center justify-between pb-2 border-b border-gray-800">
+              <span class="text-gray-400 font-sans text-xs">Salutation & météo</span>
+              <button type="button"
+                      x-on:click="copyText('{今日|きょう}は{良|い}い{天気|てんき}ですね。', 6)"
+                      class="text-xs px-2.5 py-1 rounded bg-gray-800 hover:bg-primary text-white transition flex items-center gap-1 cursor-pointer"
+                      :class="copiedIndex === 6 && 'bg-green-600'">
+                <span x-text="copiedIndex === 6 ? '✓ Copié' : '📋 Copier'"></span>
+              </button>
+            </div>
+            <p class="text-gray-200 select-all">{今日|きょう}は{良|い}い{天気|てんき}ですね。</p>
+            <p class="text-sm font-sans text-white border-t border-gray-800/80 pt-2"><ruby>今日<rt>きょう</rt></ruby>は<ruby>良<rt>い</rt></ruby>い<ruby>天気<rt>てんき</rt></ruby>ですね。</p>
+          </div>
+        </div>
+
+        {# ── Avantages de la plateforme ── #}
+        <div class="p-4 bg-gray-100 rounded-xl space-y-2 text-xs text-gray-700">
+          <p class="font-bold text-gray-900">✨ Bonnes pratiques pour vos cours :</p>
+          <ul class="list-disc pl-5 space-y-1 text-gray-600">
+            <li><strong>Copier-coller sans pollution</strong> : Vos étudiants peuvent surligner et copier les phrases sans que les prononciations ne viennent se glisser au milieu du texte copié.</li>
+            <li><strong>Support partout</strong> : Fonctionne dans les blocs Markdown (texte, audio, anki), les questions et réponses des Quiz, les titres de leçons et les FAQs.</li>
+            <li><strong>Mise en page automatique</strong> : Un interligne dynamique est appliqué automatiquement pour éviter que les lectures ne touchent la ligne au-dessus.</li>
+          </ul>
+        </div>
+
+      </div>
+
+      {# ── Footer ── #}
+      <div class="px-6 py-3 bg-gray-50 border-t-2 border-gray-200 flex justify-end shrink-0">
+        <button type="button"
+                x-on:click="open = false"
+                class="px-4 py-2 text-xs font-bold bg-gray-900 text-white rounded-lg hover:bg-primary transition cursor-pointer">
+          Fermer
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

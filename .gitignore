@@ -16,6 +16,7 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media/
+protected_media/
 staticfiles/
 
 # Env files
@@ -45,3 +46,11 @@ Thumbs.db
 .claude/
 .gemini/
 .impeccable/
+
+# Scratch & Temporary
+scratch/
+new_index.html
+old_index.html
+
+# Heavy media
+static/videos/

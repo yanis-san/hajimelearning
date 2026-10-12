@@ -1,0 +1,5 @@
+{% if is_dropdown %}
+  <c-notification.item :notif="notif" compact="true" />
+{% else %}
+  <c-notification.item :notif="notif" compact="false" />
+{% endif %}

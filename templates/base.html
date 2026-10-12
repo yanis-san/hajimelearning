@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="fr" class="h-full bg-[#FAF8F5]">
+<html lang="fr" class="min-h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,19 +21,55 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
 
     <script src="{% static 'js/htmx.min.js' %}"></script>
     <script defer src="{% static 'js/alpine.min.js' %}"></script>
 
     <style>
         [x-cloak] { display: none !important; }
+        .manga-drawn {
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px !important;
+        }
+        .manga-drawn-alt {
+            border-radius: 15px 255px 15px 225px/225px 15px 255px 15px !important;
+        }
+
+        /* ── Furigana / Ruby Typography ── */
+        ruby {
+            ruby-position: over;
+            -webkit-ruby-position: over;
+            ruby-align: center;
+            line-height: 1.85;
+        }
+        rt {
+            font-size: 0.58em;
+            line-height: 1.1;
+            font-weight: 600;
+            text-align: center;
+            color: #000000;
+            opacity: 1;
+            letter-spacing: 0.02em;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            font-family: 'Klee One', 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+        }
+        :is(.text-white, .text-gray-100, .text-gray-200, .text-gray-300, .bg-gray-900, .bg-gray-950, .bg-black, [class*="bg-gray-900"], [class*="bg-gray-950"], [class*="bg-dark"]) rt {
+            color: #ffffff;
+        }
+        :where(p, li, h1, h2, h3, h4, h5, td, th, blockquote):has(ruby) {
+            line-height: 2.2 !important;
+        }
+        .prose :where(p, li, h1, h2, h3, h4):has(ruby) {
+            line-height: 2.25 !important;
+        }
     </style>
 
     {% block extra_head %}{% endblock %}
 </head>
 
-<body class="h-full flex flex-col font-['Outfit',system-ui,sans-serif] text-gray-900 antialiased"
+<body class="min-h-screen flex flex-col font-sans text-dark antialiased"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
     <c-layout.navbar />

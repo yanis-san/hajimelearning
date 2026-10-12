@@ -41,7 +41,7 @@ vine==5.1.0
 click==8.3.1
 
 # --- PDF ---
-weasyprint==68.1
+xhtml2pdf==0.2.16
 
 # --- Base de données Prod (MySQL via cPanel) ---
 PyMySQL==1.1.2

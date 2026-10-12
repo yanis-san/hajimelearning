@@ -3,11 +3,12 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.http import require_POST
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, FileResponse, Http404, HttpResponseForbidden
 from django.template.loader import render_to_string
 from django.db.models import Count, Q, F, Prefetch
 from django.contrib.auth import get_user_model
 from django.utils.safestring import mark_safe
+from django.utils import timezone
 from .models import Category
 from django.urls import reverse
 from markdownx.utils import markdownify
@@ -112,18 +113,12 @@ def course_detail(request, course_slug):
 
     completed_lesson_ids = []
     progress_percent = 0
+    user_progress = None
     if request.user.is_authenticated:
-        completed_lesson_ids = StudentProgress.objects.filter(
-            student=request.user,
-            lesson__module__course=course
-        ).values_list('lesson_id', flat=True)
-        # Compter seulement les leçons publiées pour la progression
-        total_lessons = Lesson.objects.filter(
-            module__course=course, is_published=True,
-            module__is_published=True,
-        ).count()
-        if total_lessons > 0:
-            progress_percent = int((len(completed_lesson_ids) / total_lessons) * 100)
+        from .progress import get_course_progress
+        user_progress = get_course_progress(request.user, course)
+        completed_lesson_ids = user_progress.completed_ids
+        progress_percent = user_progress.percent
 
     landing_sections = course_with_modules.landing_sections.filter(is_visible=True)
 
@@ -138,6 +133,7 @@ def course_detail(request, course_slug):
         'has_access': has_access,
         'completed_lesson_ids': completed_lesson_ids,
         'progress_percent': progress_percent,
+        'user_progress': user_progress,
         'landing_sections': landing_sections,
         'preview_landing': preview_landing,
         'is_manager': is_manager,
@@ -171,11 +167,23 @@ def lesson_detail(request, course_slug, lesson_slug):
     ).get(pk=course.pk)
 
     completed_lesson_ids = []
+    prev_lesson, next_lesson = None, None
+    blocks = list(lesson.blocks.all())
     if request.user.is_authenticated:
-        completed_lesson_ids = StudentProgress.objects.filter(
-            student=request.user,
-            lesson__module__course=course
-        ).values_list('lesson_id', flat=True)
+        from .progress import get_course_progress, record_visit
+        from .models import StudentNote
+        progress = get_course_progress(request.user, course)
+        completed_lesson_ids = progress.completed_ids
+        prev_lesson, next_lesson = progress.neighbours(lesson)
+        record_visit(request.user, course, lesson)
+
+        # Notes personnelles par bloc
+        notes = dict(
+            StudentNote.objects.filter(student=request.user, block__in=blocks)
+            .values_list('block_id', 'content')
+        )
+        for block in blocks:
+            block.my_note = notes.get(block.id, "")
     
     question_form = QuestionForm()
     has_access = user_has_access(request.user, course)
@@ -184,9 +192,12 @@ def lesson_detail(request, course_slug, lesson_slug):
         'lesson': lesson,
         'course': course_for_sidebar,
         'completed_lesson_ids': completed_lesson_ids,
+        'prev_lesson': prev_lesson,
+        'next_lesson': next_lesson,
         'question_form': question_form,
         'has_access': has_access,
         'is_manager': is_manager,
+        'blocks': blocks,
     })
 
 @login_required
@@ -204,7 +215,7 @@ def user_dashboard(request):
     ).values_list('course_id', flat=True)
 
     my_courses = Course.objects.filter(
-        Q(id__in=enrolled_ids) | Q(id__in=approved_ids) | Q(id__in=activation_ids),
+        Q(id__in=enrolled_ids) | Q(id__in=approved_ids) | Q(id__in=activation_ids) | Q(instructor=request.user),
         is_published=True,
     ).distinct().order_by('-created_at')
 
@@ -213,6 +224,10 @@ def user_dashboard(request):
         CourseCompletion.objects.filter(student=request.user)
         .values_list('course_id', flat=True)
     )
+
+    from .progress import get_course_progress
+    for course in my_courses:
+        course.user_progress = get_course_progress(request.user, course)
 
     return render(request, 'courses/dashboard.html', {
         'courses': my_courses,
@@ -233,17 +248,10 @@ def mark_lesson_complete(request, course_slug, lesson_slug):
     StudentProgress.objects.get_or_create(student=request.user, lesson=current_lesson)
 
     # ── Vérification complétion totale du cours ──────────────────────────────
-    total_published = Lesson.objects.filter(
-        module__course=course, module__is_published=True, is_published=True
-    ).count()
-    completed_count = StudentProgress.objects.filter(
-        student=request.user,
-        lesson__module__course=course,
-        lesson__is_published=True,
-        lesson__module__is_published=True,
-    ).count()
+    from .progress import get_course_progress
+    progress = get_course_progress(request.user, course)
 
-    if total_published > 0 and completed_count >= total_published:
+    if progress.is_complete:
         completion, created = CourseCompletion.objects.get_or_create(
             student=request.user, course=course
         )
@@ -255,21 +263,60 @@ def mark_lesson_complete(request, course_slug, lesson_slug):
             else:
                 generate_certificate_pdf.delay(completion.id)
 
-    course_lessons = Lesson.objects.filter(
-        module__course=current_lesson.module.course
-    ).order_by('module__order', 'order')
-    
-    lesson_list = list(course_lessons)
-    try:
-        current_index = lesson_list.index(current_lesson)
-        if current_index + 1 < len(lesson_list):
-            next_lesson = lesson_list[current_index + 1]
-            return redirect('lesson_detail', course_slug=course_slug, lesson_slug=next_lesson.slug)
-    except ValueError:
-        pass
+    _, next_lesson = progress.neighbours(current_lesson)
+    if next_lesson:
+        return redirect('lesson_detail', course_slug=course_slug, lesson_slug=next_lesson.slug)
 
     messages.success(request, "Félicitations ! Vous avez terminé ce cours.")
     return redirect('course_detail', course_slug=course_slug)
+@login_required
+@require_POST
+def unmark_lesson_complete(request, course_slug, lesson_slug):
+    current_lesson = get_object_or_404(Lesson, module__course__slug=course_slug, slug=lesson_slug)
+    course = current_lesson.module.course
+
+    if not _is_course_manager(request.user, course) and not user_has_access(request.user, course):
+        messages.error(request, "Vous n'avez pas accès à ce cours.")
+        return redirect('course_detail', course_slug=course_slug)
+
+    StudentProgress.objects.filter(student=request.user, lesson=current_lesson).delete()
+
+    from .progress import get_course_progress
+    progress = get_course_progress(request.user, course)
+    if not progress.is_complete:
+        CourseCompletion.objects.filter(student=request.user, course=course).delete()
+
+    return redirect('lesson_detail', course_slug=course_slug, lesson_slug=lesson_slug)
+
+
+
+@login_required
+@require_POST
+def save_block_note(request, course_slug, block_id):
+    """Enregistre (ou supprime si vide) la note personnelle d'un étudiant sur un bloc."""
+    block = get_object_or_404(
+        ContentBlock.objects.select_related('lesson__module__course'),
+        pk=block_id, lesson__module__course__slug=course_slug,
+    )
+    lesson = block.lesson
+    course = lesson.module.course
+
+    if not _is_course_manager(request.user, course) and not lesson.is_free \
+            and not user_has_access(request.user, course):
+        return JsonResponse({'ok': False, 'error': 'forbidden'}, status=403)
+
+    from .models import StudentNote
+    content = request.POST.get('note_content', '').strip()
+    if content:
+        StudentNote.objects.update_or_create(
+            student=request.user, block=block, defaults={'content': content}
+        )
+    else:
+        StudentNote.objects.filter(student=request.user, block=block).delete()
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'ok': True, 'content': content})
+    return redirect('lesson_detail', course_slug=course_slug, lesson_slug=lesson.slug)
 
 
 @login_required
@@ -327,6 +374,35 @@ def save_quiz_result(request, block_id):
         return JsonResponse({'status': 'error', 'message': 'Une erreur est survenue.'}, status=500)
 
 
+@login_required
+def download_protected_media(request, block_id, field_name):
+    """
+    Sert les fichiers protégés (file_content ou related_file).
+    Vérifie que l'utilisateur a accès au cours.
+    """
+    block = get_object_or_404(ContentBlock, id=block_id)
+    course = block.lesson.module.course
+
+    if not _is_course_manager(request.user, course) and not user_has_access(request.user, course):
+        if not block.lesson.is_free:
+            return HttpResponseForbidden("Accès refusé. Vous devez être inscrit au cours.")
+
+    if field_name == 'file_content':
+        file_field = block.file_content
+    elif field_name == 'related_file':
+        file_field = block.related_file
+    else:
+        raise Http404("Champ inconnu.")
+
+    if not file_field or not file_field.name:
+        raise Http404("Fichier introuvable.")
+
+    try:
+        return FileResponse(file_field.open('rb'), as_attachment=True, filename=file_field.name.split('/')[-1])
+    except FileNotFoundError:
+        raise Http404("Le fichier physique n'existe plus.")
+
+
 # --- VUES BUILDER (SÉCURISÉES : STAFF ONLY) ---
 
 @builder_access_required
@@ -365,12 +441,33 @@ def add_block(request, lesson_id, block_type):
             last_block = lesson.blocks.last()
             block.order = last_block.order + 1 if last_block else 1
             block.save()
+
+            is_autosave = request.headers.get('X-Autosave') == 'true' or request.POST.get('is_autosave') == '1'
+            if is_autosave:
+                now_str = timezone.localtime(timezone.now()).strftime('%H:%M:%S')
+                block_list_html = render_to_string(
+                    'courses/manage/partials/block_list.html',
+                    {'lesson': lesson}, request=request,
+                )
+                return JsonResponse({
+                    'ok': True,
+                    'created': True,
+                    'block_id': block.id,
+                    'edit_url': reverse('edit_block', args=[block.id]),
+                    'saved_at': now_str,
+                    'message': f'Enregistré à {now_str}',
+                    'block_list_html': block_list_html,
+                })
+
             block_list_html = render_to_string(
                 'courses/manage/partials/block_list.html',
                 {'lesson': lesson}, request=request,
             )
             clear_form = '<div id="block-form-container" hx-swap-oob="innerHTML" class="mb-8"></div>'
             return HttpResponse(block_list_html + clear_form)
+        else:
+            if request.headers.get('X-Autosave') == 'true' or request.POST.get('is_autosave') == '1':
+                return JsonResponse({'ok': False, 'errors': form.errors.get_json_data()}, status=400)
     else:
         form = ContentBlockForm()
 
@@ -388,12 +485,31 @@ def edit_block(request, block_id):
         form = ContentBlockForm(request.POST, request.FILES, instance=block)
         if form.is_valid():
             form.save()
+
+            is_autosave = request.headers.get('X-Autosave') == 'true' or request.POST.get('is_autosave') == '1'
+            if is_autosave:
+                now_str = timezone.localtime(timezone.now()).strftime('%H:%M:%S')
+                block_list_html = render_to_string(
+                    'courses/manage/partials/block_list.html',
+                    {'lesson': block.lesson}, request=request,
+                )
+                return JsonResponse({
+                    'ok': True,
+                    'saved_at': now_str,
+                    'block_id': block.id,
+                    'message': f'Enregistré à {now_str}',
+                    'block_list_html': block_list_html,
+                })
+
             block_list_html = render_to_string(
                 'courses/manage/partials/block_list.html',
                 {'lesson': block.lesson}, request=request,
             )
             clear_form = '<div id="block-form-container" hx-swap-oob="innerHTML" class="mb-8"></div>'
             return HttpResponse(block_list_html + clear_form)
+        else:
+            if request.headers.get('X-Autosave') == 'true' or request.POST.get('is_autosave') == '1':
+                return JsonResponse({'ok': False, 'errors': form.errors.get_json_data()}, status=400)
     else:
         form = ContentBlockForm(instance=block)
 
@@ -436,7 +552,12 @@ def update_block_order(request):
     block_ids = request.POST.getlist('block_order')
     for index, block_id in enumerate(block_ids):
         ContentBlock.objects.filter(id=block_id).update(order=index + 1)
-    return HttpResponse("Ordre mis à jour")
+    now_str = timezone.localtime(timezone.now()).strftime('%H:%M:%S')
+    return HttpResponse(
+        f'<div class="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg shadow-xs transition-opacity duration-300">'
+        f'<span class="w-2 h-2 rounded-full bg-emerald-500"></span>'
+        f'<span>✓ Ordre enregistré automatiquement ({now_str})</span></div>'
+    )
 
 @builder_access_required
 def add_quiz_question(request, block_id):

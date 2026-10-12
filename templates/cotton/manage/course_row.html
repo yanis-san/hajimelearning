@@ -44,21 +44,21 @@
 
   {# Actions #}
   <td class="py-4 px-4">
-    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition"
+    <div class="flex items-center gap-1.5 flex-wrap"
          x-data="{ confirmDelete: false }">
-      <c-ui.btn variant="outline" size="sm" href="{% url 'manage_course_edit' course.slug %}">
-        ✏️ Éditer
+      <c-ui.btn variant="outline" size="sm" href="{% url 'manage_course_edit' course.slug %}" title="Paramètres & Prix">
+        ⚙️ Paramètres
       </c-ui.btn>
-      <c-ui.btn variant="ghost" size="sm" href="{% url 'manage_course_modules' course.slug %}">
-        📦 Modules
+      <c-ui.btn variant="primary" size="sm" href="{% url 'manage_course_modules' course.slug %}" title="Modules & Leçons">
+        📦 Modules & Leçons
       </c-ui.btn>
-      <c-ui.btn variant="ghost" size="sm" href="{% url 'course_detail' course.slug %}">
-        👁️ Voir le cours
+      <c-ui.btn variant="ghost" size="sm" href="{% url 'manage_course_landing' course.slug %}" title="Page Vitrine">
+        🎨 Vitrine
       </c-ui.btn>
-      <c-ui.btn variant="ghost" size="sm" href="{% url 'course_detail' course.slug %}?view=landing">
-        🏪 Vitrine
+      <c-ui.btn variant="ghost" size="sm" href="{% url 'course_detail' course.slug %}" target="_blank" title="Voir la formation">
+        👁️ Voir
       </c-ui.btn>
-      <c-ui.btn variant="ghost" size="sm" href="{% url 'manage_course_students' course.slug %}">
+      <c-ui.btn variant="ghost" size="sm" href="{% url 'manage_course_students' course.slug %}" title="Étudiants">
         👥 Étudiants
       </c-ui.btn>
 

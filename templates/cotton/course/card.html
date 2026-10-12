@@ -1,69 +1,84 @@
-<c-vars course="" show_progress="false" progress="0" />
+<c-vars course="" show_progress="false" progress="0" is_completed="false" />
 
-{# Format jaquette PS2 — ratio 7:10, image = tout #}
-<article class="group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 aspect-[7/10]" {{ attrs }}>
+{# Format brutalist manga - aspect 7:10 #}
+<article class="group relative bg-white border-2 border-gray-900 rounded-2xl shadow-[4px_4px_0_0_#111827] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#111827] transition-all duration-300 aspect-[7/10] overflow-hidden manga-drawn" {{ attrs }}>
+
+  {# ── Scotch Decoration ── #}
+  <div class="absolute -top-2 -left-2 w-8 h-3 bg-primary border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
 
   {# ── Image plein cadre (la jaquette) ── #}
-  <a href="{{ course.get_absolute_url }}" class="absolute inset-0 block">
+  <a href="{{ course.get_absolute_url }}" class="absolute inset-0 block overflow-hidden border-b-2 border-gray-900">
     {% if course.thumbnail %}
       <img src="{{ course.thumbnail.url }}"
            alt="{{ course.title }}"
            loading="lazy"
-           class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500">
+           class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-[1.05] transition-transform duration-500">
+      <div class="absolute inset-0 opacity-10 pointer-events-none mix-blend-multiply" style="background-image: radial-gradient(#000 1.5px, transparent 1.5px); background-size: 8px 8px;"></div>
     {% else %}
-      <div class="w-full h-full bg-gradient-to-br from-gray-800 via-gray-900 to-black flex items-center justify-center">
-        <svg class="w-14 h-14 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-        </svg>
+      <div class="w-full h-full bg-gray-100 flex items-center justify-center relative">
+        <div class="absolute inset-0 opacity-10 pointer-events-none mix-blend-multiply" style="background-image: radial-gradient(#000 1.5px, transparent 1.5px); background-size: 8px 8px;"></div>
+        <span class="text-6xl font-bold text-gray-200 opacity-50 transform rotate-12">無</span>
       </div>
     {% endif %}
   </a>
 
   {# ── Pastille catégorie (coin haut gauche) ── #}
   {% if course.category %}
-    <div class="absolute top-2.5 left-2.5 z-10">
-      <span class="px-2 py-0.5 text-[10px] font-semibold rounded-md bg-black/60 text-white/90 backdrop-blur-sm tracking-wide">
+    <div class="absolute top-3 left-3 z-10">
+      <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-gray-900 text-white border-2 border-gray-900 rounded-md shadow-sm">
         {{ course.category.name }}
       </span>
     </div>
   {% endif %}
 
   {# ── Pastille prix (coin haut droit) ── #}
-  <div class="absolute top-2.5 right-2.5 z-10">
+  <div class="absolute top-3 right-3 z-10">
     {% if course.price == 0 %}
-      <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-md bg-green-500 text-white shadow-lg">Gratuit</span>
+      <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-green-100 text-green-800 border-2 border-green-200 rounded-md shadow-sm">Gratuit</span>
     {% else %}
-      <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-white/95 text-gray-900 shadow-lg backdrop-blur-sm">{{ course.price|floatformat:0 }} DA</span>
+      <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-white text-gray-900 border-2 border-gray-200 rounded-md shadow-sm">{{ course.price|floatformat:0 }} DA</span>
     {% endif %}
   </div>
 
   {# ── Overlay bas : titre (optionnel) + bouton ── #}
-  <div class="absolute inset-x-0 bottom-0 z-10
-              bg-gradient-to-t from-black/90 via-black/50 to-transparent
-              p-3 pt-10
-              flex flex-col items-center gap-2
-              opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+  <div class="absolute inset-x-0 bottom-0 z-10 bg-white border-t-2 border-gray-900 p-4 flex flex-col items-center gap-3 opacity-0 translate-y-4 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-300">
 
     {% if not course.hide_title_on_card %}
-      <h2 class="text-sm font-bold text-white text-center leading-snug line-clamp-2 drop-shadow-lg">
+      <h2 class="text-base font-extrabold text-gray-900 text-center tracking-tight line-clamp-2">
         {{ course.title }}
       </h2>
     {% endif %}
 
-    {# Barre de progression (dashboard) #}
-    {% if show_progress == 'true' %}
-      <div class="w-full h-1 bg-white/20 rounded-full overflow-hidden">
-        <div class="h-full bg-orange-300 rounded-full" style="width: {{ progress }}%"></div>
-      </div>
+    {# CTA principal #}
+    {% if is_completed == 'true' %}
+      <a href="{% url 'download_certificate' course.slug %}"
+         class="w-full text-center px-3 py-2 text-xs font-bold uppercase tracking-widest bg-gray-900 text-white border-2 border-gray-900 rounded-lg shadow-sm hover:translate-y-0.5 hover:shadow-none hover:bg-black transition-all manga-drawn-alt">
+        🎓 Certificat
+      </a>
+      <a href="{{ course.get_absolute_url }}"
+         class="w-full text-center px-3 py-2 text-xs font-bold uppercase tracking-widest bg-white text-gray-900 border-2 border-gray-900 rounded-lg shadow-sm hover:translate-y-0.5 hover:shadow-none hover:bg-gray-50 transition-all manga-drawn-alt">
+        Revoir
+      </a>
+    {% else %}
+      <a href="{{ course.get_absolute_url }}"
+         class="w-full text-center px-3 py-2 text-xs font-bold uppercase tracking-widest bg-primary text-white border-2 border-gray-900 rounded-lg shadow-sm hover:translate-y-0.5 hover:shadow-none hover:bg-gray-900 transition-all manga-drawn-alt">
+        {% if show_progress == 'true' and progress|add:"0" > 0 %}Continuer{% elif show_progress == 'true' %}Commencer{% else %}Voir le cours{% endif %}
+      </a>
     {% endif %}
 
-    <a href="{{ course.get_absolute_url }}"
-       class="w-full text-center px-3 py-1.5 text-xs font-semibold rounded-lg
-              bg-orange-500 text-white hover:bg-orange-600
-              transition-all duration-200 shadow-md">
-      Voir le cours
-    </a>
+    {% if user.is_staff or course.instructor_id == user.id %}
+      <a href="{% url 'manage_course_edit' course.slug %}"
+         class="w-full text-center px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider bg-yellow-400 text-gray-900 border-2 border-gray-900 rounded-lg shadow-sm hover:translate-y-0.5 hover:shadow-none hover:bg-yellow-300 transition-all manga-drawn-alt">
+        ⚙️ Gérer ce cours
+      </a>
+    {% endif %}
   </div>
+
+  {# Barre de progression toujours visible en bas (dashboard) #}
+  {% if show_progress == 'true' %}
+    <div class="absolute inset-x-0 bottom-0 h-2 bg-white border-t-2 border-gray-900">
+      <div class="h-full bg-primary border-r-2 border-gray-900 transition-all duration-500 ease-out" style="width: {{ progress }}%"></div>
+    </div>
+  {% endif %}
 
 </article>

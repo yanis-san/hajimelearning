@@ -6,8 +6,8 @@ from .tasks import send_access_confirmation_email
 
 
 def _dispatch(task, *args):
-    """Lance une task Celery : synchrone en DEBUG (pas de broker requis), async en prod."""
-    if settings.DEBUG:
+    """Lance une task Celery : synchrone en DEBUG ou test (eager), async en prod."""
+    if settings.DEBUG or getattr(settings, 'CELERY_TASK_ALWAYS_EAGER', False):
         task.apply(args=args)
     else:
         task.delay(*args)

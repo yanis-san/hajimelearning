@@ -3,34 +3,168 @@
 
 {% block extra_head %}
   <script src="{% static 'js/marked.min.js' %}"></script>
+  <script>
+    window.renderLessonBlockMarkdown = function(src, targetId) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      if (!src || !src.trim()) {
+        el.innerHTML = '<p class="text-gray-400 italic text-sm">L\'aperçu apparaîtra ici…</p>';
+        return;
+      }
+      let converted = src
+        .replace(/\{([^{|\n]+)\|([^{}\n]+)\}/g, (m, k, r) => {
+          if (r.includes('|')) {
+            const parts = r.split('|').map(s => s.trim());
+            if (k.trim().length === parts.length) {
+              return parts.map((p, i) => `<ruby>${k.trim()[i]}<rt>${p}</rt></ruby>`).join('');
+            }
+          }
+          return `<ruby>${k.trim()}<rt>${r.trim()}</rt></ruby>`;
+        })
+        .replace(/\[([^\]\n]+)\]\{([^{}\n]+)\}/g, (m, k, r) => {
+          if (r.includes('|')) {
+            const parts = r.split('|').map(s => s.trim());
+            if (k.trim().length === parts.length) {
+              return parts.map((p, i) => `<ruby>${k.trim()[i]}<rt>${p}</rt></ruby>`).join('');
+            }
+          }
+          return `<ruby>${k.trim()}<rt>${r.trim()}</rt></ruby>`;
+        })
+        .replace(/[｜\|]([^《\n]+)《([^》\n]+)》/g, '<ruby>$1<rt>$2</rt></ruby>')
+        .replace(/([\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff々〆ヵヶ]+)《([^》\n]+)》/g, '<ruby>$1<rt>$2</rt></ruby>');
+
+      const parsed = (window.marked && window.marked.parse) ? window.marked.parse(converted) : converted;
+      el.innerHTML = '<div class="prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-a:text-orange-600 prose-strong:text-gray-800 prose-table:text-sm">' + parsed + '</div>';
+    };
+
+    window.initBlockEditorData = function(postUrl) {
+      return {
+        tab: 'edit',
+        autosaveState: 'saved',
+        lastSavedText: 'Tous les changements sont enregistrés',
+        saveTimer: null,
+        hasUnsaved: false,
+        postUrl: postUrl,
+        init() {
+          window.addEventListener('beforeunload', (e) => {
+            if (this.hasUnsaved) {
+              this.autosave();
+              e.preventDefault();
+              e.returnValue = '';
+            }
+          });
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden' && this.hasUnsaved) {
+              this.autosave();
+            }
+          });
+        },
+        markDirty() {
+          this.hasUnsaved = true;
+          this.autosaveState = 'dirty';
+          this.lastSavedText = 'Modifications en cours…';
+          window.dispatchEvent(new CustomEvent('builder-status', { detail: { state: 'dirty' } }));
+          clearTimeout(this.saveTimer);
+          this.saveTimer = setTimeout(() => this.autosave(), 1200);
+        },
+        async autosave() {
+          if (!this.hasUnsaved && this.autosaveState === 'saved') return;
+          clearTimeout(this.saveTimer);
+          this.autosaveState = 'saving';
+          this.lastSavedText = 'Sauvegarde automatique…';
+          window.dispatchEvent(new CustomEvent('builder-status', { detail: { state: 'saving' } }));
+
+          const formEl = this.$refs.blockForm;
+          if (!formEl) return;
+          const formData = new FormData(formEl);
+          formData.append('is_autosave', '1');
+
+          try {
+            const res = await fetch(this.postUrl, {
+              method: 'POST',
+              headers: {
+                'X-Autosave': 'true',
+                'X-Requested-With': 'XMLHttpRequest'
+              },
+              body: formData
+            });
+
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            if (data.ok) {
+              this.hasUnsaved = false;
+              this.autosaveState = 'saved';
+              this.lastSavedText = '✓ Enregistré automatiquement à ' + data.saved_at;
+              window.dispatchEvent(new CustomEvent('builder-status', { detail: { state: 'saved', time: data.saved_at } }));
+
+              if (data.created && data.edit_url) {
+                this.postUrl = data.edit_url;
+                formEl.setAttribute('hx-post', data.edit_url);
+              }
+              if (data.block_list_html) {
+                const bl = document.getElementById('block-list');
+                if (bl) bl.innerHTML = data.block_list_html;
+              }
+            } else {
+              throw new Error();
+            }
+          } catch (e) {
+            this.autosaveState = 'error';
+            this.lastSavedText = '⚠️ Erreur de sauvegarde, nouvel essai…';
+            window.dispatchEvent(new CustomEvent('builder-status', { detail: { state: 'error' } }));
+            this.saveTimer = setTimeout(() => this.autosave(), 3000);
+          }
+        }
+      };
+    };
+  </script>
 {% endblock %}
 
 {% block content %}
 <c-layout.admin-card
   title="Éditer : {{ lesson.title }}"
   subtitle="{{ lesson.module.course.title }} › {{ lesson.module.title }}"
-  back_href="{% url 'course_detail' lesson.module.course.slug %}"
-  back_label="Retour au cours">
+  back_href="{% url 'manage_module_lessons' lesson.module.course.slug lesson.module.id %}"
+  back_label="Leçons du module">
 
   {# ── Breadcrumb ── #}
   <c-slot name="breadcrumb">
-    <a href="{% url 'course_detail' lesson.module.course.slug %}" class="hover:text-gray-800 transition">{{ lesson.module.course.title }}</a>
+    <a href="{% url 'manage_course_modules' lesson.module.course.slug %}" class="hover:text-primary transition font-bold">{{ lesson.module.course.title }}</a>
     <span class="text-gray-300">/</span>
-    <span class="text-gray-600">{{ lesson.module.title }}</span>
+    <a href="{% url 'manage_module_lessons' lesson.module.course.slug lesson.module.id %}" class="hover:text-primary transition">{{ lesson.module.title }}</a>
     <span class="text-gray-300">/</span>
-    <span class="text-gray-800 font-medium">{{ lesson.title }}</span>
+    <span class="text-gray-800 font-bold">{{ lesson.title }}</span>
   </c-slot>
 
   {# ── Action: voir le résultat ── #}
   <c-slot name="actions">
-    <c-ui.btn variant="outline" size="sm" href="{% url 'lesson_detail' lesson.module.course.slug lesson.slug %}" target="_blank">
-      👁️ Voir le résultat
-    </c-ui.btn>
+    <div class="flex items-center gap-2">
+      <c-ui.btn variant="outline" size="sm" href="{% url 'manage_module_lessons' lesson.module.course.slug lesson.module.id %}">
+        📦 Leçons
+      </c-ui.btn>
+      <c-ui.btn variant="outline" size="sm" href="{% url 'manage_course_modules' lesson.module.course.slug %}">
+        🗂️ Modules
+      </c-ui.btn>
+      <c-ui.btn variant="primary" size="sm" href="{% url 'lesson_detail' lesson.module.course.slug lesson.slug %}" target="_blank">
+        👁️ Voir la leçon
+      </c-ui.btn>
+    </div>
   </c-slot>
 
-  {# ── Toolbar: palette de blocs ── #}
-  <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 sticky top-20 z-10 flex flex-wrap gap-3 justify-center items-center">
-    <span class="text-sm font-medium text-gray-400">Ajouter :</span>
+  {# ── Toolbar: palette de blocs + autosave status ── #}
+  <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 sticky top-20 z-10 flex flex-wrap gap-3 justify-between items-center"
+       x-data="{
+         autosaveStatus: 'saved',
+         lastSavedTime: '',
+         init() {
+           window.addEventListener('builder-status', (e) => {
+             this.autosaveStatus = e.detail.state;
+             if (e.detail.time) this.lastSavedTime = e.detail.time;
+           });
+         }
+       }">
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="text-sm font-medium text-gray-400">Ajouter :</span>
 
     <c-ui.btn variant="ghost" size="sm"
               hx-get="{% url 'add_block' lesson.id 'text' %}"
@@ -61,7 +195,52 @@
               hx-target="#block-form-container" hx-swap="innerHTML">
       🧠 Quiz
     </c-ui.btn>
+
+    <div class="h-5 w-px bg-gray-200 hidden sm:block mx-1"></div>
+
+    <button type="button"
+            x-data
+            x-on:click="$dispatch('open-furigana-guide')"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border-2 border-gray-900 bg-yellow-300 hover:bg-yellow-400 text-gray-900 shadow-[2px_2px_0_0_#111827] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition cursor-pointer"
+            title="Consulter le guide et copier des modèles furigana">
+      <span>💡 Guide Furigana</span>
+    </button>
   </div>
+
+  {# ── Statut autosave Google Docs ── #}
+  <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all select-none"
+       :class="{
+         'bg-emerald-50 border-emerald-200 text-emerald-800': autosaveStatus === 'saved',
+         'bg-amber-50 border-amber-200 text-amber-800 animate-pulse': autosaveStatus === 'saving',
+         'bg-blue-50 border-blue-200 text-blue-700': autosaveStatus === 'dirty',
+         'bg-red-50 border-red-200 text-red-700': autosaveStatus === 'error'
+       }">
+    <template x-if="autosaveStatus === 'saved'">
+      <span class="flex items-center gap-1.5">
+        <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        <span x-text="lastSavedTime ? ('Enregistré automatiquement (' + lastSavedTime + ')') : 'Tous les changements sont enregistrés'"></span>
+      </span>
+    </template>
+    <template x-if="autosaveStatus === 'saving'">
+      <span class="flex items-center gap-1.5">
+        <svg class="w-4 h-4 text-amber-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+        <span>Sauvegarde automatique…</span>
+      </span>
+    </template>
+    <template x-if="autosaveStatus === 'dirty'">
+      <span class="flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+        <span>Modifications en cours…</span>
+      </span>
+    </template>
+    <template x-if="autosaveStatus === 'error'">
+      <span class="flex items-center gap-1.5">
+        <span>⚠️</span>
+        <span>Erreur réseau, nouvel essai…</span>
+      </span>
+    </template>
+  </div>
+</div>
 
   {# ── Form container (filled via HTMX) ── #}
   <div id="block-form-container" class="mb-8"></div>
@@ -99,4 +278,7 @@
   </script>
 
 </c-layout.admin-card>
+
+<c-manage.furigana-guide />
+
 {% endblock %}

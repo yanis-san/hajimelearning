@@ -1,959 +1,462 @@
-{% extends 'base.html' %}
-
-{% block title %}Hajime Learning — Formez-vous, concrètement.{% endblock %}
-{% block meta_description %}Des formations pratiques pour apprendre à votre rythme. Accès à vie, support inclus, paiement local.{% endblock %}
-
-{% block extra_head %}
-<style>
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
-  }
-  @keyframes float-delayed {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-  @keyframes slide-up-fade {
-    0% { opacity: 0; transform: translateY(15px); }
-    20% { opacity: 1; transform: translateY(0); }
-    80% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-15px); }
-  }
-  @keyframes fill-bar {
-    0% { width: 0%; }
-    40% { width: 100%; }
-    100% { width: 100%; }
-  }
-  .reveal {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .reveal.active {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  
-  /* Course Builder Drag & Drop Animation */
-  @keyframes drop-in-1 {
-    0%, 5% { transform: translate(120px, 0px) scale(0.9); opacity: 0; }
-    10% { transform: translate(60px, -10px) scale(1.05); opacity: 1; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-    15% { transform: translate(0, 0) scale(1.05); opacity: 1; box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.2); }
-    18%, 95% { transform: translate(0, 0) scale(1); opacity: 1; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
-    100% { transform: translate(0, 0); opacity: 0; }
-  }
-  @keyframes drop-in-2 {
-    0%, 30% { transform: translate(120px, -50px) scale(0.9); opacity: 0; }
-    35% { transform: translate(60px, -20px) scale(1.05); opacity: 1; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-    40% { transform: translate(0, 0) scale(1.05); opacity: 1; box-shadow: 0 20px 25px -5px rgba(168, 85, 247, 0.2); }
-    43%, 95% { transform: translate(0, 0) scale(1); opacity: 1; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
-    100% { transform: translate(0, 0); opacity: 0; }
-  }
-  @keyframes drop-in-3 {
-    0%, 55% { transform: translate(120px, -100px) scale(0.9); opacity: 0; }
-    60% { transform: translate(60px, -50px) scale(1.05); opacity: 1; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-    65% { transform: translate(0, 0) scale(1.05); opacity: 1; box-shadow: 0 20px 25px -5px rgba(249, 115, 22, 0.2); }
-    68%, 95% { transform: translate(0, 0) scale(1); opacity: 1; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
-    100% { transform: translate(0, 0); opacity: 0; }
-  }
-  
-  /* Product Tour Animations */
-  @keyframes pt-progress {
-    0% { width: 0%; }
-    100% { width: 66%; }
-  }
-  @keyframes pt-pop-in {
-    0% { transform: scale(0.5); opacity: 0; }
-    70% { transform: scale(1.15); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  @keyframes pt-slide-up {
-    0% { transform: translateY(20px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
-  }
-  @keyframes pt-slide-down {
-    0% { transform: translateY(-20px); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
-  }
-  /* Quiz Sequence Animations */
-  @keyframes pt-quiz-select-bg {
-    0%, 15% { border-color: #f3f4f6; background-color: #ffffff; transform: scale(1); }
-    18% { transform: scale(1.02); }
-    21%, 95% { border-color: #f97316; background-color: #fff7ed; transform: scale(1); }
-    100% { border-color: #f3f4f6; background-color: #ffffff; transform: scale(1); }
-  }
-  @keyframes pt-quiz-select-radio {
-    0%, 15% { border-width: 2px; border-color: #d1d5db; background-color: transparent; }
-    21%, 95% { border-width: 4px; border-color: #f97316; background-color: #ffffff; }
-    100% { border-width: 2px; border-color: #d1d5db; background-color: transparent; }
-  }
-  @keyframes pt-quiz-select-text {
-    0%, 15% { color: #111827; }
-    21%, 95% { color: #c2410c; }
-    100% { color: #111827; }
-  }
-  @keyframes pt-quiz-btn {
-    0%, 30% { background-color: #111827; transform: scale(1); }
-    32% { transform: scale(0.95); }
-    34%, 95% { background-color: #22c55e; transform: scale(1); }
-    100% { background-color: #111827; transform: scale(1); }
-  }
-  @keyframes pt-quiz-banner {
-    0%, 35% { opacity: 0; transform: translateY(10px); }
-    38%, 95% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(10px); }
-  }
-
-  /* Chat Sequence Animations (12s loop) */
-  @keyframes pt-chat-typing-1 {
-    0%, 8% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: scale(0.9); }
-    10%, 20% { opacity: 1; max-height: 60px; margin-top: 1rem; transform: scale(1); overflow: visible; }
-    22%, 100% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: scale(0.9); }
-  }
-  @keyframes pt-chat-answer-1 {
-    0%, 20% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: translateY(20px); }
-    22%, 95% { opacity: 1; max-height: 200px; margin-top: 1rem; transform: translateY(0); overflow: visible; }
-    100% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: translateY(20px); }
-  }
-  @keyframes pt-chat-typing-2 {
-    0%, 30% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: scale(0.9); }
-    32%, 42% { opacity: 1; max-height: 60px; margin-top: 1rem; transform: scale(1); overflow: visible; }
-    44%, 100% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: scale(0.9); }
-  }
-  @keyframes pt-chat-answer-2 {
-    0%, 42% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: translateY(20px); }
-    44%, 95% { opacity: 1; max-height: 200px; margin-top: 1rem; transform: translateY(0); overflow: visible; }
-    100% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: translateY(20px); }
-  }
-  @keyframes pt-chat-status {
-    0%, 52% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: scale(0.5); }
-    54%, 95% { opacity: 1; max-height: 40px; margin-top: 1rem; transform: scale(1); overflow: visible; }
-    100% { opacity: 0; max-height: 0; margin-top: 0; overflow: hidden; transform: scale(0.5); }
-  }
-  
-  /* Hero Window Animations */
-  @keyframes hero-scrub {
-    0% { width: 0%; }
-    100% { width: 100%; }
-  }
-  @keyframes pulse-play {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(249,115,22,0.3); }
-    50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(249,115,22,0.6); }
-  }
-  @keyframes pt-typing-dot {
-    0%, 100% { transform: translateY(0); opacity: 0.4; }
-    50% { transform: translateY(-4px); opacity: 1; }
-  }
-  
-  /* Stagger delay classes */
-  .delay-100 { transition-delay: 100ms; }
-  .delay-200 { transition-delay: 200ms; }
-  .delay-300 { transition-delay: 300ms; }
-</style>
-{% endblock %}
+{% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 
-  {# ══ HERO ════════════════════════════════════════════════════════════════════ #}
-  <section class="bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 sm:pt-32 sm:pb-24 flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+<!-- ====== HERO ====== -->
+<section class="bg-primary min-h-[85vh] flex items-center justify-center relative overflow-hidden py-20 px-6 border-b-2 border-primary-dark">
+    <style>
+        @keyframes slow-spin {
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .elegant-sunburst {
+            position: absolute;
+            width: 200vw;
+            height: 200vw;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: repeating-conic-gradient(
+                from 0deg at 50% 50%, 
+                rgba(255,255,255,0.04) 0deg 2deg, 
+                transparent 2deg 6deg
+            );
+            animation: slow-spin 90s linear infinite;
+        }
+        .manga-tape {
+            clip-path: polygon(
+                0% 6%, 3% 0%, 8% 7%, 12% 0%, 88% 2%, 92% 8%, 97% 0%, 100% 5%, 
+                99% 95%, 96% 100%, 92% 93%, 88% 98%, 12% 96%, 8% 100%, 4% 93%, 0% 98%
+            );
+        }
+    </style>
+    <!-- Background élégant (dynamique mais sobre) -->
+    <div class="elegant-sunburst pointer-events-none"></div>
+    <!-- Halftone dots over it -->
+    <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#000 2px, transparent 2px); background-size: 16px 16px;"></div>
 
-      <div class="flex-1 max-w-xl">
-        <span class="inline-block text-xs font-semibold tracking-widest text-orange-500 uppercase mb-5">
-          Hajime Learning
-        </span>
-        <h1 class="text-4xl sm:text-5xl font-medium text-gray-900 tracking-tight leading-[1.15] mb-5"
-            x-data="{
-                text: '',
-                phrases: ['À votre rythme.', 'En pratiquant.', 'Sans compromis.'],
-                currentPhraseIndex: 0,
-                charIndex: 0,
-                isDeleting: false,
-                typeSpeed: 80,
-                deleteSpeed: 40,
-                pauseTime: 2500,
-                init() { setTimeout(() => this.type(), 500); },
-                type() {
-                    const currentPhrase = this.phrases[this.currentPhraseIndex];
-                    if (this.isDeleting) {
-                        this.text = currentPhrase.substring(0, this.charIndex - 1);
-                        this.charIndex--;
-                    } else {
-                        this.text = currentPhrase.substring(0, this.charIndex + 1);
-                        this.charIndex++;
-                    }
-                    let speed = this.isDeleting ? this.deleteSpeed : this.typeSpeed;
-                    if (!this.isDeleting && this.charIndex === currentPhrase.length) {
-                        speed = this.pauseTime;
-                        this.isDeleting = true;
-                    } else if (this.isDeleting && this.charIndex === 0) {
-                        this.isDeleting = false;
-                        this.currentPhraseIndex = (this.currentPhraseIndex + 1) % this.phrases.length;
-                        speed = 500;
-                    }
-                    setTimeout(() => this.type(), speed);
-                }
-            }">
-          Apprenez.<br>
-          <span class="text-orange-500 relative">
-            <span x-text="text" class="min-h-[1.2em] inline-block"></span>
-            <span class="absolute -right-2 top-0 bottom-0 w-[3px] bg-orange-500 animate-pulse"></span>
-          </span>
-        </h1>
-        <p class="text-lg text-gray-500 mb-8 leading-relaxed">
-          Des formations que je conçois et anime moi-même : du contenu pratique,
-          un suivi personnalisé, et des réponses directes à vos questions.
-        </p>
-        <div class="flex items-center gap-4 mb-10">
-          {% if user.is_authenticated %}
-            <c-ui.btn href="{% url 'user_dashboard' %}" size="lg">Mes formations</c-ui.btn>
-            <c-ui.btn href="#catalogue" variant="ghost" size="lg">Explorer ↓</c-ui.btn>
-          {% else %}
-            <c-ui.btn href="{% url 'account_signup' %}" size="lg">Commencer</c-ui.btn>
-            <c-ui.btn href="#catalogue" variant="ghost" size="lg">Explorer ↓</c-ui.btn>
-          {% endif %}
-        </div>
-        <div class="flex items-center gap-6 text-sm text-gray-400">
-          <span>{{ courses|length }} formation{{ courses|length|pluralize }}</span>
-          <span class="w-1 h-1 rounded-full bg-gray-300"></span>
-          <span>Accès à vie</span>
-          <span class="w-1 h-1 rounded-full bg-gray-300"></span>
-          <span>Paiement local</span>
-        </div>
-      </div>
-
-      {# High-Fidelity App UI (Pro Style) #}
-      <div class="flex-1 hidden lg:block relative z-10 w-full" style="perspective: 1200px;">
-        
-        <!-- Massive ambient glow -->
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-orange-400/20 via-amber-300/20 to-red-400/10 rounded-full blur-[80px] -z-10"></div>
-        
-        <!-- Isometric App Window -->
-        <div class="relative bg-white/80 backdrop-blur-2xl border border-white/60 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] rounded-[24px] overflow-hidden transition-transform duration-700 ease-out hover:rotate-0"
-             style="transform: rotateY(-12deg) rotateX(4deg) rotateZ(-1deg) scale(0.95); transform-style: preserve-3d; animation: float 8s ease-in-out infinite;">
-          
-          <!-- Mac OS style top bar -->
-          <div class="bg-gray-50/80 backdrop-blur-md border-b border-gray-200/50 px-4 py-3 flex items-center">
-            <div class="flex gap-2 w-1/3">
-              <div class="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]"></div>
-              <div class="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]"></div>
-              <div class="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29]"></div>
-            </div>
-            <div class="w-1/3 flex justify-center">
-              <div class="w-32 h-4 bg-gray-200/60 rounded-full"></div>
-            </div>
-          </div>
-          
-          <!-- Dashboard Layout -->
-          <div class="p-6 grid grid-cols-12 gap-6 bg-gradient-to-b from-white/50 to-gray-50/30">
-             
-             <!-- Left Column: Video Player & Info -->
-             <div class="col-span-8 flex flex-col gap-5">
-                <!-- Video Player -->
-                <div class="w-full aspect-video bg-gray-900 rounded-xl relative overflow-hidden shadow-lg group">
-                  <div class="absolute inset-0 bg-gradient-to-tr from-orange-600/20 to-purple-900/40"></div>
-                  <!-- Play button -->
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 transition-transform group-hover:scale-110" style="animation: pulse-play 3s infinite;">
-                      <svg class="w-7 h-7 text-white ml-1" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"/></svg>
-                    </div>
-                  </div>
-                  <!-- Scrubber -->
-                  <div class="absolute bottom-4 inset-x-4 flex items-center gap-3">
-                    <span class="text-[10px] font-medium text-white/90 uppercase tracking-wider">En cours</span>
-                    <div class="flex-1 h-1.5 bg-white/20 rounded-full relative cursor-pointer">
-                      <div class="absolute left-0 top-0 bottom-0 bg-orange-500 rounded-full" style="animation: hero-scrub 20s linear infinite;">
-                        <div class="absolute right-0 top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-md scale-0 group-hover:scale-100 transition-transform"></div>
-                      </div>
-                    </div>
-                    <span class="text-xs font-medium text-white/50">12:45</span>
-                  </div>
+    <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-8 items-center z-10">
+        <!-- Text Content -->
+        <div class="animate-fade-in-up">
+            <div class="drop-shadow-sm mb-6 inline-block">
+                <div class="inline-flex items-center gap-2 px-6 py-2 bg-gray-900 text-white manga-tape transform -skew-x-6 -rotate-1 hover:rotate-0 hover:-translate-y-0.5 transition-all cursor-default shadow-[2px_2px_0_0_#111827]">
+                    <span class="text-xs md:text-sm font-bold tracking-widest uppercase">⚡ Méthode Hybride d'Enseignement</span>
                 </div>
+            </div>
+
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.1] tracking-tight drop-shadow-md mb-6">
+                <ruby>燃<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">mo</rt></ruby><ruby>え<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">e</rt></ruby><ruby>ろ<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">ro</rt></ruby>！<br>
+                <ruby>日<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">ni</rt></ruby><ruby>本<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">hon</rt></ruby><ruby>語<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">go</rt></ruby><ruby>能<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">nō</rt></ruby><ruby>力<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">ryoku</rt></ruby>！<br>
+                <span class="text-gray-900 bg-white px-4 md:px-5 py-2 rounded-xl leading-none border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] transform -rotate-2 inline-block mt-4 text-xl md:text-2xl font-bold tracking-wide">Enflamme tes compétences en japonais !</span>
+            </h1>
+
+            <p class="text-white/95 font-medium text-lg md:text-xl leading-relaxed mb-10 max-w-lg drop-shadow-sm">
+                Des formations que je conçois et anime moi-même : du contenu pratique, un suivi personnalisé, et des réponses directes à vos questions pour maîtriser le japonais.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+                <a href="{% url 'contact' %}?reason=Cours particulier" class="w-full sm:w-auto bg-gray-900 text-white font-bold rounded-xl px-8 py-3.5 border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#111827] active:translate-y-0.5 active:shadow-[2px_2px_0_0_#111827] transition-all text-center">
+                    Cours particulier
+                </a>
+                <a href="{% if user.is_authenticated %}{% url 'user_dashboard' %}{% else %}#catalogue{% endif %}" class="w-full sm:w-auto bg-white text-gray-900 font-bold rounded-xl px-8 py-3.5 border-2 border-gray-900 hover:border-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#111827] active:translate-y-0.5 active:shadow-[2px_2px_0_0_#111827] transition-all text-center">
+                    Voir mes formations
+                </a>
+            </div>
+        </div>
+
+        <!-- Image / Manga Box -->
+        <div class="relative max-w-sm lg:max-w-md mx-auto transform rotate-2 hover:rotate-1 transition-transform duration-500 w-full animate-fade-in-up delay-100">
+            <!-- Cadre de fond décalé -->
+            <div class="absolute -inset-2 lg:-inset-3 bg-gray-900 rounded-2xl rotate-[-3deg] z-0 shadow-lg"></div>
+            
+            <!-- Conteneur Photo -->
+            <div class="relative bg-white border-2 border-gray-900 rounded-xl p-2 lg:p-3 z-10 aspect-[4/5] shadow-[4px_4px_0_0_#111827]">
                 
-                <!-- Lesson Info -->
-                <div>
-                  <h3 class="text-2xl font-bold text-gray-900 tracking-tight leading-tight">2. Méthodologie d'apprentissage</h3>
-                  <div class="flex items-center gap-3 mt-2">
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-orange-100 text-orange-700 text-xs font-bold">
-                      Formation Complète
-                    </span>
-                    <span class="text-sm font-medium text-gray-500">Chapitre 1 : Introduction</span>
-                  </div>
+                <!-- Scotch Manga -->
+                <div class="absolute -top-2 -left-2 w-10 h-3 bg-primary transform -rotate-45 z-20 border-2 border-gray-900 rounded-sm"></div>
+                <div class="absolute -bottom-2 -right-2 w-10 h-3 bg-primary transform -rotate-45 z-20 border-2 border-gray-900 rounded-sm"></div>
+
+                <!-- Image -->
+                <div class="w-full h-full bg-gray-100 rounded-lg overflow-hidden relative group">
+                    <video src="{% static 'videos/hero.mp4' %}" autoplay loop muted playsinline class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"></video>
+                    <!-- Trame Manga -->
+                    <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-multiply" style="background-image: radial-gradient(#000 1.5px, transparent 1.5px); background-size: 10px 10px;"></div>
                 </div>
-             </div>
-             
-             <!-- Right Column: Sidebar Syllabus -->
-             <div class="col-span-4 flex flex-col gap-2">
-               <!-- Progress Card -->
-               <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100 mb-2">
-                 <div class="flex justify-between items-end mb-2">
-                   <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Progression</span>
-                   <span class="text-sm font-black text-gray-900">33%</span>
-                 </div>
-                 <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                   <div class="bg-orange-500 h-full rounded-full w-1/3 relative">
-                     <div class="absolute inset-0 bg-white/20" style="animation: shimmer 2s infinite;"></div>
-                   </div>
-                 </div>
-               </div>
-               
-               <!-- Real Accordion Mockup -->
-               <div class="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm flex-1">
-                 <!-- Header -->
-                 <div class="w-full flex items-center justify-between px-3 py-2.5 bg-gray-50 border-b border-gray-100">
-                   <div class="flex items-center gap-2">
-                     <span class="flex items-center justify-center w-5 h-5 rounded-md bg-orange-100 text-orange-600 text-[10px] font-bold shrink-0">1</span>
-                     <span class="text-[11px] font-bold text-gray-800 truncate">Introduction</span>
-                   </div>
-                   <svg class="w-3 h-3 text-gray-400 rotate-180 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                 </div>
-                 
-                 <!-- Lessons -->
-                 <ul class="divide-y divide-gray-100">
-                   <!-- Lesson 1 (Completed) -->
-                   <li class="flex items-center justify-between px-3 py-2.5">
-                     <div class="flex items-center gap-2 min-w-0">
-                       <svg class="w-3.5 h-3.5 text-green-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                       <span class="text-[10px] font-medium text-gray-700 truncate">Bienvenue</span>
-                     </div>
-                   </li>
-                   
-                   <!-- Lesson 2 (Active/Animating) -->
-                   <li class="flex items-center justify-between px-3 py-2.5 bg-orange-50/80 relative overflow-hidden group">
-                     <div class="flex items-center gap-2 min-w-0">
-                       <span class="w-3.5 h-3.5 flex items-center justify-center shrink-0 rounded-full border border-orange-400 bg-orange-100 text-[8px] text-orange-600 font-bold">2</span>
-                       <span class="text-[10px] font-bold text-orange-700 truncate">Méthodologie</span>
-                     </div>
-                     <div class="flex gap-1 items-center justify-center shrink-0 h-3">
-                       <div class="w-0.5 h-full bg-orange-500 rounded-full animate-pulse" style="animation-duration: 0.8s;"></div>
-                       <div class="w-0.5 h-2/3 bg-orange-500 rounded-full animate-pulse" style="animation-duration: 1s;"></div>
-                       <div class="w-0.5 h-full bg-orange-500 rounded-full animate-pulse" style="animation-duration: 0.6s;"></div>
-                     </div>
-                   </li>
-
-                   <!-- Lesson 3 (Locked/Unplayed) -->
-                   <li class="flex items-center justify-between px-3 py-2.5 opacity-60">
-                     <div class="flex items-center gap-2 min-w-0">
-                       <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                       <span class="text-[10px] font-medium text-gray-500 truncate">Exercice</span>
-                     </div>
-                   </li>
-                 </ul>
-               </div>
-             </div>
-             
-          </div>
-        </div>
-        
-        <!-- Floating decorative element (Badge) -->
-        <div class="absolute -right-6 bottom-12 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-100/50 p-4 flex items-center gap-3 z-20 transition-transform hover:scale-105"
-             style="transform: translateZ(50px); animation: float-delayed 5s ease-in-out infinite;">
-          <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center shrink-0 shadow-lg shadow-green-500/30">
-            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-          </div>
-          <div>
-            <div class="text-xs font-bold text-gray-900 mb-0.5">Module validé !</div>
-            <div class="text-[11px] font-medium text-gray-500">Vous avancez bien</div>
-          </div>
-        </div>
-        
-      </div>
-
-    </div>
-  </section>
-
-  {# ══ FONCTIONNALITÉS ÉTUDIANT (Product Tour Interactif) ════════════════════════ #}
-  <section class="bg-transparent border-y border-stone-200/50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24" x-data="{ activeFeature: 1 }">
-      
-      <div class="text-center max-w-2xl mx-auto mb-16 reveal">
-        <h2 class="text-3xl sm:text-4xl font-semibold text-stone-900 tracking-tight mb-4">
-          Tout pour apprendre <span class="text-orange-500">efficacement.</span>
-        </h2>
-        <p class="text-gray-500 text-lg">
-          Chaque formation est pensée pour vous faire progresser, pas vous noyer dans la théorie. Découvrez l'expérience étudiant.
-        </p>
-      </div>
-
-      <div class="flex flex-col lg:flex-row gap-12 lg:gap-8 items-start reveal delay-100">
-        
-        {# Liste des fonctionnalités (Navigation) #}
-        <div class="w-full lg:w-5/12 space-y-2">
-          
-          <!-- Tab 1 -->
-          <button @click="activeFeature = 1" type="button" 
-                  class="w-full text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer"
-                  :class="activeFeature === 1 ? 'bg-white border-orange-200 shadow-md ring-1 ring-orange-100' : 'bg-transparent border-transparent hover:bg-white/60'">
-            <div class="flex items-start gap-4">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors"
-                   :class="activeFeature === 1 ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-500'">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-              </div>
-              <div>
-                <h3 class="text-base font-semibold transition-colors" :class="activeFeature === 1 ? 'text-gray-900' : 'text-gray-600'">Progression claire</h3>
-                <p class="text-sm text-gray-500 mt-1 leading-relaxed" x-show="activeFeature === 1" x-collapse>Chaque leçon validée est enregistrée. Reprenez exactement là où vous vous étiez arrêté sans jamais vous perdre.</p>
-              </div>
-            </div>
-          </button>
-
-          <!-- Tab 2 -->
-          <button @click="activeFeature = 2" type="button" 
-                  class="w-full text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer"
-                  :class="activeFeature === 2 ? 'bg-white border-orange-200 shadow-md ring-1 ring-orange-100' : 'bg-transparent border-transparent hover:bg-white/60'">
-            <div class="flex items-start gap-4">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors"
-                   :class="activeFeature === 2 ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-500'">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-              </div>
-              <div>
-                <h3 class="text-base font-semibold transition-colors" :class="activeFeature === 2 ? 'text-gray-900' : 'text-gray-600'">Questions & Support</h3>
-                <p class="text-sm text-gray-500 mt-1 leading-relaxed" x-show="activeFeature === 2" x-collapse>Posez vos questions directement dans la leçon. Je vous réponds personnellement, au bon endroit.</p>
-              </div>
-            </div>
-          </button>
-
-          <!-- Tab 3 -->
-          <button @click="activeFeature = 3" type="button" 
-                  class="w-full text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer"
-                  :class="activeFeature === 3 ? 'bg-white border-orange-200 shadow-md ring-1 ring-orange-100' : 'bg-transparent border-transparent hover:bg-white/60'">
-            <div class="flex items-start gap-4">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors"
-                   :class="activeFeature === 3 ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-500'">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-              </div>
-              <div>
-                <h3 class="text-base font-semibold transition-colors" :class="activeFeature === 3 ? 'text-gray-900' : 'text-gray-600'">Quiz & Validation</h3>
-                <p class="text-sm text-gray-500 mt-1 leading-relaxed" x-show="activeFeature === 3" x-collapse>Des exercices intégrés pour tester vos connaissances à chaque étape. Vous savez exactement ce que vous maîtrisez.</p>
-              </div>
-            </div>
-          </button>
-
-          <!-- Tab 4 -->
-          <button @click="activeFeature = 4" type="button" 
-                  class="w-full text-left p-5 rounded-2xl border transition-all duration-200 cursor-pointer"
-                  :class="activeFeature === 4 ? 'bg-white border-orange-200 shadow-md ring-1 ring-orange-100' : 'bg-transparent border-transparent hover:bg-white/60'">
-            <div class="flex items-start gap-4">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors"
-                   :class="activeFeature === 4 ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-500'">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-              </div>
-              <div>
-                <h3 class="text-base font-semibold transition-colors" :class="activeFeature === 4 ? 'text-gray-900' : 'text-gray-600'">Notifications</h3>
-                <p class="text-sm text-gray-500 mt-1 leading-relaxed" x-show="activeFeature === 4" x-collapse>Soyez alerté dès qu'une réponse arrive. Restez dans le flux sans effort.</p>
-              </div>
-            </div>
-          </button>
-          
-          <div class="flex flex-col sm:flex-row gap-4 mt-8 p-5">
-            <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-              <span class="text-sm font-medium text-gray-600">Accès à vie</span>
-            </div>
-            <div class="hidden sm:block w-px h-5 bg-gray-200"></div>
-            <div class="flex items-center gap-3">
-              <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-              <span class="text-sm font-medium text-gray-600">Paiement local (DA)</span>
-            </div>
-          </div>
-        </div>
-
-        {# Vitrine Visuelle (Affichage dynamique) #}
-        <div class="w-full lg:w-7/12 relative aspect-square sm:aspect-video lg:aspect-square bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex items-center justify-center p-8">
-          
-          <!-- Background Decoration -->
-          <div class="absolute inset-0 bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:2rem_2rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30"></div>
-          
-          <!-- VISUAL 1: Progression -->
-          <div x-show="activeFeature === 1" x-transition:enter="transition ease-out duration-500 delay-100" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="w-full max-w-sm absolute z-10">
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-5 space-y-4">
-              <div>
-                <div class="text-xs font-semibold text-orange-500 uppercase tracking-wider mb-1">Japonais Débutant (JLPT N5)</div>
-                <div class="text-base font-bold text-gray-900 mb-2">基礎語彙と文法 <span class="font-medium opacity-75 ml-1 text-xs text-gray-500">(Vocabulaire & Grammaire)</span></div>
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-medium text-gray-500">2/3 Leçons complétées</span>
-                  <span class="text-xs font-bold text-gray-900">66%</span>
-                </div>
-                <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                  <div class="bg-orange-500 h-2 rounded-full" style="width: 66%; animation: pt-progress 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;"></div>
-                </div>
-              </div>
-              <div class="space-y-1 mt-4">
-                <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div class="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white shrink-0" style="opacity:0; animation: pt-pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s forwards;"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
-                  <div class="flex-1"><div class="text-sm font-medium text-gray-900">1. Salutations et politesse</div></div>
-                  <div class="text-xs text-gray-400">03:20</div>
-                </div>
-                <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div class="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white shrink-0" style="opacity:0; animation: pt-pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s forwards;"><svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
-                  <div class="flex-1"><div class="text-sm font-medium text-gray-900">2. Particules は et が</div></div>
-                  <div class="text-xs text-gray-400">05:45</div>
-                </div>
-                <div class="flex items-center gap-3 p-2 bg-orange-50 border border-orange-100 rounded-lg shadow-sm">
-                  <div class="w-5 h-5 rounded-full border-2 border-orange-500 shrink-0 flex items-center justify-center text-orange-500">
-                    <svg class="w-2.5 h-2.5 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
-                  </div>
-                  <div class="flex-1"><div class="text-sm font-bold text-orange-700">3. Compter jusqu'à 100</div></div>
-                  <div class="text-xs font-semibold text-orange-500">En cours</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- VISUAL 2: Support -->
-          <div x-show="activeFeature === 2" x-cloak x-transition:enter="transition ease-out duration-500 delay-100" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="w-full max-w-sm absolute z-10">
-            <div>
-              <!-- Student question -->
-              <div class="flex gap-3">
-                <div class="w-8 h-8 rounded-full bg-blue-100 shrink-0 flex items-center justify-center text-blue-600 font-bold text-xs">AM</div>
-                <div class="bg-white rounded-2xl rounded-tl-none shadow-md border border-gray-100 p-4 w-full">
-                  <div class="flex justify-between items-end mb-2">
-                    <span class="text-xs font-bold text-gray-900">Amine</span>
-                    <span class="text-[10px] text-gray-400">10:42</span>
-                  </div>
-                  <p class="text-sm text-gray-600 leading-snug">Salut ! J'ai du mal à différencier "Shi" (シ) et "Tsu" (ツ) en Katakana, ils se ressemblent trop. Une astuce ?</p>
-                </div>
-              </div>
-
-              <!-- Typing Indicator 1 (Instructor) -->
-              <div class="flex gap-3 flex-row-reverse origin-bottom-right" style="animation: pt-chat-typing-1 12s infinite;">
-                <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0 border border-orange-200">
-                  <svg class="w-4 h-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                </div>
-                <div class="bg-gray-100 rounded-2xl rounded-tr-none px-4 py-3 flex items-center gap-1.5 mt-2 h-9">
-                  <div class="w-1.5 h-1.5 bg-gray-500 rounded-full" style="animation: pt-typing-dot 1.2s infinite 0s;"></div>
-                  <div class="w-1.5 h-1.5 bg-gray-500 rounded-full" style="animation: pt-typing-dot 1.2s infinite 0.2s;"></div>
-                  <div class="w-1.5 h-1.5 bg-gray-500 rounded-full" style="animation: pt-typing-dot 1.2s infinite 0.4s;"></div>
-                </div>
-              </div>
-
-              <!-- Instructor Answer -->
-              <div class="flex gap-3 flex-row-reverse origin-bottom-right" style="animation: pt-chat-answer-1 12s infinite;">
-                <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0 border border-orange-200">
-                  <svg class="w-4 h-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                </div>
-                <div class="bg-gray-900 rounded-2xl rounded-tr-none shadow-md p-4 w-full text-white">
-                  <div class="flex justify-between items-end mb-2">
-                    <span class="text-xs font-bold text-white">Yanis</span>
-                    <span class="text-[10px] text-gray-400">10:45</span>
-                  </div>
-                  <p class="text-sm text-gray-300 leading-snug">Hello Amine 👋 C'est normal ! Regarde l'inclinaison : les traits de Shi (シ) partent plus à l'horizontale, ceux de Tsu (ツ) tombent du haut à la verticale.</p>
-                </div>
-              </div>
-              
-              <!-- Typing Indicator 2 (Student) -->
-              <div class="flex gap-3 origin-top-left" style="animation: pt-chat-typing-2 12s infinite;">
-                <div class="w-8 h-8 rounded-full bg-blue-100 shrink-0 flex items-center justify-center text-blue-600 font-bold text-xs">AM</div>
-                <div class="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3 flex items-center gap-1.5 h-9 mt-2">
-                  <div class="w-1.5 h-1.5 bg-gray-500 rounded-full" style="animation: pt-typing-dot 1.2s infinite 0s;"></div>
-                  <div class="w-1.5 h-1.5 bg-gray-500 rounded-full" style="animation: pt-typing-dot 1.2s infinite 0.2s;"></div>
-                  <div class="w-1.5 h-1.5 bg-gray-500 rounded-full" style="animation: pt-typing-dot 1.2s infinite 0.4s;"></div>
-                </div>
-              </div>
-              
-              <!-- Student Reply -->
-              <div class="flex gap-3 origin-top-left" style="animation: pt-chat-answer-2 12s infinite;">
-                <div class="w-8 h-8 rounded-full bg-blue-100 shrink-0 flex items-center justify-center text-blue-600 font-bold text-xs">AM</div>
-                <div class="bg-white rounded-2xl rounded-tl-none shadow-md border border-gray-100 p-4 w-full">
-                  <div class="flex justify-between items-end mb-2">
-                    <span class="text-xs font-bold text-gray-900">Amine</span>
-                    <span class="text-[10px] text-gray-400">10:48</span>
-                  </div>
-                  <p class="text-sm text-gray-600 leading-snug">Ah super, je vois beaucoup mieux la différence maintenant, merci beaucoup ! 🙏</p>
-                </div>
-              </div>
-
-              <!-- Status -->
-              <div class="flex justify-center" style="animation: pt-chat-status 12s infinite;">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 border border-green-200 text-xs font-medium text-green-700 shadow-sm h-[30px]">
-                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                  Question résolue
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- VISUAL 3: Quiz -->
-          <div x-show="activeFeature === 3" x-cloak x-transition:enter="transition ease-out duration-500 delay-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="w-full max-w-sm absolute z-10">
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 relative overflow-hidden">
-              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-orange-50 text-orange-600 text-xs font-bold mb-4 uppercase tracking-wider">
-                Question 3/5
-              </div>
-              <h4 class="text-base font-bold text-gray-900 mb-6">Quelle est la traduction correcte pour "Bonjour" (le matin) ?</h4>
-              
-              <div class="space-y-3">
-                <div class="p-3 rounded-xl border-2 border-gray-100 flex items-center gap-3 transition-colors hover:bg-gray-50 cursor-pointer">
-                  <div class="w-5 h-5 rounded-full border-2 border-gray-300 shrink-0"></div>
-                  <div class="text-sm font-medium text-gray-700">こんにちは (Konnichiwa)</div>
-                </div>
-                <div class="p-3 rounded-xl border-2 flex items-center gap-3 relative" style="animation: pt-quiz-select-bg 8s infinite;">
-                  <div class="w-5 h-5 rounded-full shrink-0" style="animation: pt-quiz-select-radio 8s infinite;"></div>
-                  <div class="text-sm font-medium text-gray-900" style="animation: pt-quiz-select-text 8s infinite;">おはようございます (Ohayou)</div>
-                </div>
-                <div class="p-3 rounded-xl border-2 border-gray-100 flex items-center gap-3 transition-colors hover:bg-gray-50 cursor-pointer">
-                  <div class="w-5 h-5 rounded-full border-2 border-gray-300 shrink-0"></div>
-                  <div class="text-sm font-medium text-gray-700">こんばんは (Konbanwa)</div>
-                </div>
-              </div>
-              <div class="mt-6 flex justify-between items-center border-t border-gray-100 pt-4">
-                <span class="text-xs font-medium text-gray-400">QCM Vocabulaire</span>
-                <div class="px-4 py-2 text-white text-xs font-bold rounded-lg cursor-pointer" style="animation: pt-quiz-btn 8s infinite;">Valider</div>
-              </div>
-
-              <!-- Success Banner -->
-              <div class="absolute inset-x-0 bottom-0 bg-green-500 text-white px-5 py-3.5 flex justify-center items-center shadow-lg" style="animation: pt-quiz-banner 8s infinite;">
-                <div class="flex items-center gap-2.5">
-                  <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                  <span class="font-bold text-sm">Bonne réponse !</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- VISUAL 4: Notifications -->
-          <div x-show="activeFeature === 4" x-cloak x-transition:enter="transition ease-out duration-500 delay-100" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" class="w-full max-w-sm absolute z-10">
-            <div class="flex justify-end mb-4">
-              <div class="w-12 h-12 rounded-xl bg-white shadow-md border border-gray-100 flex items-center justify-center relative cursor-pointer hover:bg-gray-50">
-                <svg class="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                <div class="absolute top-2.5 right-2.5 w-3 h-3 rounded-full bg-orange-500 ring-2 ring-white animate-pulse"></div>
-              </div>
-            </div>
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-0 w-full ml-auto overflow-hidden" style="opacity:0; animation: pt-slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;">
-              <div class="bg-gray-50 border-b border-gray-100 px-4 py-2.5 flex justify-between items-center">
-                <span class="text-xs font-bold text-gray-600 uppercase tracking-wide">Notifications</span>
-                <span class="text-xs font-medium text-orange-500 hover:text-orange-600 cursor-pointer">Tout marquer lu</span>
-              </div>
-              <div class="p-3 hover:bg-orange-50/30 flex items-start gap-3 border-l-4 border-orange-500 bg-white transition-colors cursor-pointer">
-                <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center shrink-0 border border-orange-200 overflow-hidden">
-                  <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                </div>
-                <div>
-                  <div class="text-sm font-semibold text-gray-900 mb-0.5">Nouvelle réponse de Yanis</div>
-                  <div class="text-xs text-gray-600 leading-tight">Yanis a répondu à votre question sur la leçon "Lire l'heure en japonais".</div>
-                  <div class="text-[10px] text-orange-500 font-bold mt-1.5">À l'instant</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {# ══ VOTRE FORMATEUR ════════════════════════════════════════════════════════ #}
-  {# Personnalise librement le texte ci-dessous (parcours, chiffres, photo…). #}
-  <section id="formateur" class="bg-white relative overflow-hidden">
-    <div class="absolute -top-32 -right-32 w-[28rem] h-[28rem] bg-gradient-to-br from-orange-200/40 via-amber-100/30 to-transparent rounded-full blur-3xl pointer-events-none"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative">
-      <div class="flex flex-col lg:flex-row items-center gap-14 lg:gap-20">
-
-        {# Portrait (monogramme — remplace par une vraie photo quand tu veux) #}
-        <div class="reveal flex-1 flex justify-center lg:justify-start">
-          <div class="relative" style="animation: float 9s ease-in-out infinite;">
-            <div class="absolute inset-0 bg-gradient-to-tr from-orange-500 to-amber-400 rounded-[2.5rem] rotate-6 opacity-20"></div>
-            <div class="relative w-64 h-72 sm:w-72 sm:h-80 rounded-[2.5rem] bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900 shadow-2xl flex flex-col items-center justify-center overflow-hidden">
-              <span class="absolute top-6 right-7 text-6xl font-bold text-white/5 select-none">始</span>
-              <span class="text-8xl font-semibold text-white tracking-tight">Y</span>
-              <span class="mt-3 text-xs font-semibold tracking-[0.3em] text-orange-300 uppercase">Formateur</span>
-            </div>
-            <div class="absolute -bottom-5 -right-6 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 flex items-center gap-3"
-                 style="animation: float-delayed 6s ease-in-out infinite;">
-              <div class="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-              </div>
-              <div>
-                <div class="text-xs font-bold text-gray-900">Réponses perso</div>
-                <div class="text-[11px] text-gray-500">Directement par moi</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {# Texte #}
-        <div class="reveal delay-200 flex-1 max-w-xl">
-          <span class="inline-block text-xs font-semibold tracking-widest text-orange-500 uppercase mb-4">
-            Votre formateur
-          </span>
-          <h2 class="text-3xl sm:text-4xl font-medium text-gray-900 tracking-tight mb-5">
-            Moi, c'est <span class="text-orange-500">Yanis</span>.
-          </h2>
-          <p class="text-gray-500 mb-4 leading-relaxed">
-            J'ai créé Hajime Learning pour partager ce que j'aurais aimé trouver quand j'ai commencé :
-            des formations claires, concrètes, et un vrai accompagnement.
-          </p>
-          <p class="text-gray-500 mb-8 leading-relaxed">
-            Chaque leçon, chaque quiz et chaque réponse sur la plateforme vient de moi.
-            Pas d'intermédiaire : vous apprenez avec la personne qui a conçu le cours.
-          </p>
-          <ul class="space-y-3 mb-9">
-            <li class="flex items-start gap-3 text-sm text-gray-600">
-              <svg class="w-4 h-4 text-orange-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-              Des formations structurées pas à pas, pensées pour la pratique
-            </li>
-            <li class="flex items-start gap-3 text-sm text-gray-600">
-              <svg class="w-4 h-4 text-orange-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-              Je réponds moi-même à vos questions, directement dans les leçons
-            </li>
-            <li class="flex items-start gap-3 text-sm text-gray-600">
-              <svg class="w-4 h-4 text-orange-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-              Des contenus mis à jour et enrichis régulièrement, accès à vie
-            </li>
-          </ul>
-          <div class="flex flex-wrap items-center gap-3">
-            <c-ui.btn href="#catalogue">Voir mes formations</c-ui.btn>
-            <c-ui.btn href="{% url 'contact' %}" variant="outline">Me contacter</c-ui.btn>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  {# ══ ESPACE INSTRUCTEUR (masqué : plateforme mono-formateur) ════════════════════ #}
-  {% comment %}
-  <section class="bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-      <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-
-        {# Texte #}
-        <div class="reveal flex-1 max-w-lg">
-          <span class="inline-block text-xs font-semibold tracking-widest text-orange-500 uppercase mb-4">
-            Pour les experts
-          </span>
-          <h2 class="text-2xl sm:text-3xl font-medium text-gray-900 tracking-tight mb-4">
-            Partagez votre expertise.<br>Créez votre formation.
-          </h2>
-          <p class="text-gray-500 mb-6 leading-relaxed">
-            Vous avez des compétences à transmettre ? Rejoignez la plateforme en tant qu'instructeur.
-            Créez vos modules, vos leçons, vos quiz — et gérez vos étudiants depuis un espace dédié.
-          </p>
-          <ul class="space-y-3 mb-8">
-            {% for item in "123"|make_list %}
-              {% if forloop.first %}
-                <li class="flex items-start gap-3 text-sm text-gray-600">
-                  <svg class="w-4 h-4 text-orange-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                  Créer des formations structurées (modules, leçons, quiz)
-                </li>
-              {% elif forloop.counter == 2 %}
-                <li class="flex items-start gap-3 text-sm text-gray-600">
-                  <svg class="w-4 h-4 text-orange-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                  Répondre aux questions de vos étudiants en direct
-                </li>
-              {% else %}
-                <li class="flex items-start gap-3 text-sm text-gray-600">
-                  <svg class="w-4 h-4 text-orange-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                  Suivre vos statistiques et votre audience depuis un tableau de bord
-                </li>
-              {% endif %}
-            {% endfor %}
-          </ul>
-          <div class="flex items-center gap-3">
-            <c-ui.btn href="{% url 'instructor_plans' %}">
-              Devenir instructeur
-            </c-ui.btn>
-            <c-ui.btn href="{% url 'contact' %}" variant="outline">
-              Nous contacter
-            </c-ui.btn>
-          </div>
-          <p class="mt-4 text-xs text-gray-400">
-            L'accès instructeur est soumis à validation. Contactez-nous pour en savoir plus.
-          </p>
-        </div>
-
-        {# Visuel dashboard instructeur (Builder Drag & Drop) #}
-        <div class="reveal delay-200 flex-1 hidden lg:block">
-          <div class="relative w-full max-w-lg ml-auto h-[340px]">
-            <!-- Palette d'outils (droite) -->
-            <div class="absolute right-0 top-6 w-28 bg-white rounded-2xl shadow-xl border border-gray-100 p-3 space-y-2.5 z-20">
-              <div class="text-[9px] uppercase font-bold text-gray-400 tracking-wider text-center mb-1">Éléments</div>
-              
-              <!-- Video Tool -->
-              <div class="flex flex-col items-center justify-center py-2.5 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 transition hover:bg-blue-100 cursor-pointer">
-                <svg class="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span class="text-[10px] font-semibold">Vidéo</span>
-              </div>
-          
-              <!-- Audio Tool -->
-              <div class="flex flex-col items-center justify-center py-2.5 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 transition hover:bg-purple-100 cursor-pointer">
-                <svg class="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
-                <span class="text-[10px] font-semibold">Audio</span>
-              </div>
-          
-              <!-- Quiz Tool -->
-              <div class="flex flex-col items-center justify-center py-2.5 rounded-xl bg-orange-50 border border-orange-100 text-orange-600 transition hover:bg-orange-100 cursor-pointer">
-                <svg class="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                <span class="text-[10px] font-semibold">Quiz</span>
-              </div>
             </div>
             
-            <!-- Canvas (gauche) -->
-            <div class="absolute left-0 top-0 right-14 bottom-0 bg-gray-50/80 rounded-2xl border border-gray-200 p-5 overflow-hidden z-10 shadow-inner flex flex-col">
-              <div class="flex items-center gap-3 mb-5 border-b border-gray-200 pb-3">
-                <div class="w-2.5 h-2.5 rounded-full bg-orange-500"></div>
-                <div class="h-3 w-40 bg-gray-300 rounded-full"></div>
-              </div>
-              
-              <div class="flex-1 space-y-3 relative">
-                 <!-- Drop Zone indicator -->
-                 <div class="absolute inset-0 border-2 border-dashed border-gray-200 rounded-xl"></div>
-
-                 <!-- Item 1: Video -->
-                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex items-center gap-3 relative z-20"
-                      style="animation: drop-in-1 9s infinite both;">
-                    <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">
-                       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
-                    </div>
-                    <div class="flex-1">
-                       <div class="flex justify-between items-center mb-1.5">
-                         <div class="h-2 w-24 bg-gray-300 rounded-full"></div>
-                         <div class="text-[9px] font-bold text-gray-400">05:20</div>
-                       </div>
-                       <div class="h-1.5 w-16 bg-gray-100 rounded-full"></div>
-                    </div>
-                 </div>
-          
-                 <!-- Item 2: Audio -->
-                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex items-center gap-3 relative z-20"
-                      style="animation: drop-in-2 9s infinite both;">
-                    <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500 shrink-0">
-                       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
-                    </div>
-                    <div class="flex-1">
-                       <div class="flex justify-between items-center mb-1.5">
-                         <div class="h-2 w-28 bg-gray-300 rounded-full"></div>
-                         <div class="text-[9px] font-bold text-gray-400">12:10</div>
-                       </div>
-                       <div class="h-1.5 w-20 bg-gray-100 rounded-full"></div>
-                    </div>
-                 </div>
-          
-                 <!-- Item 3: Quiz -->
-                 <div class="bg-white rounded-xl shadow-sm border border-orange-200 p-3 flex items-center gap-3 relative z-20"
-                      style="animation: drop-in-3 9s infinite both;">
-                    <div class="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500 shrink-0">
-                       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                    </div>
-                    <div class="flex-1">
-                       <div class="flex justify-between items-center mb-1.5">
-                         <div class="h-2 w-20 bg-gray-300 rounded-full"></div>
-                         <div class="text-[9px] font-bold text-orange-400">5 QUESTIONS</div>
-                       </div>
-                       <div class="h-1.5 w-12 bg-gray-100 rounded-full"></div>
-                    </div>
-                 </div>
-              </div>
+            <!-- Badge Flottant -->
+            <div class="absolute -bottom-4 lg:-bottom-6 -left-4 z-30 bg-white border-2 border-gray-900 rounded-xl px-4 py-2 transform rotate-6 shadow-[3px_3px_0_0_#111827]">
+                <span class="font-bold text-gray-900 text-lg lg:text-xl">ヤニス先生</span>
             </div>
-          </div>
+        </div>
+    </div>
+
+    <!-- Bandeau défilant (Marquee) à la pub japonaise -->
+    <div class="absolute bottom-0 left-0 w-full bg-white border-t-2 border-gray-900 py-2.5 z-20 overflow-hidden flex whitespace-nowrap shadow-sm">
+        <style>
+            @keyframes marquee {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+            }
+            .animate-marquee {
+                animation: marquee 20s linear infinite;
+            }
+        </style>
+        <div class="animate-marquee flex items-center">
+            <!-- Bloc 1 -->
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Apprendre le Japonais de Zéro</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Préparation JLPT (N5-N1)</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Méthode Intuitive & Pratique</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Maîtrisez les Kanji</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+
+            <!-- Répétition -->
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Apprendre le Japonais de Zéro</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Préparation JLPT (N5-N1)</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Méthode Intuitive & Pratique</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Maîtrisez les Kanji</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            
+            <!-- Bloc 2 (copie exacte pour la boucle fluide) -->
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Apprendre le Japonais de Zéro</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Préparation JLPT (N5-N1)</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Méthode Intuitive & Pratique</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Maîtrisez les Kanji</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+
+            <!-- Répétition -->
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Apprendre le Japonais de Zéro</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Préparation JLPT (N5-N1)</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Méthode Intuitive & Pratique</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Maîtrisez les Kanji</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+        </div>
+    </div>
+</section>
+
+<!-- ====== PROMO VIDEO & STATS ====== -->
+<section class="relative bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 pt-24 pb-20 lg:py-20 border-b-2 border-gray-100 overflow-hidden">
+    <!-- Grille authentique de cahier d'entraînement de kanji (Kanji Drill / 漢字練習帳) : carreaux avec croix médiane en pointillés -->
+    <div class="absolute inset-0 opacity-[0.05] pointer-events-none"
+         style="background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect x='0.5' y='0.5' width='79' height='79' fill='none' stroke='%23ffffff' stroke-width='1'/%3E%3Cline x1='40' y1='0' x2='40' y2='80' stroke='%23ffffff' stroke-width='1' stroke-dasharray='4 4'/%3E%3Cline x1='0' y1='40' x2='80' y2='40' stroke='%23ffffff' stroke-width='1' stroke-dasharray='4 4'/%3E%3C/svg%3E&quot;); background-size: 80px 80px;"></div>
+
+    <!-- 3 kanji tracés directement dans les 3 premières cases de la grille de fond (日 • 本 • 語) -->
+    <div class="absolute top-0 left-0 flex pointer-events-none select-none z-0">
+        <div class="w-[80px] h-[80px] flex items-center justify-center">
+            <span class="text-4xl sm:text-5xl font-['Klee_One',cursive] text-white/30 leading-none">日</span>
+        </div>
+        <div class="w-[80px] h-[80px] flex items-center justify-center">
+            <span class="text-4xl sm:text-5xl font-['Klee_One',cursive] text-white/30 leading-none">本</span>
+        </div>
+        <div class="w-[80px] h-[80px] flex items-center justify-center">
+            <span class="text-4xl sm:text-5xl font-['Klee_One',cursive] text-white/30 leading-none">語</span>
+        </div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center z-10">
+        
+        <!-- Video Container -->
+        <div class="lg:col-span-7 relative group" x-data="{ isMuted: true }">
+            <div class="absolute -inset-1 bg-primary transform rotate-1 rounded-2xl z-0 opacity-50"></div>
+            <div class="relative bg-white border-2 border-gray-900 rounded-xl p-2 z-10 shadow-[4px_4px_0_0_#111827] flex items-center justify-center aspect-video cursor-pointer">
+                <!-- Video Player -->
+                <video x-ref="promoVideo" src="{% static 'videos/other.mp4' %}" autoplay loop muted playsinline class="w-full h-full border-2 border-gray-100 rounded-lg object-cover aspect-video cursor-pointer" @click="isMuted = !isMuted; $refs.promoVideo.muted = isMuted"></video>
+                
+                <!-- Manga tape -->
+                <div class="absolute -top-2 -left-2 w-10 h-3 bg-primary border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
+                <div class="absolute -bottom-2 -right-2 w-10 h-3 bg-primary border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
+                
+                <!-- Sound Toggle Button -->
+                <button @click="isMuted = !isMuted; $refs.promoVideo.muted = isMuted"
+                        class="absolute bottom-6 right-6 z-30 bg-white border-2 border-gray-200 rounded-xl p-3 text-gray-900 shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#111827] transition-all cursor-pointer group/btn"
+                        aria-label="Activer/Désactiver le son">
+                    <svg x-show="isMuted" class="w-6 h-6 group-hover/btn:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+                    <svg x-show="!isMuted" x-cloak class="w-6 h-6 group-hover/btn:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                </button>
+            </div>
         </div>
 
-      </div>
+        <!-- Stats / Personal Selling Points -->
+        <div class="lg:col-span-5 grid grid-cols-1 gap-6">
+            
+            <div class="relative bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 transition-all manga-drawn transform rotate-1 hover:rotate-2">
+                <!-- Speech Bubble Tail -->
+                <div class="absolute -bottom-2 left-8 w-4 h-4 bg-white border-b-2 border-r-2 border-gray-200 transform rotate-45"></div>
+                <div class="flex items-center justify-between mb-2 relative z-10">
+                    <span class="block font-bold text-gray-900 uppercase tracking-widest text-sm">Formé au Japon</span>
+                    <span class="text-2xl">🎌</span>
+                </div>
+                <p class="font-medium text-gray-600 leading-relaxed text-sm relative z-10">J'ai été formé à l'enseignement du japonais à la Japan Foundation (Saitama). J'enseigne la méthode officielle.</p>
+            </div>
+            
+            <div class="relative bg-primary text-white border-2 border-primary rounded-2xl p-6 shadow-sm hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 transition-all manga-drawn-alt transform -rotate-1 hover:-rotate-2">
+                <!-- Speech Bubble Tail -->
+                <div class="absolute top-8 -right-2 w-4 h-4 bg-primary border-t-2 border-r-2 border-primary transform rotate-45"></div>
+                <div class="flex items-center justify-between mb-2 relative z-10">
+                    <span class="block font-bold text-white uppercase tracking-widest text-sm">Suivi Personnel</span>
+                    <span class="text-2xl">👨‍🏫</span>
+                </div>
+                <p class="font-medium text-white/90 leading-relaxed text-sm relative z-10">Pas d'intermédiaires. Je conçois les cours, je les anime, et je réponds directement à vos questions.</p>
+            </div>
+
+            <div class="relative bg-gray-800/90 text-white border-2 border-gray-700 rounded-2xl p-6 shadow-sm hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 transition-all manga-drawn transform rotate-1 hover:rotate-2">
+                <!-- Speech Bubble Tail -->
+                <div class="absolute -left-2 bottom-8 w-4 h-4 bg-gray-800 border-b-2 border-l-2 border-gray-700 transform rotate-45"></div>
+                <div class="flex items-center justify-between mb-2 relative z-10">
+                    <span class="block font-bold text-white uppercase tracking-widest text-sm">Pratique & Concret</span>
+                    <span class="text-2xl">🎯</span>
+                </div>
+                <p class="font-medium text-gray-300 leading-relaxed text-sm relative z-10">L'objectif est simple : vous donner les clés pour comprendre et parler le japonais de tous les jours.</p>
+            </div>
+
+        </div>
     </div>
-  </section>
-  {% endcomment %}
+</section>
 
-  {# ══ CATALOGUE ════════════════════════════════════════════════════════════ #}
-  <section id="catalogue" class="bg-transparent border-t border-stone-200/50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20"
-         x-data="{ active: 'all' }">
+<!-- ====== A PROPOS (PRESENTATION SENSEI) ====== -->
+<section class="py-24 bg-primary text-white relative overflow-hidden border-b-2 border-primary-dark">
+    <!-- Manga Halftone background -->
+    <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-multiply" style="background-image: radial-gradient(#000 2px, transparent 2px); background-size: 16px 16px;"></div>
 
-      <c-ui.page-header title="Mes formations" subtitle="Toutes les formations que j'ai créées pour vous">
-        {% if courses %}
-          <c-ui.badge variant="gray">{{ courses|length }} formation{{ courses|length|pluralize }}</c-ui.badge>
-        {% endif %}
-      </c-ui.page-header>
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            
+            <!-- Video Presentation -->
+            <div class="relative group" x-data="{ isMuted: true }">
+                <!-- Background Offset -->
+                <div class="absolute -inset-2 bg-gray-900 transform rotate-[-2deg] rounded-2xl z-0 opacity-20"></div>
+                
+                <div class="relative bg-white border-2 border-gray-900 rounded-xl p-2 z-10 shadow-[4px_4px_0_0_#111827]">
+                    <!-- Video -->
+                    <video x-ref="senseiVideo" src="{% static 'videos/presentation.mp4' %}" autoplay loop muted playsinline class="w-full h-full border-2 border-gray-100 rounded-lg object-cover aspect-[4/5] cursor-pointer" @click="isMuted = !isMuted; $refs.senseiVideo.muted = isMuted"></video>
+                    
+                    <!-- Manga tape -->
+                    <div class="absolute -top-2 -left-2 w-10 h-3 bg-white border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
+                    <div class="absolute -bottom-2 -right-2 w-10 h-3 bg-white border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
+                    
+                    <!-- Sound Toggle Button -->
+                    <button @click="isMuted = !isMuted; $refs.senseiVideo.muted = isMuted"
+                            class="absolute bottom-6 right-6 z-30 bg-primary border-2 border-gray-900 rounded-xl p-3 text-white shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#111827] transition-all cursor-pointer group/btn"
+                            aria-label="Activer/Désactiver le son">
+                        <svg x-show="isMuted" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+                        <svg x-show="!isMuted" x-cloak class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                    </button>
+                </div>
+            </div>
 
-      {# ── Pills catégories — filtre HTMX sur place ── #}
-      {% if categories %}
-        <div class="flex items-center gap-2 flex-wrap mb-6">
+            <!-- Text Content -->
+            <div>
+                <div class="drop-shadow-sm mb-6 inline-block">
+                    <div class="inline-block bg-gray-900 text-white rounded-lg px-4 py-1.5 manga-tape transform -rotate-1 shadow-[2px_2px_0_0_#111827]">
+                        <span class="font-bold tracking-widest uppercase text-xs">Votre Sensei (先生)</span>
+                    </div>
+                </div>
+                
+                <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight drop-shadow-md mb-8">
+                    Des cours pensés<br>pour la répétition espacée.
+                </h2>
+                
+                <div class="space-y-6">
+                    <div class="bg-white border-2 border-gray-900 rounded-2xl p-6 text-gray-900 shadow-sm hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 transition-all manga-drawn">
+                        <h3 class="font-bold text-xl mb-2 flex items-center gap-2 uppercase tracking-wide">
+                            <span class="text-primary text-2xl">🧠</span> Révision intégrée via Anki
+                        </h3>
+                        <p class="font-medium text-lg leading-relaxed text-gray-600">
+                            Fini les oublis au bout d'une semaine. Je fournis des decks Anki (flashcards) pour chaque leçon afin d'ancrer le vocabulaire et la grammaire sur le long terme via la répétition espacée.
+                        </p>
+                    </div>
 
-          <button type="button"
-                  @click="active = 'all'"
-                  hx-get="{% url 'catalogue' %}"
-                  hx-target="#index-grid"
-                  hx-swap="innerHTML"
-                  hx-indicator="#index-grid"
-                  class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-1"
-                  :class="active === 'all'
-                    ? 'bg-orange-500 border-orange-500 text-white'
-                    : 'bg-white border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600'">
-            Toutes
-          </button>
+                    <div class="bg-gray-900 border-2 border-gray-800 rounded-2xl p-6 text-white shadow-sm hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 transition-all manga-drawn-alt">
+                        <h3 class="font-bold text-xl mb-2 flex items-center gap-2 uppercase tracking-wide">
+                            <span class="text-2xl">🎌</span> Formé à Saitama (Japon)
+                        </h3>
+                        <p class="font-medium text-lg leading-relaxed text-gray-300">
+                            J'ai été formé à l'enseignement de la langue japonaise à la Japan Foundation à Saitama. Ce que j'y ai appris, je m'efforce aujourd'hui de vous le transmettre de la façon la plus claire possible.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-          {% for cat in categories %}
+        </div>
+    </div>
+</section>
+
+<!-- ====== POURQUOI HAJIME (MANGA STYLE) ====== -->
+<section class="py-24 bg-white relative overflow-hidden border-b-2 border-gray-100">
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#000 2px, transparent 2px); background-size: 16px 16px;"></div>
+
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+        
+        <!-- Header -->
+        <div class="mb-16 flex flex-col items-center md:items-start">
+            <div class="relative inline-block">
+                <div class="absolute -inset-2 bg-primary rounded-xl rotate-[-1deg] z-0 opacity-20"></div>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-gray-900 relative z-10 tracking-tight italic px-2">
+                    La qualité avant la quantité
+                </h2>
+            </div>
+            <div class="mt-6 text-base md:text-lg font-bold text-gray-700 bg-white border-2 border-gray-200 rounded-xl px-6 py-4 shadow-sm max-w-2xl text-center md:text-left">
+                Je préfère accompagner chaque apprenant individuellement plutôt que d'avoir des milliers d'élèves perdus.
+            </div>
+        </div>
+
+        <!-- Manga Panels -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+            
+            <div class="md:col-span-12 lg:col-span-7 bg-white border-2 border-gray-200 rounded-2xl p-8 md:p-10 relative shadow-[4px_4px_0_0_#111827] hover:-translate-y-1 transition-transform duration-300 group overflow-hidden manga-drawn">
+                <div class="absolute top-2 right-4 text-[150px] text-gray-50 font-black tracking-tighter opacity-60 group-hover:scale-110 transition-transform duration-500 select-none">ゴ</div>
+                <div class="relative z-10">
+                    <h3 class="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight tracking-tight">Pas d'intermédiaire</h3>
+                    <p class="mt-4 text-gray-600 font-medium text-lg md:text-xl leading-relaxed">
+                        Chaque leçon, chaque quiz et chaque réponse vient de moi. Vous apprenez avec la personne qui a conçu le cours. Je réponds moi-même à vos questions directement.
+                    </p>
+                </div>
+            </div>
+
+            <div class="md:col-span-6 lg:col-span-5 bg-gray-900 text-white border-2 border-gray-900 rounded-2xl p-8 md:p-10 relative shadow-[4px_4px_0_0_#111827] hover:-translate-y-1 transition-transform duration-300 group overflow-hidden manga-drawn-alt">
+                <div class="absolute -right-8 -bottom-8 text-9xl opacity-10 font-bold group-hover:rotate-12 transition-transform duration-500 select-none">🎌</div>
+                <div class="relative z-10">
+                    <h3 class="text-2xl md:text-3xl font-extrabold text-white leading-tight tracking-tight">Accès à vie</h3>
+                    <p class="mt-4 text-gray-300 font-medium text-lg leading-relaxed">
+                        Prenez votre temps. Des contenus mis à jour et enrichis régulièrement, sans abonnement mensuel caché.
+                    </p>
+                </div>
+            </div>
+
+            <div class="md:col-span-6 lg:col-span-12 bg-primary text-white border-2 border-primary rounded-2xl p-8 md:p-12 relative shadow-[4px_4px_0_0_#111827] hover:-translate-y-1 transition-transform duration-300 group overflow-hidden flex flex-col justify-center manga-drawn">
+                <div class="relative z-10 flex flex-col md:flex-row items-center md:items-start justify-between gap-8 text-center md:text-left">
+                    <div class="flex-1">
+                        <h3 class="text-3xl md:text-5xl font-extrabold text-white leading-tight italic drop-shadow-sm tracking-tight">Des formations pensées pour la pratique !</h3>
+                        <p class="mt-4 text-white/95 font-bold text-lg md:text-2xl leading-relaxed max-w-3xl drop-shadow-sm">
+                            Tout pour apprendre efficacement : progression claire, exercices concrets, quiz de validation.
+                        </p>
+                    </div>
+                    
+                    <div class="shrink-0 bg-white border-2 border-gray-900 text-gray-900 font-bold text-3xl md:text-5xl px-8 py-6 rounded-2xl transform rotate-3 shadow-[4px_4px_0_0_#111827] group-hover:scale-105 group-hover:rotate-6 transition-transform duration-300 relative select-none">
+                        ドン !
+                        <div class="absolute -bottom-2 -left-2 w-6 h-6 bg-white border-b-2 border-l-2 border-gray-900 transform rotate-45"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ====== CATALOGUE ====== -->
+<section id="catalogue" class="py-24 bg-gray-50 border-b-2 border-gray-100 relative">
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#000 2px, transparent 2px); background-size: 16px 16px;"></div>
+
+    <div class="max-w-7xl mx-auto px-6 relative z-10" x-data="{ active: 'all' }">
+        
+        <div class="mb-16 flex flex-col md:flex-row items-center md:items-end gap-4 md:gap-8 relative">
+            <!-- Huge Background Kanji -->
+            <div class="absolute -top-12 -left-8 text-[120px] text-gray-200 font-extrabold opacity-40 pointer-events-none select-none z-0">コース</div>
+            
+            <div class="relative z-10 text-center md:text-left w-full">
+                <div class="drop-shadow-sm inline-block">
+                    <div class="inline-block bg-gray-900 text-white px-4 py-1.5 mb-3 rounded-lg manga-tape transform -rotate-1 shadow-[2px_2px_0_0_#111827]">
+                        <span class="font-bold tracking-widest uppercase text-xs">CATALOGUE (カタログ)</span>
+                    </div>
+                </div>
+                <h2 class="text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight drop-shadow-sm">
+                    Mes formations
+                </h2>
+                <div class="mt-6 inline-block bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm max-w-xl manga-drawn-alt transform rotate-1">
+                    <p class="text-lg md:text-xl font-medium text-gray-600">
+                        Toutes les formations que j'ai créées pour vous
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        {% if categories %}
+        <div class="flex items-center justify-center md:justify-start gap-4 flex-wrap mb-12">
+            <button type="button"
+                    @click="active = 'all'"
+                    hx-get="{% url 'catalogue' %}"
+                    hx-target="#index-grid"
+                    hx-swap="innerHTML"
+                    class="px-6 py-2 text-sm font-bold border-2 rounded-xl transition-all shadow-sm hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_#111827] focus:outline-none manga-drawn"
+                    :class="active === 'all'
+                      ? 'bg-gray-900 border-gray-900 text-white'
+                      : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900'">
+              Toutes
+            </button>
+            {% for cat in categories %}
             <button type="button"
                     @click="active = '{{ cat.slug }}'"
                     hx-get="{% url 'catalogue' %}?category={{ cat.slug }}"
                     hx-target="#index-grid"
                     hx-swap="innerHTML"
-                    hx-indicator="#index-grid"
-                    class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-1"
+                    class="px-6 py-2 text-sm font-bold border-2 rounded-xl transition-all shadow-sm hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_#111827] focus:outline-none manga-drawn"
                     :class="active === '{{ cat.slug }}'
-                      ? 'bg-orange-500 border-orange-500 text-white'
-                      : 'bg-white border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600'">
+                      ? 'bg-gray-900 border-gray-900 text-white'
+                      : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900'">
               {{ cat.name }}
             </button>
-          {% endfor %}
-
-        </div>
-      {% endif %}
-
-      {# ── Grille (rendue côté serveur au premier chargement, HTMX ensuite) ── #}
-      <div id="index-grid" class="transition-opacity duration-150 htmx-request:opacity-50">
-        {% if courses %}
-          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
-            {% for course in courses %}
-              <div class="reveal delay-{{ forloop.counter|default_if_none:'1'|add:0|slugify|add:'00' }}">
-                <c-course.card :course="course" />
-              </div>
             {% endfor %}
-          </div>
-        {% else %}
-          <c-ui.empty-state
-            title="Aucune formation disponible"
-            message="Les premières formations arrivent bientôt. Revenez très vite !">
-            <c-ui.btn href="{% url 'account_signup' %}" variant="outline" size="sm">
-              M'avertir à l'ouverture
-            </c-ui.btn>
-          </c-ui.empty-state>
+        </div>
         {% endif %}
-      </div>
 
+        <div id="index-grid" class="transition-opacity duration-150 htmx-request:opacity-50">
+            {% if courses %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {% for course in courses %}
+                <!-- Style the course card to match neo-brutalism if possible via CSS overrides, or just use the existing one but wrap it nicely -->
+                <div class="bg-white border-2 border-gray-200 rounded-2xl shadow-sm hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#111827] transition-all duration-300 overflow-hidden">
+                    <c-course.card :course="course" />
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="bg-white border-2 border-gray-200 rounded-2xl shadow-sm p-12 text-center max-w-2xl mx-auto">
+                <div class="text-6xl mb-6">🚧</div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">Aucune formation disponible</h3>
+                <p class="text-gray-600 font-medium mb-8">Les premières formations arrivent bientôt. Revenez très vite !</p>
+                <a href="{% url 'account_signup' %}" class="inline-block bg-primary text-white font-bold rounded-xl px-8 py-3.5 border-2 border-primary shadow-[4px_4px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#111827] transition-all">
+                    M'avertir à l'ouverture
+                </a>
+            </div>
+            {% endif %}
+        </div>
     </div>
-  </section>
+</section>
 
-  {# ══ CTA FINAL ════════════════════════════════════════════════════════════════ #}
-  {% if not user.is_authenticated %}
-  <section class="bg-white border-t border-gray-100 reveal">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
-      <h2 class="text-2xl sm:text-3xl font-medium text-gray-900 tracking-tight mb-3">
-        Prêt à commencer ?
-      </h2>
-      <p class="text-gray-500 mb-8">
-        Créez votre compte gratuitement. Accédez aux formations en quelques secondes.
-      </p>
-      <div class="flex items-center justify-center gap-3">
-        <c-ui.btn href="{% url 'account_signup' %}" size="lg">Créer mon compte</c-ui.btn>
-        <c-ui.btn href="{% url 'contact' %}" variant="outline" size="lg">Nous contacter</c-ui.btn>
-      </div>
+<!-- ====== CTA FINAL ====== -->
+{% if not user.is_authenticated %}
+<section class="bg-primary text-white py-24 border-b-2 border-primary-dark relative overflow-hidden">
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#000 2px, transparent 2px); background-size: 16px 16px;"></div>
+    
+    <div class="max-w-4xl mx-auto px-6 text-center relative z-10">
+        <h2 class="text-4xl md:text-6xl font-extrabold tracking-tight italic mb-6 drop-shadow-sm">
+            Prêt à commencer l'aventure ?
+        </h2>
+        <p class="text-lg md:text-xl font-medium text-white/90 mb-10 max-w-2xl mx-auto">
+            Créez votre compte gratuitement. Accédez aux formations en quelques secondes et rejoignez les élèves.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <a href="{% url 'account_signup' %}" class="w-full sm:w-auto bg-white text-gray-900 font-bold rounded-xl px-8 py-3.5 border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#111827] active:translate-y-0.5 transition-all text-center">
+                Créer mon compte
+            </a>
+            <a href="{% url 'contact' %}" class="w-full sm:w-auto bg-transparent text-white font-bold rounded-xl px-8 py-3.5 border-2 border-white hover:bg-white hover:text-gray-900 transition-all text-center">
+                Nous contacter
+            </a>
+        </div>
     </div>
-  </section>
-  {% endif %}
+</section>
+{% endif %}
 
-{% endblock %}
-
-{% block extra_js %}
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
-
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-  });
-</script>
 {% endblock %}

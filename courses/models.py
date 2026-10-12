@@ -2,7 +2,8 @@ from django.db import models
 from django.conf import settings
 from markdownx.models import MarkdownxField
 from django.core.validators import FileExtensionValidator
-from .validators import get_upload_path, FileSizeValidator, IMAGE_EXTENSIONS, DOC_EXTENSIONS, AUDIO_EXTENSIONS
+from .validators import get_upload_path, FileSizeValidator, IMAGE_EXTENSIONS, DOC_EXTENSIONS, AUDIO_EXTENSIONS, ANKI_EXTENSIONS
+from .storage import protected_storage
 from django.urls import reverse
 
 
@@ -123,6 +124,10 @@ class Lesson(models.Model):
     order = models.PositiveIntegerField("Ordre", default=0)
     is_free = models.BooleanField("Gratuit (Aperçu)", default=False)
     is_published = models.BooleanField("Publié", default=True)
+    duration_minutes = models.PositiveSmallIntegerField(
+        "Durée estimée (min)", null=True, blank=True,
+        help_text="Affichée à l'étudiant dans le sommaire (optionnel).",
+    )
     
     class Meta:
         ordering = ['order']
@@ -132,13 +137,26 @@ class Lesson(models.Model):
     def __str__(self):
         return self.title
 
+    # Priorité d'affichage du type principal d'une leçon (icône du sommaire)
+    _TYPE_PRIORITY = ('video', 'quiz', 'anki', 'audio', 'file', 'text')
+
+    @property
+    def primary_type(self):
+        """Type dominant de la leçon (utilise les blocs préchargés si dispo)."""
+        types = {b.type for b in self.blocks.all()}
+        for t in self._TYPE_PRIORITY:
+            if t in types:
+                return t
+        return 'text'
+
 class ContentBlock(models.Model):
     CONTENT_TYPES = (
         ('text', '📝 Texte / Image'),
-        ('video', '🎬 Vidéo (Bunny)'),
+        ('video', '🎬 Vidéo (YouTube)'),
         ('audio', '🎧 Audio (MP3)'),
         ('file', '📎 Fichier à télécharger'),
         ('quiz', '🧠 Quiz / Examen'), 
+        ('anki', '🗂️ Deck Anki'),
     )
 
     lesson = models.ForeignKey(Lesson, related_name='blocks', on_delete=models.CASCADE)
@@ -152,30 +170,39 @@ class ContentBlock(models.Model):
     text_content = MarkdownxField("Contenu", blank=True, null=True)
     video_id = models.CharField("ID Vidéo", max_length=100, blank=True)
     
-    # Fichier principal (Audio ou Doc) - SÉCURISÉ
+    # Fichier principal (Audio, Doc ou Deck Anki) - PROTÉGÉ (hors MEDIA_ROOT)
     file_content = models.FileField(
         "Fichier Principal", 
         upload_to=get_upload_path, 
+        storage=protected_storage,
         blank=True, null=True,
         validators=[
-            FileExtensionValidator(allowed_extensions=AUDIO_EXTENSIONS + DOC_EXTENSIONS),
-            FileSizeValidator(max_mb=50)
+            FileExtensionValidator(allowed_extensions=AUDIO_EXTENSIONS + DOC_EXTENSIONS + ANKI_EXTENSIONS),
+            FileSizeValidator(max_mb=100)
         ]
     )
 
-    # Fichier correction (Caché) - SÉCURISÉ
+    # Fichier correction (Caché) - PROTÉGÉ
     related_file = models.FileField(
         "Fichier associé (Correction)", 
         upload_to=get_upload_path, 
+        storage=protected_storage,
         blank=True, null=True,
         validators=[
             FileExtensionValidator(allowed_extensions=DOC_EXTENSIONS),
             FileSizeValidator(max_mb=10)
         ]
     )
+
+    # Deck Anki : nombre de cartes (calculé automatiquement à l'upload, modifiable)
+    card_count = models.PositiveIntegerField("Nombre de cartes", null=True, blank=True)
     
     # Titre du Quiz
     quiz_title = models.CharField("Titre du Quiz", max_length=200, blank=True, null=True)
+    pass_percent = models.PositiveSmallIntegerField(
+        "Seuil de réussite (%)", default=70,
+        help_text="Score minimum pour considérer le quiz comme réussi.",
+    )
 
     class Meta:
         ordering = ['order']
@@ -205,6 +232,7 @@ class QuizQuestion(models.Model):
         ordering = ['order']
 
 class QuizResult(models.Model):
+    """Meilleur résultat d'un étudiant à un quiz (une ligne par étudiant/quiz)."""
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='quiz_results')
     block = models.ForeignKey(ContentBlock, on_delete=models.CASCADE)
     score = models.IntegerField()
@@ -216,6 +244,23 @@ class QuizResult(models.Model):
 
     def __str__(self):
         return f"{self.student.email} - Quiz {self.block.id}: {self.score}/{self.total_questions}"
+
+
+class QuizAttempt(models.Model):
+    """Historique de chaque tentative (score corrigé côté serveur)."""
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='quiz_attempts')
+    block = models.ForeignKey(ContentBlock, on_delete=models.CASCADE, related_name='attempts')
+    score = models.PositiveIntegerField()
+    total_questions = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Tentative de quiz"
+        verbose_name_plural = "Tentatives de quiz"
+
+    def __str__(self):
+        return f"{self.student.email} - Quiz {self.block_id}: {self.score}/{self.total_questions}"
         
 class LandingSection(models.Model):
     """Section libre pour la page vitrine d'un cours (page-builder léger)."""
@@ -236,7 +281,7 @@ class LandingSection(models.Model):
         ('white', 'Blanc'),
         ('gray', 'Gris clair'),
         ('green', 'Vert clair'),
-        ('orange', 'Orange clair'),
+        ('orange', 'Teinte principale claire'),
         ('dark', 'Sombre'),
     )
 
@@ -299,6 +344,23 @@ class StudentProgress(models.Model):
         return f"{self.student.email} - {self.lesson.title}"
 
 
+class CourseActivity(models.Model):
+    """Dernière leçon consultée par un étudiant dans un cours (bouton « Continuer »)."""
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='course_activities')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='activities')
+    last_lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['student', 'course']
+        ordering = ['-updated_at']
+        verbose_name = "Activité de cours"
+        verbose_name_plural = "Activités de cours"
+
+    def __str__(self):
+        return f"{self.student.email} — {self.course.title}"
+
+
 class CourseCompletion(models.Model):
     """Enregistrement unique quand un étudiant termine toutes les leçons d'un cours."""
     student = models.ForeignKey(
@@ -327,3 +389,19 @@ class CourseCompletion(models.Model):
 
     def __str__(self):
         return f"{self.student.email} — {self.course.title}"
+
+class StudentNote(models.Model):
+    """Notes personnelles de l'étudiant pour un bloc de contenu."""
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notes')
+    block = models.ForeignKey(ContentBlock, on_delete=models.CASCADE, related_name='student_notes')
+    content = models.TextField("Mes notes", blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['student', 'block']
+        ordering = ['-updated_at']
+        verbose_name = "Note personnelle"
+        verbose_name_plural = "Notes personnelles"
+
+    def __str__(self):
+        return f"Notes de {self.student.email} sur le bloc {self.block.id}"

@@ -1,10 +1,10 @@
 <c-vars variant="gray" />
 
-<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-             {% if variant == 'green' %}bg-green-100 text-green-800
-             {% elif variant == 'red' %}bg-red-100 text-red-800
-             {% elif variant == 'blue' %}bg-blue-100 text-blue-800
-             {% elif variant == 'orange' %}bg-orange-100 text-orange-700
-             {% elif variant == 'yellow' %}bg-yellow-100 text-yellow-800
-             {% else %}bg-gray-100 text-gray-600{% endif %}"
+<span class="inline-flex items-center px-3 py-1 border-2 border-dark font-black uppercase tracking-widest text-xs shadow-[2px_2px_0_0_#09090B]
+             {% if variant == 'green' %}bg-[#00E676] text-dark
+             {% elif variant == 'red' %}bg-primary text-white border-primary shadow-[2px_2px_0_0_#09090B]
+             {% elif variant == 'blue' %}bg-[#00E5FF] text-dark
+             {% elif variant == 'orange' %}bg-[#FF9100] text-dark
+             {% elif variant == 'yellow' %}bg-[#FFEA00] text-dark
+             {% else %}bg-white text-dark{% endif %}"
      {{ attrs }}>{{ slot }}</span>

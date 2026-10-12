@@ -183,6 +183,11 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Fichiers de cours payants (audio, PDF, decks Anki) : stockés HORS de MEDIA_ROOT
+# pour qu'aucune URL /media/ ne puisse les servir. Ils passent par la vue
+# `block_file` qui vérifie l'accès de l'étudiant.
+PROTECTED_MEDIA_ROOT = BASE_DIR / 'protected_media'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 

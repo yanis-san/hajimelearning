@@ -24,9 +24,9 @@ class CustomSignupForm(SignupForm):
         # On parcourt TOUS les champs du formulaire
         for field_name, field in self.fields.items():
             
-            # Application du style Tailwind à tout le monde
+            # Application du style Tailwind Soft-Brutalist
             field.widget.attrs.update({
-                'class': 'w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition mb-2'
+                'class': 'w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-gray-900 focus:ring-0 transition-colors font-medium text-gray-900 mb-2'
             })
             
             # Si c'est un champ mot de passe (ou confirmation), on vide le texte d'aide
@@ -52,7 +52,7 @@ class CustomLoginForm(LoginForm):
             self.fields['login'].label = "Adresse e-mail"
             self.fields['login'].widget.attrs.update({
                 'placeholder': 'ex: yanis@gmail.com',
-                'class': 'w-full p-2 border border-gray-300 rounded-lg mb-4',
+                'class': 'w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-gray-900 focus:ring-0 transition-colors font-medium text-gray-900 mb-4',
                 'autofocus': 'autofocus'
             })
         
@@ -61,7 +61,7 @@ class CustomLoginForm(LoginForm):
             self.fields['password'].help_text = None # On enlève le texte d'aide au login aussi au cas où
             self.fields['password'].widget = forms.PasswordInput(attrs={
                 'placeholder': 'Votre mot de passe',
-                'class': 'w-full p-2 border border-gray-300 rounded-lg mb-4',
+                'class': 'w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-gray-900 focus:ring-0 transition-colors font-medium text-gray-900 mb-4',
             })
 
         if 'remember' in self.fields:
@@ -84,11 +84,11 @@ class UserProfileForm(forms.ModelForm):
         
         for field in self.fields:
             self.fields[field].widget.attrs.update({
-                'class': 'w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition'
+                'class': 'w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-gray-900 focus:ring-0 transition-colors font-medium text-gray-900'
             })
             
         self.fields['avatar'].widget.attrs.update({
-            'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer'
+            'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-gray-100 file:text-gray-900 hover:file:bg-gray-200 cursor-pointer'
         })
 
 
@@ -100,7 +100,7 @@ class CustomResetPasswordForm(ResetPasswordForm):
         # On applique le style Tailwind au champ Email
         if 'email' in self.fields:
             self.fields['email'].widget.attrs.update({
-                'class': 'w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition',
+                'class': 'w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-gray-900 focus:ring-0 transition-colors font-medium text-gray-900',
                 'placeholder': 'Entrez votre adresse e-mail'
             })
 
@@ -114,9 +114,9 @@ class CustomResetPasswordKeyForm(ResetPasswordKeyForm):
             # 1. Enlever le texte d'aide (Les règles 8 caractères, etc.)
             field.help_text = None 
             
-            # 2. Style Tailwind
+            # 2. Style Tailwind Soft-Brutalist
             field.widget.attrs.update({
-                'class': 'w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition mb-2'
+                'class': 'w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-gray-900 focus:ring-0 transition-colors font-medium text-gray-900 mb-2'
             })
             
             # 3. Placeholder sympa

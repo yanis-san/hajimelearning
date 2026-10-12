@@ -31,10 +31,10 @@
                   hx-push-url="true"
                   hx-include="[name='q'], [name='sort']"
                   hx-indicator="#catalogue-grid"
-                  class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition cursor-pointer"
+                  class="px-4 py-2 text-sm font-bold rounded-xl border-2 transition-all cursor-pointer manga-drawn"
                   :class="active === ''
-                    ? 'bg-orange-500 border-orange-500 text-white'
-                    : 'bg-white border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600'">
+                    ? 'bg-gray-900 border-gray-900 text-white shadow-[3px_3px_0_0_#111827] -translate-y-0.5'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5'">
             Toutes
           </button>
 
@@ -47,10 +47,10 @@
                     hx-push-url="true"
                     hx-include="[name='q'], [name='sort']"
                     hx-indicator="#catalogue-grid"
-                    class="px-3.5 py-1.5 text-xs font-medium rounded-full border transition cursor-pointer"
+                    class="px-4 py-2 text-sm font-bold rounded-xl border-2 transition-all cursor-pointer manga-drawn"
                     :class="active === '{{ cat.slug }}'
-                      ? 'bg-orange-500 border-orange-500 text-white'
-                      : 'bg-white border-gray-200 text-gray-600 hover:border-orange-300 hover:text-orange-600'">
+                      ? 'bg-gray-900 border-gray-900 text-white shadow-[3px_3px_0_0_#111827] -translate-y-0.5'
+                      : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5'">
               {{ cat.name }}
             </button>
           {% endfor %}
@@ -71,7 +71,7 @@
             name="q"
             value="{{ search_query }}"
             placeholder="Rechercher une formation…"
-            class="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 transition"
+            class="w-full pl-10 pr-4 py-3 text-sm font-medium text-gray-900 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-0 focus:border-gray-900 transition-colors shadow-sm manga-drawn-alt"
             hx-get="{% url 'catalogue' %}"
             hx-trigger="input changed delay:300ms, search"
             hx-target="#catalogue-grid"
@@ -90,10 +90,10 @@
                   hx-target="#catalogue-grid"
                   hx-push-url="true"
                   hx-include="[name='q'], [name='category']"
-                  class="px-3 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer"
+                  class="px-3 py-1.5 text-xs font-bold rounded-xl border-2 transition-all cursor-pointer manga-drawn-alt"
                   :class="(sort === '-created_at' || sort === 'created_at')
-                    ? 'bg-orange-50 border-orange-200 text-orange-700'
-                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'">
+                    ? 'bg-gray-900 border-gray-900 text-white shadow-[2px_2px_0_0_#111827]'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-[2px_2px_0_0_#111827]'">
             Récent
             <span x-text="sort === '-created_at' ? '↓' : sort === 'created_at' ? '↑' : ''"></span>
           </button>
@@ -104,10 +104,10 @@
                   hx-target="#catalogue-grid"
                   hx-push-url="true"
                   hx-include="[name='q'], [name='category']"
-                  class="px-3 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer"
+                  class="px-3 py-1.5 text-xs font-bold rounded-xl border-2 transition-all cursor-pointer manga-drawn-alt"
                   :class="(sort === 'title' || sort === '-title')
-                    ? 'bg-orange-50 border-orange-200 text-orange-700'
-                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'">
+                    ? 'bg-gray-900 border-gray-900 text-white shadow-[2px_2px_0_0_#111827]'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-[2px_2px_0_0_#111827]'">
             Titre
             <span x-text="sort === 'title' ? '↑' : sort === '-title' ? '↓' : ''"></span>
           </button>
@@ -118,10 +118,10 @@
                   hx-target="#catalogue-grid"
                   hx-push-url="true"
                   hx-include="[name='q'], [name='category']"
-                  class="px-3 py-1.5 text-xs font-medium rounded-lg border transition cursor-pointer"
+                  class="px-3 py-1.5 text-xs font-bold rounded-xl border-2 transition-all cursor-pointer manga-drawn-alt"
                   :class="(sort === 'price' || sort === '-price')
-                    ? 'bg-orange-50 border-orange-200 text-orange-700'
-                    : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'">
+                    ? 'bg-gray-900 border-gray-900 text-white shadow-[2px_2px_0_0_#111827]'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-[2px_2px_0_0_#111827]'">
             Prix
             <span x-text="sort === 'price' ? '↑' : sort === '-price' ? '↓' : ''"></span>
           </button>

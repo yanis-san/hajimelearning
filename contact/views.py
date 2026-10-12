@@ -20,6 +20,17 @@ class ContactView(FormView):
             initial['first_name'] = user.first_name
             initial['last_name']  = user.last_name
             initial['email']      = user.email
+            
+        reason_label = self.request.GET.get('reason')
+        if reason_label:
+            from .models import ContactReason
+            # On cherche de manière insensible à la casse
+            reason = ContactReason.objects.filter(label__iexact=reason_label).first()
+            if not reason:
+                # Création automatique du motif pour éviter les erreurs
+                reason = ContactReason.objects.create(label=reason_label, order=10, is_active=True)
+            initial['reason'] = reason.id
+            
         return initial
 
     def form_valid(self, form):

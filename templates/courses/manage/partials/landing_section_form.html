@@ -1,12 +1,5 @@
 <div class="bg-white border border-orange-200 rounded-xl p-6 shadow-sm"
-     x-data="{
-       tab: 'edit',
-       renderMd(src, targetId) {
-         const el = document.getElementById(targetId);
-         if (!src.trim()) { el.innerHTML = '<p class=&quot;text-gray-400 italic text-sm&quot;>L\'aperçu apparaîtra ici…</p>'; return; }
-         el.innerHTML = '<div class=&quot;prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-a:text-orange-600 prose-strong:text-gray-800&quot;>' + marked.parse(src) + '</div>';
-       }
-     }">
+     x-data="{ tab: 'edit' }">
 
   <h3 class="text-lg font-semibold text-gray-800 mb-4">
     {% if section %}✏️ Modifier la section{% else %}✨ Nouvelle section :
@@ -90,13 +83,13 @@
               ✏️ Édition
             </button>
             <button type="button"
-                    x-on:click="tab = 'split'; $nextTick(() => { $refs.splitEditor.value = document.getElementById('id_body').value; renderMd($refs.splitEditor.value, 'section-md-preview') })"
+                    x-on:click="tab = 'split'; $nextTick(() => { $refs.splitEditor.value = document.getElementById('id_body').value; renderLandingSectionMarkdown($refs.splitEditor.value, 'section-md-preview') })"
                     :class="tab === 'split' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'"
                     class="px-3 py-1 text-xs font-medium rounded-md transition cursor-pointer">
               ⬛⬜ Split
             </button>
             <button type="button"
-                    x-on:click="tab = 'preview'; $nextTick(() => renderMd(document.getElementById('id_body').value, 'section-md-preview'))"
+                    x-on:click="tab = 'preview'; $nextTick(() => renderLandingSectionMarkdown(document.getElementById('id_body').value, 'section-md-preview'))"
                     :class="tab === 'preview' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500 hover:text-gray-700'"
                     class="px-3 py-1 text-xs font-medium rounded-md transition cursor-pointer">
               👁️ Aperçu
@@ -112,7 +105,7 @@
         {# Split mode #}
         <div x-show="tab === 'split'" x-cloak class="grid grid-cols-2 gap-4">
           <textarea x-ref="splitEditor"
-                    x-on:input="document.getElementById('id_body').value = $el.value; renderMd($el.value, 'section-md-preview')"
+                    x-on:input="document.getElementById('id_body').value = $el.value; renderLandingSectionMarkdown($el.value, 'section-md-preview')"
                     class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
                     rows="10"></textarea>
           <div id="section-md-preview" class="prose prose-sm max-w-none p-4 border border-gray-200 rounded-xl bg-gray-50 overflow-y-auto"></div>
@@ -177,3 +170,18 @@
     </div>
   </form>
 </div>
+
+<script>
+  if (typeof window.renderLandingSectionMarkdown !== 'function') {
+    window.renderLandingSectionMarkdown = function(src, targetId) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      if (!src || !src.trim()) {
+        el.innerHTML = '<p class="text-gray-400 italic text-sm">L\'aperçu apparaîtra ici…</p>';
+        return;
+      }
+      const parsed = (window.marked && window.marked.parse) ? window.marked.parse(src) : src;
+      el.innerHTML = '<div class="prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-a:text-orange-600 prose-strong:text-gray-800">' + parsed + '</div>';
+    };
+  }
+</script>

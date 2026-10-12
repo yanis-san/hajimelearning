@@ -3,212 +3,699 @@
 
 {% block extra_head %}
   <script src="{% static 'js/marked.min.js' %}"></script>
+  <script>
+    function convertCourseFurigana(text) {
+      if (!text) return '';
+      return text
+        .replace(/\{([^\}]+)\}\(([^\)]+)\)/g, (m, k, r) => {
+          if (r.includes('|')) {
+            const parts = r.split('|').map(s => s.trim());
+            if (k.trim().length === parts.length) {
+              return parts.map((p, i) => `<ruby>${k.trim()[i]}<rt>${p}</rt></ruby>`).join('');
+            }
+          }
+          return `<ruby>${k.trim()}<rt>${r.trim()}</rt></ruby>`;
+        })
+        .replace(/\[([^\]\n]+)\]\{([^{}\n]+)\}/g, (m, k, r) => {
+          if (r.includes('|')) {
+            const parts = r.split('|').map(s => s.trim());
+            if (k.trim().length === parts.length) {
+              return parts.map((p, i) => `<ruby>${k.trim()[i]}<rt>${p}</rt></ruby>`).join('');
+            }
+          }
+          return `<ruby>${k.trim()}<rt>${r.trim()}</rt></ruby>`;
+        })
+        .replace(/[｜\|]([^《\n]+)《([^》\n]+)》/g, '<ruby>$1<rt>$2</rt></ruby>')
+        .replace(/([\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff々〆ヵヶ]+)《([^》\n]+)》/g, '<ruby>$1<rt>$2</rt></ruby>');
+    }
+
+    function renderCourseMarkdown(srcText, targetId) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      const converted = convertCourseFurigana(srcText || '');
+      const parsed = (window.marked && window.marked.parse) ? window.marked.parse(converted) : converted;
+      el.innerHTML = '<div class="prose prose-sm max-w-none prose-headings:text-gray-900 prose-headings:font-bold prose-p:text-gray-700 prose-a:text-orange-600 prose-strong:text-gray-900 prose-ul:list-disc prose-ul:pl-5">' + (parsed || '<p class="text-gray-400 italic">Aucun contenu rédigé pour le moment…</p>') + '</div>';
+    }
+  </script>
 {% endblock %}
 
 {% block content %}
 <c-layout.course_builder :course="course" active_tab="infos" :is_edit="is_edit">
 
-  <form method="post" enctype="multipart/form-data" class="max-w-4xl"
-        x-data="{ tab: 'infos' }"
+  <form method="post" enctype="multipart/form-data" class="max-w-4xl" novalidate
+        x-data="{
+          tab: 'infos',
+          mdTab: 'edit',
+          metaDescLength: 0,
+          trailerId: '',
+          courseTitle: '',
+          courseSlug: '',
+          init() {
+            const descEl = document.getElementById('id_meta_description');
+            if (descEl) {
+              this.metaDescLength = descEl.value.length;
+              descEl.addEventListener('input', () => { this.metaDescLength = descEl.value.length; });
+            }
+            const trailerEl = document.getElementById('id_trailer_video_id');
+            if (trailerEl) {
+              this.trailerId = trailerEl.value;
+              trailerEl.addEventListener('input', () => { this.trailerId = trailerEl.value.trim(); });
+            }
+            const titleEl = document.getElementById('id_title');
+            if (titleEl) {
+              this.courseTitle = titleEl.value;
+              titleEl.addEventListener('input', () => { this.courseTitle = titleEl.value; });
+            }
+            const slugEl = document.getElementById('id_slug');
+            if (slugEl) {
+              this.courseSlug = slugEl.value;
+              slugEl.addEventListener('input', () => { this.courseSlug = slugEl.value; });
+            }
+          },
+          syncSplitPreview() {
+            const mainEl = document.getElementById('id_description');
+            const splitEl = this.$refs.splitEditor;
+            if (mainEl && splitEl) {
+              splitEl.value = mainEl.value;
+              renderCourseMarkdown(splitEl.value, 'desc-split-preview');
+            }
+          },
+          syncFullPreview() {
+            const mainEl = document.getElementById('id_description');
+            if (mainEl) {
+              renderCourseMarkdown(mainEl.value, 'desc-full-preview');
+            }
+          }
+        }"
+        {% if is_edit %}
         hx-post="."
         hx-trigger="change delay:1s from:input, change delay:1s from:textarea, change delay:1s from:select, submit"
         hx-target="#save-indicator-container"
-        hx-swap="innerHTML">
+        hx-swap="innerHTML"
+        {% endif %}>
     {% csrf_token %}
 
-    <!-- En-tête des onglets -->
-    <div class="flex border-b border-gray-200 mb-6 gap-6 relative">
-      <button type="button" @click="tab = 'infos'" :class="tab === 'infos' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-2 border-b-2 font-medium text-sm transition-colors">Informations</button>
-      <button type="button" @click="tab = 'vente'" :class="tab === 'vente' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-2 border-b-2 font-medium text-sm transition-colors">Page de vente</button>
-      <button type="button" @click="tab = 'seo'" :class="tab === 'seo' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700'" class="pb-2 border-b-2 font-medium text-sm transition-colors">SEO</button>
-      
-      <!-- Indicateur de sauvegarde auto -->
-      <div id="save-indicator-container" class="absolute right-0 bottom-2 flex items-center htmx-indicator-container">
-        <!-- Rempli par HTMX lors de la sauvegarde -->
-      </div>
-    </div>
-
-    <!-- Contenu des onglets -->
-    <div class="space-y-8 min-h-[400px]">
-      {# ── Informations principales ── #}
-      <div x-show="tab === 'infos'" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5" style="display: none;">
-        <h2 class="text-lg font-semibold text-gray-800">Informations principales</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label for="id_title" class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
-            {{ form.title }}
-            {% if form.title.errors %}<p class="text-xs text-red-500 mt-1">{{ form.title.errors.0 }}</p>{% endif %}
-          </div>
-          <div>
-            <label for="id_slug" class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-            {{ form.slug }}
-            <p class="text-xs text-gray-400 mt-1">{{ form.slug.help_text }}</p>
-            {% if form.slug.errors %}<p class="text-xs text-red-500 mt-1">{{ form.slug.errors.0 }}</p>{% endif %}
-          </div>
-        </div>
-
-        <div>
-          <label for="id_short_description" class="block text-sm font-medium text-gray-700 mb-1">Accroche (carte d'accueil)</label>
-          {{ form.short_description }}
-          {% if form.short_description.errors %}<p class="text-xs text-red-500 mt-1">{{ form.short_description.errors.0 }}</p>{% endif %}
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div>
-            <label for="id_price" class="block text-sm font-medium text-gray-700 mb-1">Prix (DA)</label>
-            {{ form.price }}
-            {% if form.price.errors %}<p class="text-xs text-red-500 mt-1">{{ form.price.errors.0 }}</p>{% endif %}
-          </div>
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">🃏 Image carte <span class="text-xs text-gray-400">(catalogue, accueil)</span></label>
-              {% if is_edit and course.thumbnail %}
-                <div class="mb-2">
-                  <img src="{{ course.thumbnail.url }}" alt="" class="w-24 h-24 rounded-lg object-cover border border-gray-200">
-                </div>
-              {% endif %}
-              {{ form.thumbnail }}
-              {% if form.thumbnail.errors %}<p class="text-xs text-red-500 mt-1">{{ form.thumbnail.errors.0 }}</p>{% endif %}
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">🖼️ Image vitrine <span class="text-xs text-gray-400">(page de vente — sidebar)</span></label>
-              {% if is_edit and course.cover_image %}
-                <div class="mb-2">
-                  <img src="{{ course.cover_image.url }}" alt="" class="w-24 h-24 rounded-lg object-cover border border-gray-200">
-                </div>
-              {% endif %}
-              {{ form.cover_image }}
-              {% if form.cover_image.errors %}<p class="text-xs text-red-500 mt-1">{{ form.cover_image.errors.0 }}</p>{% endif %}
-            </div>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-3">
-          <div class="flex items-center gap-3">
-            {{ form.is_published }}
-            <label for="id_is_published" class="text-sm font-medium text-gray-700">Publier ce cours</label>
-          </div>
-          {% if request.user.is_superuser %}
-          <div class="flex items-center gap-3">
-            {{ form.is_featured }}
-            <label for="id_is_featured" class="text-sm font-medium text-gray-700">Afficher sur l'accueil</label>
-            <span class="text-xs text-gray-400">(visible sur la page d'accueil)</span>
-          </div>
-          <div class="flex items-center gap-3">
-            {{ form.hide_title_on_card }}
-            <label for="id_hide_title_on_card" class="text-sm font-medium text-gray-700">Masquer le titre sur la carte</label>
-            <span class="text-xs text-gray-400">(si la jaquette contient déjà le titre)</span>
-          </div>
+    <!-- ── En-tête des onglets avec style Manga & Démarcation nette ── -->
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b-2 border-gray-900 pb-4 mb-8">
+      <div class="flex flex-wrap gap-2">
+        <button type="button" @click="tab = 'infos'"
+                :class="tab === 'infos'
+                  ? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#111827] -translate-y-0.5'
+                  : 'bg-white hover:bg-gray-100 text-gray-700 border-2 border-gray-200'"
+                class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer">
+          <span>📋 Informations</span>
+          {% if form.title.errors or form.slug.errors or form.short_description.errors or form.price.errors or form.thumbnail.errors or form.cover_image.errors %}
+            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse" title="Erreurs dans cet onglet"></span>
           {% endif %}
-        </div>
+        </button>
+
+        <button type="button" @click="tab = 'vente'"
+                :class="tab === 'vente'
+                  ? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#111827] -translate-y-0.5'
+                  : 'bg-white hover:bg-gray-100 text-gray-700 border-2 border-gray-200'"
+                class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer">
+          <span>🛍️ Page de vente</span>
+          {% if form.description.errors or form.what_you_will_learn.errors or form.prerequisites.errors or form.trailer_video_id.errors %}
+            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse" title="Erreurs dans cet onglet"></span>
+          {% endif %}
+        </button>
+
+        <button type="button" @click="tab = 'seo'"
+                :class="tab === 'seo'
+                  ? 'bg-gray-900 text-white shadow-[2px_2px_0_0_#111827] -translate-y-0.5'
+                  : 'bg-white hover:bg-gray-100 text-gray-700 border-2 border-gray-200'"
+                class="px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer">
+          <span>🔍 SEO & Google</span>
+          {% if form.meta_description.errors or form.keywords.errors %}
+            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse" title="Erreurs dans cet onglet"></span>
+          {% endif %}
+        </button>
       </div>
 
-      {# ── Page de vente (Markdown) ── #}
-      <div x-show="tab === 'vente'" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5" style="display: none;"
-           x-data="{
-             mdTab: 'edit',
-             renderMd(src, targetId) {
-               const el = document.getElementById(targetId);
-               if (el && window.marked) {
-                 el.innerHTML = marked.parse(document.getElementById(src).value || '');
-               }
-             }
-           }">
-        <h2 class="text-lg font-semibold text-gray-800">Page de vente</h2>
-
-        {# Description longue with preview #}
-        <div>
-          <div class="flex items-center justify-between mb-2">
-            <label for="id_description" class="block text-sm font-medium text-gray-700">Description détaillée</label>
-            <div class="flex gap-1">
-              <button type="button" x-on:click="mdTab = 'edit'"
-                      :class="mdTab === 'edit' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100'"
-                      class="px-2.5 py-1 text-xs rounded-lg transition cursor-pointer font-medium">
-                ✏️ Édition
-              </button>
-              <button type="button" x-on:click="mdTab = 'split'; $nextTick(() => renderMd('id_description', 'desc-preview'))"
-                      :class="mdTab === 'split' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100'"
-                      class="px-2.5 py-1 text-xs rounded-lg transition cursor-pointer font-medium">
-                ⬛⬜ Split
-              </button>
-              <button type="button" x-on:click="mdTab = 'preview'; $nextTick(() => renderMd('id_description', 'desc-preview'))"
-                      :class="mdTab === 'preview' ? 'bg-orange-100 text-orange-700' : 'text-gray-500 hover:bg-gray-100'"
-                      class="px-2.5 py-1 text-xs rounded-lg transition cursor-pointer font-medium">
-                👁️ Aperçu
-              </button>
-            </div>
-          </div>
-
-          <div x-show="mdTab === 'edit'">
-            {{ form.description }}
-          </div>
-          <div x-show="mdTab === 'split'" x-cloak class="grid grid-cols-2 gap-4">
-            <textarea x-on:input="document.getElementById('id_description').value = $el.value; renderMd('id_description', 'desc-preview')"
-                      x-init="$el.value = document.getElementById('id_description')?.value || ''"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
-                      rows="10"></textarea>
-            <div id="desc-preview" class="prose prose-sm max-w-none p-4 border border-gray-200 rounded-xl bg-gray-50 overflow-y-auto"></div>
-          </div>
-          <div x-show="mdTab === 'preview'" x-cloak>
-            <div id="desc-preview" class="prose prose-sm max-w-none p-4 border border-gray-200 rounded-xl bg-gray-50 min-h-[200px]"></div>
-          </div>
-          {% if form.description.errors %}<p class="text-xs text-red-500 mt-1">{{ form.description.errors.0 }}</p>{% endif %}
-        </div>
-
-        {# What you will learn #}
-        <div>
-          <label for="id_what_you_will_learn" class="block text-sm font-medium text-gray-700 mb-1">Ce que vous allez apprendre</label>
-          {{ form.what_you_will_learn }}
-          {% if form.what_you_will_learn.errors %}<p class="text-xs text-red-500 mt-1">{{ form.what_you_will_learn.errors.0 }}</p>{% endif %}
-        </div>
-
-        <div>
-          <label for="id_prerequisites" class="block text-sm font-medium text-gray-700 mb-1">Pré-requis</label>
-          {{ form.prerequisites }}
-          {% if form.prerequisites.errors %}<p class="text-xs text-red-500 mt-1">{{ form.prerequisites.errors.0 }}</p>{% endif %}
-        </div>
-
-        <div>
-          <label for="id_trailer_video_id" class="block text-sm font-medium text-gray-700 mb-1">ID Vidéo Trailer (YouTube)</label>
-          {{ form.trailer_video_id }}
-          {% if form.trailer_video_id.errors %}<p class="text-xs text-red-500 mt-1">{{ form.trailer_video_id.errors.0 }}</p>{% endif %}
-        </div>
-      </div>
-
-      {# ── SEO ── #}
-      <div x-show="tab === 'seo'" class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 space-y-5" style="display: none;">
-        <h2 class="text-lg font-semibold text-gray-800">SEO</h2>
-
-        <div>
-          <label for="id_meta_description" class="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
-          {{ form.meta_description }}
-          <p class="text-xs text-gray-400 mt-1">160 caractères max pour Google</p>
-          {% if form.meta_description.errors %}<p class="text-xs text-red-500 mt-1">{{ form.meta_description.errors.0 }}</p>{% endif %}
-        </div>
-
-        <div>
-          <label for="id_keywords" class="block text-sm font-medium text-gray-700 mb-1">Mots-clés</label>
-          {{ form.keywords }}
-          {% if form.keywords.errors %}<p class="text-xs text-red-500 mt-1">{{ form.keywords.errors.0 }}</p>{% endif %}
-        </div>
+      <!-- Statut de sauvegarde automatique HTMX -->
+      <div id="save-indicator-container" class="flex items-center min-h-[32px]">
+        {% if is_edit %}
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-stone-100 border border-stone-300 rounded-lg text-xs font-medium text-stone-600">
+          <svg class="w-3.5 h-3.5 text-stone-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          Changements prêts à enregistrer
+        </span>
+        {% endif %}
       </div>
     </div>
 
-    {# ── Actions ── #}
-    <div class="flex items-center justify-between mt-8 pt-4 border-t border-gray-100">
-      <div class="flex items-center gap-4">
-        <c-ui.btn variant="primary" type="submit">
-          {% if is_edit %}💾 Forcer la sauvegarde{% else %}➕ Créer le cours{% endif %}
-        </c-ui.btn>
-        <c-ui.btn variant="outline" href="{% url 'manage_course_list' %}">
-          Retour à la liste
-        </c-ui.btn>
+    {# ── Alerte Erreurs Globales ── #}
+    {% if form.errors %}
+      <div class="mb-8 p-4 bg-red-50 border-2 border-red-600 rounded-2xl shadow-[4px_4px_0_0_#DC2626] text-red-900 text-sm flex items-start gap-3">
+        <span class="text-xl leading-none">⚠️</span>
+        <div>
+          <p class="font-bold">Des erreurs empêchent la sauvegarde du cours :</p>
+          <p class="text-xs text-red-700 mt-1">Veuillez vérifier les champs signalés en rouge dans les onglets ci-dessus.</p>
+        </div>
       </div>
-      <span class="text-xs text-gray-400 flex items-center gap-1">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-        Sauvegarde automatique activée
-      </span>
+    {% endif %}
+
+    <!-- ── CONTENU DES ONGLETS ── -->
+    <div class="space-y-8 min-h-[450px]">
+
+      {# ========================================================================= #}
+      {# ── ONGLET 1 : INFORMATIONS GÉNÉRALES ── #}
+      {# ========================================================================= #}
+      <div x-show="tab === 'infos'" x-cloak class="space-y-6">
+
+        {# Carte 1 : Identité & Description courte #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-6">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>📌</span> Identité de la formation
+            </h2>
+            <span class="text-xs font-bold px-2.5 py-1 bg-orange-100 text-orange-800 rounded-lg border border-orange-200">
+              Essentiel
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {# Titre #}
+            <div>
+              <label for="id_title" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between">
+                <span>Titre du cours</span>
+                <span class="text-red-500 font-bold">*</span>
+              </label>
+              {{ form.title }}
+              {% if form.title.errors %}
+                <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                  <span>⚠️</span> {{ form.title.errors.0 }}
+                </p>
+              {% else %}
+                <p class="text-xs text-gray-500 font-medium mt-1">Nom complet affiché aux apprenants.</p>
+              {% endif %}
+            </div>
+
+            {# Slug #}
+            <div>
+              <label for="id_slug" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between">
+                <span>Identifiant URL (Slug)</span>
+                <span class="text-gray-400 font-semibold lowercase">automatique si vide</span>
+              </label>
+              <div class="relative flex items-center">
+                <span class="absolute left-3 text-xs font-mono text-gray-400 pointer-events-none select-none">/course/</span>
+                <div class="w-full [&_input]:pl-20">
+                  {{ form.slug }}
+                </div>
+              </div>
+              {% if form.slug.errors %}
+                <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                  <span>⚠️</span> {{ form.slug.errors.0 }}
+                </p>
+              {% else %}
+                <p class="text-xs text-gray-500 font-medium mt-1">Adresse web unique du cours (ex: <code>japonais-n5</code>).</p>
+              {% endif %}
+            </div>
+          </div>
+
+          {# Accroche courte (short_description) #}
+          <div>
+            <label for="id_short_description" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between">
+              <span>Phrase d'accroche (Jaquette & Catalogue)</span>
+              <span class="text-xs font-semibold text-gray-400">Court (1-2 phrases)</span>
+            </label>
+            {{ form.short_description }}
+            {% if form.short_description.errors %}
+              <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                <span>⚠️</span> {{ form.short_description.errors.0 }}
+              </p>
+            {% else %}
+              <p class="text-xs text-gray-500 font-medium mt-1">
+                Texte d'impact qui résume la formation sur la carte d'accueil et le catalogue.
+              </p>
+            {% endif %}
+          </div>
+        </div>
+
+        {# Carte 2 : Tarification #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-4">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>💰</span> Tarification
+            </h2>
+            <span class="text-xs font-bold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg border border-emerald-200">
+              Dinars Algériens
+            </span>
+          </div>
+
+          <div class="max-w-md">
+            <label for="id_price" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between">
+              <span>Prix d'accès au cours</span>
+              <span class="text-xs text-emerald-700 font-bold">0 = Gratuit</span>
+            </label>
+            <div class="relative flex items-center">
+              {{ form.price }}
+              <div class="absolute right-3.5 px-2 py-0.5 bg-gray-200 text-gray-800 text-xs font-black rounded-md pointer-events-none">
+                DA
+              </div>
+            </div>
+            {% if form.price.errors %}
+              <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                <span>⚠️</span> {{ form.price.errors.0 }}
+              </p>
+            {% else %}
+              <p class="text-xs text-gray-500 font-medium mt-1">Indiquez 0 pour rendre cette formation accessible gratuitement.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        {# Carte 3 : Visuels & Jaquettes #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-6">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>🖼️</span> Visuels & Jaquettes de présentation
+            </h2>
+            <span class="text-xs font-bold px-2.5 py-1 bg-purple-100 text-purple-800 rounded-lg border border-purple-200">
+              Images HD
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {# Image Carte (thumbnail) #}
+            <div class="bg-stone-50/70 border-2 border-dashed border-gray-300 rounded-2xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-black uppercase tracking-wider text-gray-800">
+                  🃏 Jaquette Carte (Catalogue / Accueil)
+                </label>
+              </div>
+
+              {% if is_edit and course.thumbnail %}
+                <div class="relative rounded-xl overflow-hidden border-2 border-gray-900 bg-white shadow-xs max-w-[220px]">
+                  <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="w-full h-32 object-cover">
+                  <span class="absolute bottom-1 right-1 px-1.5 py-0.5 text-[10px] font-bold bg-gray-900/80 text-white rounded">
+                    Actuelle
+                  </span>
+                </div>
+              {% endif %}
+
+              <div>
+                {{ form.thumbnail }}
+                {% if form.thumbnail.errors %}
+                  <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                    <span>⚠️</span> {{ form.thumbnail.errors.0 }}
+                  </p>
+                {% else %}
+                  <p class="text-xs text-gray-500 font-medium mt-1.5">
+                    Format recommandé : 16:9 ou carré (ex: 800×450px).
+                  </p>
+                {% endif %}
+              </div>
+            </div>
+
+            {# Image Vitrine (cover_image) #}
+            <div class="bg-stone-50/70 border-2 border-dashed border-gray-300 rounded-2xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-black uppercase tracking-wider text-gray-800">
+                  🖼️ Image Vitrine (Page de vente)
+                </label>
+              </div>
+
+              {% if is_edit and course.cover_image %}
+                <div class="relative rounded-xl overflow-hidden border-2 border-gray-900 bg-white shadow-xs max-w-[220px]">
+                  <img src="{{ course.cover_image.url }}" alt="{{ course.title }}" class="w-full h-32 object-cover">
+                  <span class="absolute bottom-1 right-1 px-1.5 py-0.5 text-[10px] font-bold bg-gray-900/80 text-white rounded">
+                    Actuelle
+                  </span>
+                </div>
+              {% endif %}
+
+              <div>
+                {{ form.cover_image }}
+                {% if form.cover_image.errors %}
+                  <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                    <span>⚠️</span> {{ form.cover_image.errors.0 }}
+                  </p>
+                {% else %}
+                  <p class="text-xs text-gray-500 font-medium mt-1.5">
+                    Bannière principale affichée sur la page vitrine/sidebar.
+                  </p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {# Carte 4 : Visibilité & Publication #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-4">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>⚙️</span> Visibilité & Diffusion
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {# is_published #}
+            <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-gray-900 bg-stone-50/50 hover:bg-white transition cursor-pointer">
+              <div class="pt-0.5">
+                {{ form.is_published }}
+              </div>
+              <div class="space-y-0.5">
+                <span class="block text-sm font-bold text-gray-900">Publier cette formation</span>
+                <span class="block text-xs text-gray-500">Accessible aux étudiants selon son tarif (sinon brouillon).</span>
+              </div>
+            </label>
+
+            {% if request.user.is_superuser %}
+              {# is_featured #}
+              <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-gray-900 bg-stone-50/50 hover:bg-white transition cursor-pointer">
+                <div class="pt-0.5">
+                  {{ form.is_featured }}
+                </div>
+                <div class="space-y-0.5">
+                  <span class="block text-sm font-bold text-gray-900">Mettre en avant à l'accueil</span>
+                  <span class="block text-xs text-gray-500">Affiche ce cours sur la vitrine d'accueil du site.</span>
+                </div>
+              </label>
+
+              {# hide_title_on_card #}
+              <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-gray-900 bg-stone-50/50 hover:bg-white transition cursor-pointer md:col-span-2">
+                <div class="pt-0.5">
+                  {{ form.hide_title_on_card }}
+                </div>
+                <div class="space-y-0.5">
+                  <span class="block text-sm font-bold text-gray-900">Masquer le titre sur la jaquette</span>
+                  <span class="block text-xs text-gray-500">Pratique si votre image de jaquette contient déjà le nom du cours en typographie.</span>
+                </div>
+              </label>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+
+      {# ========================================================================= #}
+      {# ── ONGLET 2 : PAGE DE VENTE (MARKDOWN & ARGUMENTS) ── #}
+      {# ========================================================================= #}
+      <div x-show="tab === 'vente'" x-cloak class="space-y-6">
+
+        {# Carte 1 : Description détaillée avec éditeur Markdown / Split / Preview #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-5">
+          <div class="flex items-center justify-between flex-wrap gap-3 border-b-2 border-gray-100 pb-4">
+            <div>
+              <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                <span>📝</span> Description complète de la formation
+              </h2>
+              <p class="text-xs text-gray-500 mt-0.5 font-medium">Présentez le programme, les points clés et l'esprit du cours (Markdown & Furigana supportés).</p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              {# Bouton Furigana #}
+              <button type="button"
+                      x-on:click="$dispatch('open-furigana-guide')"
+                      class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg border-2 border-gray-900 bg-yellow-300 hover:bg-yellow-400 text-gray-900 shadow-[2px_2px_0_0_#111827] hover:-translate-y-0.5 transition cursor-pointer"
+                      title="Consulter le guide et copier des modèles furigana">
+                <span>💡 Guide Furigana</span>
+              </button>
+
+              {# Switcher de mode d'édition #}
+              <div class="flex rounded-xl bg-gray-100 p-1 border border-gray-200">
+                <button type="button"
+                        x-on:click="mdTab = 'edit'"
+                        :class="mdTab === 'edit' ? 'bg-white shadow-xs text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900 font-medium'"
+                        class="px-3 py-1 text-xs rounded-lg transition cursor-pointer">
+                  ✏️ Édition
+                </button>
+                <button type="button"
+                        x-on:click="mdTab = 'split'; $nextTick(() => syncSplitPreview())"
+                        :class="mdTab === 'split' ? 'bg-white shadow-xs text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900 font-medium'"
+                        class="px-3 py-1 text-xs rounded-lg transition cursor-pointer">
+                  ⬛⬜ Split
+                </button>
+                <button type="button"
+                        x-on:click="mdTab = 'preview'; $nextTick(() => syncFullPreview())"
+                        :class="mdTab === 'preview' ? 'bg-white shadow-xs text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900 font-medium'"
+                        class="px-3 py-1 text-xs rounded-lg transition cursor-pointer">
+                  👁️ Aperçu
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {# Mode Édition seule #}
+          <div x-show="mdTab === 'edit'" class="space-y-2">
+            {{ form.description }}
+            {% if form.description.errors %}
+              <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                <span>⚠️</span> {{ form.description.errors.0 }}
+              </p>
+            {% else %}
+              <p class="text-xs text-gray-400 font-medium">
+                Astuce : Vous pouvez utiliser les titres <code># Titre</code>, listes à puces <code>- Point</code> et modèles de furigana <code>{漢字}(かんじ)</code>.
+              </p>
+            {% endif %}
+          </div>
+
+          {# Mode Split (côte à côte avec rendu direct) #}
+          <div x-show="mdTab === 'split'" x-cloak class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-black uppercase tracking-wider text-gray-700">Code Markdown</span>
+                <span class="text-[11px] text-gray-400 font-mono">sync live</span>
+              </div>
+              <textarea x-ref="splitEditor"
+                        x-on:input="document.getElementById('id_description').value = $refs.splitEditor.value; renderCourseMarkdown($refs.splitEditor.value, 'desc-split-preview')"
+                        rows="14"
+                        placeholder="Rédigez la description en Markdown…"
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-stone-50/80 text-gray-900 font-mono text-sm leading-relaxed resize-y focus:bg-white focus:outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 shadow-2xs"></textarea>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-black uppercase tracking-wider text-gray-700">Rendu formaté en direct</span>
+                <span class="text-[11px] text-emerald-600 font-bold">✓ Marked + Furigana</span>
+              </div>
+              <div id="desc-split-preview"
+                   class="border-2 border-dashed border-gray-300 rounded-xl p-5 bg-stone-50/60 overflow-y-auto max-h-[30rem] min-h-[14rem]">
+                <p class="text-gray-400 italic text-sm">L'aperçu apparaîtra ici…</p>
+              </div>
+            </div>
+          </div>
+
+          {# Mode Aperçu seul #}
+          <div x-show="mdTab === 'preview'" x-cloak>
+            <div class="mb-2">
+              <span class="text-xs font-black uppercase tracking-wider text-gray-700">Aperçu complet tel qu'affiché sur la page vitrine :</span>
+            </div>
+            <div id="desc-full-preview"
+                 class="border-2 border-gray-200 rounded-2xl p-6 sm:p-8 bg-stone-50/40 min-h-[16rem] overflow-y-auto">
+              <p class="text-gray-400 italic text-sm">L'aperçu apparaîtra ici…</p>
+            </div>
+          </div>
+        </div>
+
+        {# Carte 2 : Points forts & Pré-requis #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-6">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>🎯</span> Arguments marketing & Pré-requis
+            </h2>
+            <span class="text-xs font-bold px-2.5 py-1 bg-amber-100 text-amber-800 rounded-lg border border-amber-200">
+              Convaincre
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {# Ce que vous allez apprendre #}
+            <div>
+              <label for="id_what_you_will_learn" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between">
+                <span>Ce que vous allez apprendre</span>
+                <span class="text-xs font-semibold text-gray-400">Puces Markdown</span>
+              </label>
+              {{ form.what_you_will_learn }}
+              {% if form.what_you_will_learn.errors %}
+                <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                  <span>⚠️</span> {{ form.what_you_will_learn.errors.0 }}
+                </p>
+              {% else %}
+                <p class="text-xs text-gray-500 font-medium mt-1.5">
+                  Inscrivez une compétence par ligne (ex: <code>- Maîtriser 100 kanji</code>).
+                </p>
+              {% endif %}
+            </div>
+
+            {# Pré-requis #}
+            <div>
+              <label for="id_prerequisites" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between">
+                <span>Pré-requis recommandés</span>
+                <span class="text-xs font-semibold text-gray-400">Pour les élèves</span>
+              </label>
+              {{ form.prerequisites }}
+              {% if form.prerequisites.errors %}
+                <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                  <span>⚠️</span> {{ form.prerequisites.errors.0 }}
+                </p>
+              {% else %}
+                <p class="text-xs text-gray-500 font-medium mt-1.5">
+                  Connaissances ou matériel préalables (ex: <code>Aucun, ouvert à tous</code>).
+                </p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {# Carte 3 : Trailer Vidéo YouTube #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-4">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>🎬</span> Vidéo de présentation (Trailer YouTube)
+            </h2>
+            <span class="text-xs font-bold px-2.5 py-1 bg-red-100 text-red-800 rounded-lg border border-red-200">
+              YouTube
+            </span>
+          </div>
+
+          <div class="max-w-xl">
+            <label for="id_trailer_video_id" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5">
+              Identifiant de la vidéo (ou lien YouTube)
+            </label>
+            <div class="relative flex items-center">
+              <span class="absolute left-3.5 text-red-600 font-black pointer-events-none select-none text-sm">▶</span>
+              <div class="w-full [&_input]:pl-9">
+                {{ form.trailer_video_id }}
+              </div>
+            </div>
+            {% if form.trailer_video_id.errors %}
+              <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                <span>⚠️</span> {{ form.trailer_video_id.errors.0 }}
+              </p>
+            {% else %}
+              <p class="text-xs text-gray-500 font-medium mt-1.5">
+                Collez l'ID (ex: <code>dQw4w9WgXcQ</code>) ou l'adresse complète. Le lecteur sera intégré sur la page de vente.
+              </p>
+            {% endif %}
+          </div>
+
+          {# Mini aperçu du lecteur si renseigné #}
+          <div x-show="trailerId" x-cloak class="mt-4 pt-4 border-t border-gray-100">
+            <span class="block text-xs font-bold text-gray-700 mb-2">Aperçu du lecteur YouTube :</span>
+            <div class="aspect-video max-w-md rounded-xl overflow-hidden border-2 border-gray-900 shadow-sm bg-black">
+              <iframe :src="'https://www.youtube-nocookie.com/embed/' + trailerId"
+                      class="w-full h-full"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen></iframe>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {# ========================================================================= #}
+      {# ── ONGLET 3 : SEO & RÉFÉRENCEMENT (GOOGLE) ── #}
+      {# ========================================================================= #}
+      <div x-show="tab === 'seo'" x-cloak class="space-y-6">
+
+        {# Carte 1 : Meta Description & Google SERP Preview #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-6">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>🔍</span> Optimisation Google & Référencement (SEO)
+            </h2>
+            <span class="text-xs font-bold px-2.5 py-1 bg-blue-100 text-blue-800 rounded-lg border border-blue-200">
+              Moteurs de recherche
+            </span>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="id_meta_description" class="block text-xs font-black uppercase tracking-wider text-gray-800">
+                Meta Description (Google Snippet)
+              </label>
+              <div class="text-xs font-mono font-bold"
+                   :class="metaDescLength > 160 ? 'text-red-600' : (metaDescLength >= 120 ? 'text-emerald-600' : 'text-gray-400')">
+                <span x-text="metaDescLength">0</span> / 160 caractères
+              </div>
+            </div>
+            {{ form.meta_description }}
+            {% if form.meta_description.errors %}
+              <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                <span>⚠️</span> {{ form.meta_description.errors.0 }}
+              </p>
+            {% else %}
+              <p class="text-xs text-gray-500 font-medium mt-1.5">
+                Court résumé qui s'affiche sous le lien bleu dans les résultats de recherche Google. Idéal : 120 à 160 caractères.
+              </p>
+            {% endif %}
+          </div>
+
+          {# Mockup réaliste du résultat Google #}
+          <div class="p-5 rounded-xl border-2 border-gray-200 bg-stone-50/70 space-y-2">
+            <span class="text-xs font-black uppercase tracking-wider text-gray-600 flex items-center gap-1.5">
+              <span>👁️</span> Simulation du résultat dans Google :
+            </span>
+            <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-xs max-w-2xl font-sans">
+              <div class="flex items-center gap-2 text-xs text-gray-600 mb-1">
+                <span class="w-4 h-4 rounded-full bg-orange-500 text-white font-black text-[9px] flex items-center justify-center">H</span>
+                <span class="font-medium text-gray-700">Hajime Learning</span>
+                <span class="text-gray-400">› course › <span x-text="courseSlug || '{{ course.slug|default:'mon-cours' }}'"></span></span>
+              </div>
+              <h3 class="text-base text-blue-700 font-medium hover:underline cursor-pointer truncate leading-snug">
+                <span x-text="courseTitle || '{{ course.title|default:'Titre de la formation' }}'"></span> — Hajime Learning
+              </h3>
+              <p class="text-xs text-gray-600 mt-1 leading-relaxed line-clamp-2">
+                <span x-text="document.getElementById('id_meta_description')?.value || 'Découvrez cette formation en ligne sur Hajime Learning et progressez pas à pas avec nos modules interactifs.'"></span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {# Carte 2 : Mots-clés (Keywords) #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-4">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>🏷️</span> Mots-clés ciblés (Meta Keywords)
+            </h2>
+          </div>
+
+          <div>
+            <label for="id_keywords" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5">
+              Mots-clés de recherche
+            </label>
+            {{ form.keywords }}
+            {% if form.keywords.errors %}
+              <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                <span>⚠️</span> {{ form.keywords.errors.0 }}
+              </p>
+            {% else %}
+              <p class="text-xs text-gray-500 font-medium mt-1.5">
+                Séparez les mots-clés par des virgules (ex: <code>japonais, n5, débutant, jlpt, kanji, cours en ligne</code>).
+              </p>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ── BARRE D'ACTIONS INFERIEURE ── -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mt-10 pt-6 border-t-2 border-gray-900">
+      <div class="flex flex-wrap items-center gap-3">
+        <button type="submit"
+                class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-wider text-xs shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition cursor-pointer">
+          <span>💾</span>
+          <span>{% if is_edit %}Enregistrer les modifications{% else %}Créer la formation{% endif %}</span>
+        </button>
+
+        <a href="{% url 'manage_course_list' %}"
+           class="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl border-2 border-gray-900 bg-white hover:bg-gray-100 text-gray-900 font-bold text-xs shadow-[2px_2px_0_0_#111827] transition">
+          Retour à la liste
+        </a>
+      </div>
+
+      {% if is_edit %}
+      <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium bg-stone-100 px-3 py-1.5 rounded-lg border border-stone-200">
+        <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        <span>Sauvegarde instantanée au changement</span>
+      </div>
+      {% endif %}
     </div>
 
   </form>

@@ -8,6 +8,13 @@
   back_label="Retour aux cours">
 
   <c-slot name="actions">
+    <button type="button"
+            x-data
+            x-on:click="$dispatch('open-furigana-guide')"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-gray-950 font-bold rounded-xl transition shadow-sm cursor-pointer text-xs"
+            title="Consulter le guide et copier des modèles furigana">
+      💡 Guide Furigana
+    </button>
     <c-ui.btn variant="outline" size="sm" href="{% url 'course_detail' course.slug %}" target="_blank">
       👁️ Voir le cours
     </c-ui.btn>
@@ -61,3 +68,5 @@
   
 </c-layout.admin-card>
 {% endif %}
+
+<c-manage.furigana-guide />

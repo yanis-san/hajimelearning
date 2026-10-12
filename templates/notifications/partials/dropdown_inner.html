@@ -1,7 +1,7 @@
 {# En-tête #}
 <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/60">
   <h3 class="text-sm font-semibold text-gray-800">Notifications</h3>
-  <a href="{% url 'my_notifications' %}" class="text-xs text-orange-500 hover:text-orange-700 font-medium transition">
+  <a href="{% url 'my_notifications' %}" class="text-xs text-primary hover:brightness-95 font-medium transition">
     Tout voir
   </a>
 </div>
@@ -10,27 +10,7 @@
 <div class="max-h-80 overflow-y-auto divide-y divide-gray-100">
   {% if notifications %}
     {% for notif in notifications %}
-      <div id="notif-item-{{ notif.id }}"
-           class="px-4 py-3 border-b border-gray-100 last:border-0 transition-colors hover:brightness-95
-                  {% if notif.category == 'support' %}
-                    {% if not notif.is_read %}bg-green-50{% else %}bg-white{% endif %}
-                  {% else %}
-                    {% if not notif.is_read %}bg-orange-50/40{% else %}bg-white{% endif %}
-                  {% endif %}">
-        <a href="{% url 'mark_read_and_redirect' notif.id %}" class="block">
-          <p class="text-sm font-medium text-gray-800 truncate">{{ notif.title|default:"Notification" }}</p>
-          <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ notif.message }}</p>
-          <p class="text-xs text-gray-400 mt-1">{{ notif.created_at|timesince }}</p>
-        </a>
-        <button type="button"
-                hx-post="{% url 'mark_notif_read' notif.id %}"
-                hx-target="#notif-item-{{ notif.id }}"
-                hx-swap="outerHTML"
-                class="mt-1 text-xs font-medium cursor-pointer transition-colors
-                       {% if not notif.is_read %}text-orange-500 hover:text-orange-700{% else %}text-gray-400 hover:text-gray-600{% endif %}">
-          {% if not notif.is_read %}Marquer comme lu{% else %}Marquer comme non lu{% endif %}
-        </button>
-      </div>
+      <c-notification.item :notif="notif" compact="true" />
     {% endfor %}
   {% else %}
     <div class="px-4 py-10 text-center">

@@ -62,9 +62,10 @@ def mark_read_and_redirect(request, notification_id):
 def mark_notification_read(request, notification_id):
     notif = get_object_or_404(Notification, id=notification_id, recipient=request.user)
     
-    # On inverse le statut (Lu <-> Non lu) pour permettre de re-marquer comme non lu
-    notif.is_read = not notif.is_read
-    notif.save()
+    # On marque uniquement comme lu (pas de toggle)
+    if not notif.is_read:
+        notif.is_read = True
+        notif.save()
 
     # Recalcul du compteur pour le badge (uniquement notifs étudiant → cloche)
     unread_count = request.user.notifications.filter(
@@ -85,8 +86,9 @@ def mark_notification_read(request, notification_id):
         badge_html = '<div id="notification-badge" hx-swap-oob="true"></div>'
 
     # Rendu de la notification mise à jour
-    context = {'notif': notif}
-    notification_html = render_to_string('notifications/partials/single_notification.html', context)
+    is_dropdown = request.headers.get('X-Source') == 'dropdown'
+    context = {'notif': notif, 'is_dropdown': is_dropdown}
+    notification_html = render_to_string('notifications/partials/hx_item.html', context, request=request)
     
     return HttpResponse(notification_html + badge_html)
 
