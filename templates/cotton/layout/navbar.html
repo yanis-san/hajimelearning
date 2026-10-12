@@ -5,13 +5,7 @@
 
       {# ── Logo + liens desktop ── #}
       <div class="flex items-center gap-8">
-        <a href="{% url 'course_list' %}"
-           class="flex items-center gap-2 font-bold text-xl text-gray-900 tracking-tight hover:-translate-y-0.5 transition-transform">
-          <div class="w-8 h-8 bg-primary border-2 border-gray-900 rounded-lg flex items-center justify-center shadow-[2px_2px_0_0_#111827]">
-            <span class="text-white font-bold leading-none text-xs">始</span>
-          </div>
-          Hajime Learning
-        </a>
+        <c-ui.logo />
 
         <div class="hidden md:flex items-center gap-2">
           <a href="{% url 'catalogue' %}"

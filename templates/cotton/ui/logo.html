@@ -1,0 +1,55 @@
+{% load static %}
+<c-vars
+  size="md"
+  shape="round"
+  text="true"
+  subtitle="false"
+  dark="false"
+  class=""
+/>
+
+<a href="{% url 'course_list' %}"
+   class="inline-flex items-center gap-2.5 font-bold tracking-tight group transition-all duration-200 {{ class }}">
+  
+  {# Sceau Hanko rouge classique #}
+  {% if size == 'sm' %}
+    <div class="w-7 h-7 bg-white rounded-lg border border-red-100 p-0.5 flex items-center justify-center shadow-sm group-hover:scale-105 group-hover:rotate-[-2deg] transition-all duration-200 shrink-0">
+      {% if shape == 'square' %}
+        <img src="{% static 'img/hanko_square.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
+      {% else %}
+        <img src="{% static 'img/hanko_round.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
+      {% endif %}
+    </div>
+  {% elif size == 'lg' %}
+    <div class="w-12 h-12 bg-white rounded-2xl border-2 border-red-100 p-1 flex items-center justify-center shadow-md group-hover:scale-105 group-hover:rotate-[-2deg] transition-all duration-200 shrink-0">
+      {% if shape == 'square' %}
+        <img src="{% static 'img/hanko_square.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
+      {% else %}
+        <img src="{% static 'img/hanko_round.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
+      {% endif %}
+    </div>
+  {% else %}
+    {# md par défaut #}
+    <div class="w-9 h-9 bg-white rounded-xl border border-red-100/80 p-0.5 flex items-center justify-center shadow-sm group-hover:scale-105 group-hover:rotate-[-2deg] transition-all duration-200 shrink-0">
+      {% if shape == 'square' %}
+        <img src="{% static 'img/hanko_square.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
+      {% else %}
+        <img src="{% static 'img/hanko_round.png' %}" alt="Hanko Hajime" class="w-full h-full object-contain">
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {# Texte Marque #}
+  {% if text %}
+    <div class="flex flex-col">
+      <span class="{% if dark %}text-white{% else %}text-gray-900{% endif %} font-black {% if size == 'sm' %}text-base{% elif size == 'lg' %}text-2xl{% else %}text-xl{% endif %} tracking-tight leading-none group-hover:text-red-600 transition-colors">
+        Hajime Learning
+      </span>
+      {% if subtitle %}
+        <span class="text-[10px] font-bold text-gray-400 tracking-widest uppercase mt-1">
+          はじめ • Apprendre le japonais
+        </span>
+      {% endif %}
+    </div>
+  {% endif %}
+</a>

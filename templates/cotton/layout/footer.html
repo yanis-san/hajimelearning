@@ -6,16 +6,7 @@
 
       <!-- ── Colonne Marque (4 cols lg) ── -->
       <div class="lg:col-span-4 space-y-6">
-        <!-- Logo -->
-        <a href="{% url 'course_list' %}" class="inline-flex items-center gap-3 group">
-          <div class="w-10 h-10 bg-primary border border-primary-dark rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-            <span class="text-white font-black leading-none text-base">始</span>
-          </div>
-          <div>
-            <span class="text-white font-black text-2xl tracking-tight uppercase italic">Hajime Learning</span>
-            <span class="block text-[10px] font-bold text-gray-400 tracking-widest uppercase">はじめ • Apprendre le japonais</span>
-          </div>
-        </a>
+        <c-ui.logo size="lg" dark="true" subtitle="true" />
 
         <!-- Description -->
         <p class="text-sm text-gray-400 leading-relaxed font-normal max-w-sm">
