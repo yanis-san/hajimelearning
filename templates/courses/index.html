@@ -76,8 +76,14 @@
                 <div class="absolute -top-2 -left-2 w-10 h-3 bg-primary transform -rotate-45 z-20 border-2 border-gray-900 rounded-sm"></div>
                 <div class="absolute -bottom-2 -right-2 w-10 h-3 bg-primary transform -rotate-45 z-20 border-2 border-gray-900 rounded-sm"></div>
 
-                <!-- Image -->
+                <!-- Image / Vidéo Hero -->
                 <div class="w-full h-full bg-gray-100 rounded-lg overflow-hidden relative group">
+                    <!-- 
+                      🎬 VIDÉO 1 : hero.mp4
+                      - Chemin : static/videos/hero.mp4
+                      - Format : Vertical (ratio 4:5), 720p ou 540p, max 1 à 2 Mo
+                      - Usage  : Boucle d'ambiance en tête de page (autoplay muet)
+                    -->
                     <video src="{% static 'videos/hero.mp4' %}" autoplay loop muted playsinline preload="metadata" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"></video>
                     <!-- Trame Manga -->
                     <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-multiply" style="background-image: radial-gradient(#000 1.5px, transparent 1.5px); background-size: 10px 10px;"></div>
@@ -187,7 +193,12 @@
              x-init="initPromoVideo()">
             <div class="absolute -inset-1 bg-primary transform rotate-1 rounded-2xl z-0 opacity-50"></div>
             <div class="relative bg-white border-2 border-gray-900 rounded-xl p-2 z-10 shadow-[4px_4px_0_0_#111827] flex items-center justify-center aspect-video cursor-pointer">
-                <!-- Video Player -->
+                <!-- 
+                  🎬 VIDÉO 2 : other.mp4
+                  - Chemin : static/videos/other.mp4
+                  - Format : Horizontal (ratio 16:9), 720p, max 5 à 8 Mo
+                  - Usage  : Démo de la méthode / cours (démarre au scroll via IntersectionObserver)
+                -->
                 <video x-ref="promoVideo" src="{% static 'videos/other.mp4' %}" loop muted playsinline preload="none" class="w-full h-full border-2 border-gray-100 rounded-lg object-cover aspect-video cursor-pointer" @click="isMuted = !isMuted; $refs.promoVideo.muted = isMuted"></video>
                 
                 <!-- Manga tape -->
@@ -271,7 +282,12 @@
                 <div class="absolute -inset-2 bg-gray-900 transform rotate-[-2deg] rounded-2xl z-0 opacity-20"></div>
                 
                 <div class="relative bg-white border-2 border-gray-900 rounded-xl p-2 z-10 shadow-[4px_4px_0_0_#111827]">
-                    <!-- Video -->
+                    <!-- 
+                      🎬 VIDÉO 3 : presentation.mp4
+                      - Chemin : static/videos/presentation.mp4
+                      - Format : Vertical (ratio 4:5), 720p, max 5 à 8 Mo
+                      - Usage  : Présentation du Sensei (démarre au scroll via IntersectionObserver)
+                    -->
                     <video x-ref="senseiVideo" src="{% static 'videos/presentation.mp4' %}" loop muted playsinline preload="none" class="w-full h-full border-2 border-gray-100 rounded-lg object-cover aspect-[4/5] cursor-pointer" @click="isMuted = !isMuted; $refs.senseiVideo.muted = isMuted"></video>
                     
                     <!-- Manga tape -->
