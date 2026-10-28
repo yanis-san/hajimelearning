@@ -2,10 +2,10 @@
 name: Hajime Learning
 description: L'e-learning ancré en Algérie — local, fiable, accessible.
 colors:
-  tangerine: "#f97316"
-  tangerine-deep: "#ea580c"
-  tangerine-soft: "#fdba74"
-  tangerine-wash: "#fff7ed"
+  primary: "#e6003a"
+  primary-dark: "#b30030"
+  primary-soft: "#fb7185"
+  primary-wash: "#fff1f4"
   ink: "#111827"
   slate: "#374151"
   smoke: "#6b7280"
@@ -61,12 +61,12 @@ spacing:
   section: "64px"
 components:
   button-primary:
-    backgroundColor: "{colors.tangerine}"
+    backgroundColor: "{colors.primary}"
     textColor: "{colors.white}"
     rounded: "{rounded.md}"
     padding: "10px 16px"
   button-primary-hover:
-    backgroundColor: "{colors.tangerine-deep}"
+    backgroundColor: "{colors.primary-dark}"
   button-secondary:
     backgroundColor: "{colors.ink}"
     textColor: "{colors.white}"
@@ -108,10 +108,15 @@ components:
     rounded: "{rounded.full}"
     padding: "2px 10px"
   avatar-fallback:
-    backgroundColor: "{colors.tangerine}"
+    backgroundColor: "{colors.primary}"
     textColor: "{colors.white}"
     rounded: "{rounded.full}"
 ---
+
+> **⚠️ Document d'intention, partiellement ancien.** La palette est désormais le rouge `primary` (`#E6003A`) et plus l'orange ;
+> les règles **à jour et vérifiées par des tests** (boutons, cartes, badges, titres, formulaires, contrastes) sont dans
+> [`CONTRIBUTING.md`](CONTRIBUTING.md). En cas de contradiction, `CONTRIBUTING.md` et le code font foi.
+
 
 # Design System: Hajime Learning
 
@@ -119,7 +124,7 @@ components:
 
 **Creative North Star: "The Local Classroom"**
 
-Hajime Learning's interface is a familiar, trustworthy learning space that feels like it belongs in Algeria, not imported from a foreign template. The design is calm and clean — restrained enough that course content always leads, spacious enough that dense information (lesson lists, quiz forms, payment flows) never feels cramped. The warmth lives in precise details: a confident tangerine accent, generous white space, and softly rounded surfaces that read as approachable without tipping into playful.
+Hajime Learning's interface is a familiar, trustworthy learning space that feels like it belongs in Algeria, not imported from a foreign template. The design is calm and clean — restrained enough that course content always leads, spacious enough that dense information (lesson lists, quiz forms, payment flows) never feels cramped. The warmth lives in precise details: a confident primary accent, generous white space, and softly rounded surfaces that read as approachable without tipping into playful.
 
 The system serves two audiences with different needs on different screens. Students browse a course catalog, watch lessons, take quizzes, and track progress — tasks that reward clear hierarchy and minimal distraction. Instructors create courses and manage content — tasks that reward density and efficiency. The design language is the same for both; only the layout density shifts.
 
@@ -127,7 +132,7 @@ There is no dramatic motion, no glassmorphism, no dark mode. The interface is a 
 
 **Key Characteristics:**
 - Content-first: the UI recedes; the course material leads
-- One accent: tangerine orange, used sparingly for CTAs and active states
+- One accent: primary red, used sparingly for CTAs and active states
 - Softly rounded: consistent `rounded-xl` / `rounded-2xl` corner language
 - Light and airy: gray-50 page background, white cards, subtle ambient shadows
 - Single typeface: Inter at every weight, no decorative fonts
@@ -137,10 +142,10 @@ There is no dramatic motion, no glassmorphism, no dark mode. The interface is a 
 A warm, neutral palette grounded by a single confident accent.
 
 ### Primary
-- **Tangerine** (#f97316): The only accent color. Used for primary CTAs, active nav states, the logo wordmark, avatar fallbacks, notification badges, focus rings, and progress bars. Its energy is the entry point; its rarity is the discipline.
-- **Tangerine Deep** (#ea580c): Hover state for primary buttons and links. Slightly darker and warmer.
-- **Tangerine Soft** (#fdba74): Progress bar fills on dark overlays (course card hover state).
-- **Tangerine Wash** (#fff7ed / `orange-50`): Tinted background for instructor plan revenue highlights and active sidebar items.
+- **Primary** (#e6003a): The only accent color. Used for primary CTAs, active nav states, the logo wordmark, avatar fallbacks, notification badges, focus rings, and progress bars. Its energy is the entry point; its rarity is the discipline.
+- **Primary Dark** (#b30030): Hover state for primary buttons and links. Slightly darker and warmer.
+- **Primary Soft** (#fb7185): Progress bar fills on dark overlays (course card hover state).
+- **Primary Wash** (#fff1f4 / `primary/5`): Tinted background for instructor plan revenue highlights and active sidebar items.
 
 ### Neutral
 - **Ink** (#111827 / `gray-900`): Primary text, headings, and the secondary button fill. The darkest value in the system.
@@ -159,7 +164,7 @@ A warm, neutral palette grounded by a single confident accent.
 - **Info** (#3b82f6 / `blue-500`): Informational alerts, default notification tint.
 
 ### Named Rules
-**The One Accent Rule.** Tangerine is the only chromatic color in the interface outside of semantic states. If something is orange, it is interactive or active. If something is not interactive, it is gray.
+**The One Accent Rule.** Primary is the only chromatic color in the interface outside of semantic states. If something is primary-red, it is interactive or active. If something is not interactive, it is gray.
 
 ## Typography
 
@@ -239,28 +244,28 @@ Source de vérité : `static/css/app/buttons.css`, utilisé via `<c-ui.btn varia
 
 ### Badges
 - **Style:** Pill-shaped (`rounded-full`), tinted background + darker text per variant.
-- **Variants:** gray (default), green, red, blue, orange, yellow — each using the `-100` background and `-800` (or `-700` for orange) text of its Tailwind color.
+- **Variants:** gray (default), green, red, blue, purple, yellow — each using the `-100` background and `-800` (`-100`/`-800` tints) text of its Tailwind color.
 - **Size:** Compact — `px-2.5 py-0.5 text-xs font-medium`.
 
 ### Cards / Containers
 - **Course Card:** PS2-jacket aspect ratio (7:10), `rounded-2xl`, full-bleed image. Overlay appears on hover with gradient-to-t from black/90. Category chip (top-left) and price badge (top-right) float over the image. Hover scales image to 1.03.
 - **Auth Card:** `rounded-2xl`, white background, `border border-gray-100`, `shadow-sm`, `px-8 py-10` internal padding. Centered on a gray-50 full-height background.
-- **Plan Card:** `rounded-2xl`, white background. Featured variant adds `border-orange-300`, `ring-2 ring-orange-100`, `shadow-lg`, and `scale-[1.03]`.
+- **Plan Card:** `rounded-2xl`, white background. Featured variant adds `border-primary/40`, `ring-2 ring-orange-100`, `shadow-lg`, and `scale-[1.03]`.
 - **General surface:** White fill, `border border-gray-100` or `border-gray-200`, `shadow-sm`, `rounded-2xl`.
 
 ### Inputs / Fields
 - **Style:** White fill, mist border (`border-gray-300`), `rounded-xl`, `px-4 py-2.5`.
-- **Focus:** `ring-2 ring-orange-400`, border becomes transparent. Clean and obvious.
+- **Focus:** `ring-2 ring-primary/40`, border becomes transparent. Clean and obvious.
 - **Error:** Border shifts to `border-red-400`, focus ring to `ring-red-400`.
-- **File input:** Dashed border, icon + label layout, hover tints border to orange.
+- **File input:** Dashed border, icon + label layout, hover tints border to primary.
 - **Select / Textarea:** Same treatment as text input. Textarea allows vertical resize.
 
 ### Navigation
-- **Navbar:** White background, `border-b border-gray-100`, `shadow-sm`, sticky `top-0 z-50`. Height is `h-16`. Logo is tangerine wordmark with book icon.
+- **Navbar:** White background, `border-b border-gray-100`, `shadow-sm`, sticky `top-0 z-50`. Height is `h-16`. Logo is primary wordmark with book icon.
 - **Desktop links:** `text-sm font-medium text-gray-600`, hover → `text-gray-900 bg-gray-50`, `rounded-lg` hover background.
-- **Active admin link:** `text-orange-600 hover:bg-orange-50`.
-- **Mobile menu:** Slide-down panel with `x-transition` (150ms ease-out in, 100ms ease-in out). Items are `rounded-xl`, hover → `text-orange-600 bg-orange-50`.
-- **Footer:** White background, `border-t border-gray-100`. Logo wordmark in tangerine, copyright in ash, CGV/Contact links in ash → smoke on hover.
+- **Active admin link:** `text-primary-dark hover:bg-primary/5`.
+- **Mobile menu:** Slide-down panel with `x-transition` (150ms ease-out in, 100ms ease-in out). Items are `rounded-xl`, hover → `text-primary-dark bg-primary/5`.
+- **Footer:** White background, `border-t border-gray-100`. Logo wordmark in primary, copyright in ash, CGV/Contact links in ash → smoke on hover.
 
 ### Alerts / Flash Messages
 - **Structure:** Icon + text, `rounded-xl`, `border` (alerts) or `border-l-4` (flash messages).
@@ -269,28 +274,28 @@ Source de vérité : `static/css/app/buttons.css`, utilisé via `<c-ui.btn varia
 
 ### Progress Bar
 - **Track:** `bg-gray-100 rounded-full h-2`.
-- **Fill:** `bg-orange-500 rounded-full`, animated width transition (`duration-500`).
+- **Fill:** `bg-primary rounded-full`, animated width transition (`duration-500`).
 - **Label:** Optional percentage in `text-xs text-gray-500`.
 
 ### Avatar
 - **With image:** `rounded-full object-cover border border-gray-200`.
-- **Fallback:** Tangerine circle with white initial letter.
+- **Fallback:** Primary circle with white initial letter.
 - **Sizes:** `sm` (24px), `md` (32px), `lg` (64px), `xl` (96px).
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** use tangerine (#f97316) exclusively for interactive elements — buttons, links, focus rings, active states, badges that signal action.
+- **Do** use primary (#e6003a) exclusively for interactive elements — buttons, links, focus rings, active states, badges that signal action.
 - **Do** keep cards white on a gray-50 background. The contrast is subtle but consistent.
 - **Do** use `rounded-xl` (12px) for components and `rounded-2xl` (16px) for containers. Match the nearest sibling if unsure.
-- **Do** pair every input border state with a matching focus ring color (orange for default, red for error).
+- **Do** pair every input border state with a matching focus ring color (primary for default, red for error).
 - **Do** use Inter at weight 400–700 only. Use size and weight to create hierarchy, never a second font.
 - **Do** auto-dismiss flash messages after 4 seconds with a graceful slide-up transition.
 
 ### Don't:
-- **Don't** introduce a second accent color. The system has one: tangerine. Blue, purple, and teal are reserved for semantic states only.
+- **Don't** introduce a second accent color. The system has one: primary. Blue, purple, and teal are reserved for semantic states only.
 - **Don't** use sharp corners (radius 0) on any visible element.
 - **Don't** stack shadows. One shadow per element, escalating only on hover or emphasis.
 - **Don't** use dark backgrounds for content areas. Dark overlays are permitted only on course card hover gradients.
 - **Don't** add decorative illustrations, patterns, or background textures. The classroom is clean.
-- **Don't** reference the Tailwind config's `primary: '#6750A4'` — it is vestigial and unused. Tangerine is the actual primary.
+- **Don't** reference the Tailwind config's `primary: '#6750A4'` — it is vestigial and unused. Primary is the actual primary.

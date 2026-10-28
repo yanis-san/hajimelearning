@@ -532,3 +532,23 @@ class TestComponentUsage:
             if not re.search(rf'<{re.escape(tag)}[\s/>]', corpus):
                 unused.append(tag)
         assert not unused, f'Composants inutilisés (à supprimer) : {unused}'
+
+
+class TestDocumentationInSync:
+    def test_contributing_lists_every_component(self):
+        """Le catalogue de CONTRIBUTING.md doit mentionner chaque composant Cotton (la doc ne se périme pas)."""
+        from pathlib import Path
+
+        doc = Path('CONTRIBUTING.md').read_text(encoding='utf-8')
+        missing = [
+            path.relative_to('templates/cotton').as_posix()
+            for path in Path('templates/cotton').rglob('*.html')
+            if path.stem.replace('_', '-') not in doc
+        ]
+        assert not missing, f'Composants absents du catalogue de CONTRIBUTING.md : {missing}'
+
+    def test_ai_entry_points_reference_the_guide(self):
+        from pathlib import Path
+
+        for name in ('CLAUDE.md', 'AGENTS.md'):
+            assert 'CONTRIBUTING.md' in Path(name).read_text(encoding='utf-8'), name

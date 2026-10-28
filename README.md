@@ -1,5 +1,7 @@
 # Hajime Learning
 
+> 📘 **Développeurs et IA : lisez d'abord [`CONTRIBUTING.md`](CONTRIBUTING.md)** — stack, règles, composants, conventions et garde-fous.
+
 Plateforme de formation en ligne (Django 5.2) : cours, quiz, progression, certificats, espace instructeur.
 
 ## Démarrage
