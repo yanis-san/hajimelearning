@@ -13,4 +13,7 @@ urlpatterns = [
     path('mark-read/<int:notification_id>/', views.mark_notification_read, name='mark_notif_read'),
     # Action "Tout marquer comme lu"
     path('mark-all/', views.mark_all_read, name='mark_all_read'),
+    # Préférences d'e-mails et désabonnement (lien signé présent dans les e-mails facultatifs)
+    path('preferences/', views.notification_preferences, name='notification_preferences'),
+    path('unsubscribe/<str:token>/', views.unsubscribe, name='unsubscribe'),
 ]

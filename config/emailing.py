@@ -35,6 +35,10 @@ class EmailContent:
     context: dict = field(default_factory=dict)
     reply_to: list = field(default_factory=list)
     attachments: list = field(default_factory=list)  # [(nom, contenu, mimetype)]
+    recipient: object = None  # utilisateur destinataire (e-mails facultatifs : préférences et désabonnement)
+    category: str = 'essential'  # 'essential' = toujours envoyé ; sinon catégorie de notifications.preferences
+    unsubscribe_url: str = ''  # lien de désabonnement en un clic (e-mails facultatifs)
+    preferences_url: str = ''
 
 
 def base_context():
@@ -44,7 +48,13 @@ def base_context():
 
 def render_html(content):
     """HTML final de l'e-mail (aussi utilisé par la prévisualisation de développement)."""
-    context = {**base_context(), **content.context, 'subject': content.subject}
+    context = {
+        **base_context(),
+        **content.context,
+        'subject': content.subject,
+        'unsubscribe_url': content.unsubscribe_url,
+        'preferences_url': content.preferences_url,
+    }
     return render_to_string(f'emails/{content.template}.html', context)
 
 
@@ -68,6 +78,16 @@ def html_to_text(markup):
     return re.sub(r'\n{3,}', '\n\n', '\n'.join(lines)).strip() + '\n'
 
 
+def _unsubscribe_headers(content):
+    """En-têtes RFC 8058 : bouton « Se désabonner » natif des messageries et meilleure délivrabilité."""
+    if not content.unsubscribe_url:
+        return None
+    return {
+        'List-Unsubscribe': f'<{content.unsubscribe_url}>',
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    }
+
+
 def send_email(content):
     """Envoie l'e-mail (HTML + texte). Retourne True si accepté par le serveur ; ne lève jamais d'exception."""
     recipients = [address for address in content.to if address]
@@ -81,6 +101,7 @@ def send_email(content):
             from_email=settings.DEFAULT_FROM_EMAIL,
             to=recipients,
             reply_to=content.reply_to or None,
+            headers=_unsubscribe_headers(content),
         )
         message.attach_alternative(markup, 'text/html')
         for name, data, mimetype in content.attachments:

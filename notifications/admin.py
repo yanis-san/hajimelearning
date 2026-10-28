@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Notification
+from .models import Notification, NotificationPreference
 
 
 @admin.register(Notification)
@@ -18,3 +18,11 @@ class NotificationAdmin(admin.ModelAdmin):
     @admin.action(description='Marquer les notifications sélectionnées comme lues')
     def mark_as_read(self, request, queryset):
         queryset.update(is_read=True)
+
+
+@admin.register(NotificationPreference)
+class NotificationPreferenceAdmin(admin.ModelAdmin):
+    list_display = ('user', 'email_support', 'email_progress', 'email_newsletter', 'updated_at')
+    list_filter = ('email_support', 'email_progress', 'email_newsletter')
+    search_fields = ('user__email',)
+    list_select_related = ('user',)

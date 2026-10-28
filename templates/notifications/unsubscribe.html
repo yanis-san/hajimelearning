@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Se désabonner | Hajime Learning{% endblock %}
+
+{% block content %}
+<c-layout.container size="md" class="py-16 text-center">
+  <c-ui.card padding="lg">
+    <c-ui.title size="sm" class="mb-3">Se désabonner ?</c-ui.title>
+    <p class="text-gray-600 mb-6">
+      Vous ne recevrez plus les e-mails « {{ label }} » à l'adresse <strong>{{ email }}</strong>.
+      Les e-mails indispensables à votre compte (paiement, accès) continueront d'être envoyés.
+    </p>
+    <form method="post">
+      <c-ui.btn type="submit" variant="primary" block="true">Confirmer le désabonnement</c-ui.btn>
+    </form>
+    <p class="mt-4 text-sm"><c-ui.link href="{% url 'course_list' %}">Non, retourner sur le site</c-ui.link></p>
+  </c-ui.card>
+</c-layout.container>
+{% endblock %}

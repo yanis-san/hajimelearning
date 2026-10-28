@@ -35,6 +35,9 @@
                 Une question ? Écrivez-nous à <a href="mailto:{{ support_email }}" style="color:#b30030;">{{ support_email }}</a>
                 ou rendez-vous sur <a href="{{ site_url }}" style="color:#b30030;">{{ site_url }}</a>.<br>
                 © {% now "Y" %} {{ site_name }}
+                {% if unsubscribe_url %}<br>Vous recevez cet e-mail car vous êtes inscrit(e) à ce type de notification.
+                <a href="{{ unsubscribe_url }}" style="color:#6b7280;">Se désabonner</a> ·
+                <a href="{{ preferences_url }}" style="color:#6b7280;">Gérer mes préférences</a>{% endif %}
               </p>
             </td>
           </tr>

@@ -17,6 +17,8 @@ from courses.models import CourseCompletion
 from instructors.models import InstructorRequest
 from support.models import Question, Response
 
+from .preferences import ESSENTIAL, preferences_url, unsubscribe_url, wants_email
+
 
 def _full_name(user):
     return user.get_full_name() or user.first_name or user.email
@@ -34,12 +36,13 @@ def _superuser_emails(exclude=None):
     return list(admins.values_list('email', flat=True))
 
 
-def _course_staff_emails(course, author):
+def _course_staff(course, author):
     """Destinataires d'une question : l'instructeur du cours, sinon l'équipe de la plateforme."""
     instructor = course.instructor
     if instructor and instructor != author and instructor.email:
-        return [instructor.email]
-    return _superuser_emails(exclude=author)
+        return [instructor]
+    admins = get_user_model().objects.filter(is_superuser=True, is_active=True).exclude(email='')
+    return list(admins.exclude(pk=author.pk))
 
 
 # ── Accès aux formations ─────────────────────────────────────────────────────
@@ -132,6 +135,7 @@ def build_certificate_ready(completion):
     return [
         EmailContent(
             to=[completion.student.email],
+            recipient=completion.student,
             subject=f'Votre certificat est prêt : {completion.course.title}',
             template='certificate_ready',
             context={
@@ -183,7 +187,8 @@ def build_instructor_rejected(instructor_request):
 def build_question_new(question):
     return [
         EmailContent(
-            to=_course_staff_emails(question.course, question.student),
+            to=[user.email],
+            recipient=user,
             subject=f'Nouvelle question : {question.title}',
             template='question_new',
             context={
@@ -194,6 +199,7 @@ def build_question_new(question):
                 'cta_url': absolute_url(reverse('question_detail', args=[question.pk])),
             },
         )
+        for user in _course_staff(question.course, question.student)
     ]
 
 
@@ -213,6 +219,7 @@ def build_question_reply(response):
     return [
         EmailContent(
             to=[user.email],
+            recipient=user,
             subject=f'Nouvelle réponse : {question.title}',
             template='question_reply',
             context={
@@ -267,25 +274,36 @@ def build_contact_receipt(message):
 
 # ── Registre ─────────────────────────────────────────────────────────────────
 
+# nom → (modèle, constructeur, catégorie). `ESSENTIAL` = toujours envoyé ; sinon l'utilisateur peut se désabonner.
 EMAILS = {
-    'access_received': (AccessRequest, build_access_received),
-    'access_admin_alert': (AccessRequest, build_access_admin_alert),
-    'access_approved': (AccessRequest, build_access_approved),
-    'access_rejected': (AccessRequest, build_access_rejected),
-    'certificate_ready': (CourseCompletion, build_certificate_ready),
-    'instructor_approved': (InstructorRequest, build_instructor_approved),
-    'instructor_rejected': (InstructorRequest, build_instructor_rejected),
-    'question_new': (Question, build_question_new),
-    'question_reply': (Response, build_question_reply),
-    'contact_message': (ContactMessage, build_contact_message),
-    'contact_receipt': (ContactMessage, build_contact_receipt),
+    'access_received': (AccessRequest, build_access_received, ESSENTIAL),
+    'access_admin_alert': (AccessRequest, build_access_admin_alert, ESSENTIAL),
+    'access_approved': (AccessRequest, build_access_approved, ESSENTIAL),
+    'access_rejected': (AccessRequest, build_access_rejected, ESSENTIAL),
+    'certificate_ready': (CourseCompletion, build_certificate_ready, 'progress'),
+    'instructor_approved': (InstructorRequest, build_instructor_approved, ESSENTIAL),
+    'instructor_rejected': (InstructorRequest, build_instructor_rejected, ESSENTIAL),
+    'question_new': (Question, build_question_new, 'support'),
+    'question_reply': (Response, build_question_reply, 'support'),
+    'contact_message': (ContactMessage, build_contact_message, ESSENTIAL),
+    'contact_receipt': (ContactMessage, build_contact_receipt, ESSENTIAL),
 }
 
 
 def deliver(name, pk):
     """Charge l'objet, construit l'e-mail `name` et l'envoie. Retourne le nombre d'e-mails acceptés."""
-    model, builder = EMAILS[name]
+    model, builder, category = EMAILS[name]
     obj = model.objects.filter(pk=pk).first()
     if obj is None:
         return 0
-    return sum(send_email(content) for content in builder(obj))
+
+    sent = 0
+    for content in builder(obj):
+        content.category = category
+        if category != ESSENTIAL and content.recipient is not None:
+            if not wants_email(content.recipient, category):
+                continue  # l'utilisateur a coupé cette catégorie
+            content.unsubscribe_url = unsubscribe_url(content.recipient, category)
+            content.preferences_url = preferences_url()
+        sent += send_email(content)
+    return sent

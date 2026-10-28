@@ -4,6 +4,7 @@
 <c-layout.container size="2xl" class="py-10">
 
   <c-ui.page-header title="Notifications">
+    <c-ui.btn href="{% url 'notification_preferences' %}" variant="outline" size="sm">⚙️ Préférences e-mail</c-ui.btn>
     {% if notifications %}
       <c-ui.btn type="button" hx-post="{% url 'mark_all_read' %}" hx-target="#notification-list" hx-swap="innerHTML" hx-vals='{"type": "{{ current_type|default:'' }}"}' variant="primary" size="sm">
     Tout marquer comme lu

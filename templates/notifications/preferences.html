@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Préférences de notification | Hajime Learning{% endblock %}
+
+{% block content %}
+<c-layout.container size="2xl" class="py-10">
+
+  <c-ui.page-header title="Préférences e-mail" subtitle="Choisissez les e-mails que vous souhaitez recevoir">
+    <c-ui.btn href="{% url 'my_notifications' %}" variant="outline" size="sm">← Mes notifications</c-ui.btn>
+  </c-ui.page-header>
+
+  <c-ui.card class="space-y-6">
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <c-form.checkbox-card :field="form.email_support" title="Questions et réponses" description="Réponses à vos questions et nouvelles questions de vos étudiants." />
+      <c-form.checkbox-card :field="form.email_progress" title="Progression et certificats" description="Votre certificat dès qu'il est prêt, et les félicitations." />
+      <c-form.checkbox-card :field="form.email_newsletter" title="Actualités" description="Nouvelles formations et nouveautés de la plateforme." />
+      <c-ui.btn type="submit" variant="primary">Enregistrer mes préférences</c-ui.btn>
+    </form>
+
+    <c-ui.card variant="muted" padding="sm">
+      <p class="text-sm text-gray-600">
+        <strong>E-mails toujours envoyés :</strong> confirmation de compte, réinitialisation du mot de passe, suivi de vos paiements
+        et de vos accès, décisions sur vos demandes. Ils sont indispensables au fonctionnement de votre compte.
+      </p>
+    </c-ui.card>
+  </c-ui.card>
+
+</c-layout.container>
+{% endblock %}

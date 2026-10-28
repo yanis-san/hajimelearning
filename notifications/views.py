@@ -1,10 +1,15 @@
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from .models import Notification
+from .forms import NotificationPreferenceForm
+from .models import Notification, NotificationPreference
+from .preferences import CATEGORIES, read_unsubscribe_token, set_preference
 
 # Valeurs autorisées pour le filtre ?type=
 _VALID_TYPES = {Notification.TYPE_STUDENT, Notification.TYPE_INSTRUCTOR}
@@ -127,3 +132,31 @@ def email_preview(request, name=None):
     if request.GET.get('text'):
         return HttpResponse(html_to_text(markup), content_type='text/plain; charset=utf-8')
     return HttpResponse(markup)
+
+
+@login_required
+def notification_preferences(request):
+    """Choix des e-mails facultatifs reçus (les e-mails essentiels — compte, paiement, accès — sont toujours envoyés)."""
+    preference, _ = NotificationPreference.objects.get_or_create(user=request.user)
+    form = NotificationPreferenceForm(request.POST or None, instance=preference)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, "Vos préférences de notification ont été enregistrées.")
+        return redirect('notification_preferences')
+    return render(request, 'notifications/preferences.html', {'form': form})
+
+
+@csrf_exempt  # le jeton signé fait office d'authentification ; les messageries envoient un POST « un clic » (RFC 8058)
+def unsubscribe(request, token):
+    """Désabonnement d'une catégorie d'e-mails depuis un lien d'e-mail : confirmation (GET) puis application (POST)."""
+    parsed = read_unsubscribe_token(token)
+    if parsed is None:
+        raise Http404
+    user_id, category = parsed
+    user = get_object_or_404(get_user_model(), pk=user_id)
+    label = CATEGORIES[category][1]
+
+    if request.method == 'POST':
+        set_preference(user, category, False)
+        return render(request, 'notifications/unsubscribed.html', {'label': label})
+    return render(request, 'notifications/unsubscribe.html', {'label': label, 'email': user.email})

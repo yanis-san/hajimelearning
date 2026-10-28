@@ -59,3 +59,35 @@ class Notification(models.Model):
     def __str__(self):
         titre_aff = self.title if self.title else "Notification"
         return f"Notif pour {self.recipient}: {titre_aff} - {self.message}"
+
+
+class NotificationPreference(models.Model):
+    """
+    Préférences d'e-mails d'un utilisateur.
+
+    Les e-mails *essentiels* (compte, paiement, accès, demandes) sont toujours envoyés et n'apparaissent pas ici.
+    Les e-mails *facultatifs* sont regroupés en catégories que l'utilisateur peut couper.
+    """
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notification_preferences'
+    )
+    email_support = models.BooleanField(
+        "Questions et réponses",
+        default=True,
+        help_text="Réponses à vos questions, nouvelles questions de vos étudiants.",
+    )
+    email_progress = models.BooleanField(
+        "Progression et certificats", default=True, help_text="Certificat prêt et félicitations."
+    )
+    email_newsletter = models.BooleanField(
+        "Actualités", default=False, help_text="Nouvelles formations et nouveautés de la plateforme."
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Préférences de notification"
+        verbose_name_plural = "Préférences de notification"
+
+    def __str__(self):
+        return f"Préférences de {self.user}"

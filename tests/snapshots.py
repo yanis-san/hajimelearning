@@ -18,6 +18,7 @@ os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
 pytest.importorskip('playwright')
 from playwright.sync_api import sync_playwright  # noqa: E402
 
+from notifications.preferences import unsubscribe_token  # noqa: E402
 from tests.test_e2e import login_as  # noqa: E402
 
 pytestmark = [pytest.mark.django_db(transaction=True)]
@@ -164,6 +165,7 @@ def pages(w):
         ('signup', reverse('account_signup')),
         ('course-sales', reverse('course_detail', args=[course.slug])),
         ('plans', reverse('instructor_plans')),
+        ('unsubscribe', reverse('unsubscribe', args=[unsubscribe_token(w['student'], 'support')])),
     ]
     student = [
         ('student-dashboard', reverse('user_dashboard')),
@@ -171,6 +173,7 @@ def pages(w):
         ('student-course', reverse('course_detail', args=[course.slug])),
         ('student-lesson', reverse('lesson_detail', args=[course.slug, lesson.slug])),
         ('student-notifications', reverse('my_notifications')),
+        ('student-email-preferences', reverse('notification_preferences')),
         ('student-support', reverse('my_questions')),
         ('student-question', reverse('question_detail', args=[w['question'].id])),
         ('student-access-form', reverse('request_access', args=[w['free'].id])),

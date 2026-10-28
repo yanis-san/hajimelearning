@@ -285,6 +285,14 @@ Source visuelle : le style « manga / néo-brutaliste » (contours encre, ombres
 - **Réagir à une TRANSITION d'état, pas à une sauvegarde** : voir `remember_previous_status` et `on_*_saved`
   dans `notifications/signals.py` (jamais d'e-mail en double quand un admin resauvegarde une demande).
 - **Notification dans le site + e-mail vont ensemble** pour les événements importants (accès, certificat, instructeur, support).
+- **Essentiel ou facultatif ?** Chaque e-mail du registre `EMAILS` a une catégorie : `ESSENTIAL` (compte, paiement, accès, demandes,
+  contact — toujours envoyé, sans lien de désabonnement) ou une catégorie facultative (`support`, `progress`, `newsletter`,
+  définies dans `notifications/preferences.py`). Un e-mail facultatif **doit** avoir `recipient=<utilisateur>` : `deliver()`
+  respecte alors ses préférences et ajoute le pied de page « Se désabonner · Gérer mes préférences » et les en-têtes
+  `List-Unsubscribe` (RFC 8058, un clic). Un e-mail de type newsletter = catégorie `newsletter` (désactivée par défaut, opt-in).
+- Préférences : `/notifications/preferences/` (connecté) ; désabonnement : `/notifications/unsubscribe/<jeton signé>/`
+  (GET = confirmation, POST = application ; jamais d'effet sur un simple GET). Ne mets pas un e-mail transactionnel
+  dans une catégorie facultative : l'utilisateur ne recevrait plus son reçu.
 - Contenu saisi par un utilisateur : toujours affiché via `{{ x|linebreaksbr }}` (échappé) — jamais `|safe`.
 - Les e-mails d'allauth (confirmation, mot de passe) sont dans `templates/account/email/` (`.html` + `.txt`).
 - **Prévisualisation** en développement : `/__emails__/` (HTML) et `/__emails__/<nom>/?text=1` (version texte).

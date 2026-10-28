@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Désabonnement enregistré | Hajime Learning{% endblock %}
+
+{% block content %}
+<c-layout.container size="md" class="py-16 text-center">
+  <c-ui.card padding="lg">
+    <c-ui.title size="sm" class="mb-3">C'est fait ✅</c-ui.title>
+    <p class="text-gray-600 mb-6">
+      Vous ne recevrez plus les e-mails « {{ label }} ». Vous pouvez changer d'avis à tout moment dans vos préférences.
+    </p>
+    <c-ui.btn href="{% url 'notification_preferences' %}" variant="outline" block="true">Gérer mes préférences</c-ui.btn>
+  </c-ui.card>
+</c-layout.container>
+{% endblock %}

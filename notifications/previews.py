@@ -1,6 +1,7 @@
 """Prévisualisation des e-mails en développement (`/__emails__/`) avec des objets d'exemple non enregistrés."""
 
 from access.models import AccessRequest, Coupon
+from config.emailing import absolute_url
 from contact.models import ContactMessage, ContactReason
 from courses.models import Course, CourseCompletion, Lesson
 from instructors.models import InstructorPlan, InstructorRequest
@@ -8,6 +9,7 @@ from support.models import Question, Response
 from users.models import User
 
 from . import emails
+from .preferences import preferences_url
 
 
 def _samples():
@@ -66,4 +68,14 @@ def _samples():
 
 def preview_contents():
     """Nom → premier `EmailContent` de chaque e-mail du catalogue, construit avec des données d'exemple."""
-    return {name: contents[0] for name, contents in _samples().items() if contents}
+    contents = {}
+    for name, built in _samples().items():
+        if not built:
+            continue
+        content = built[0]
+        category = emails.EMAILS[name][2]
+        if category != emails.ESSENTIAL:  # montre le pied de page de désabonnement des e-mails facultatifs
+            content.unsubscribe_url = absolute_url('/notifications/unsubscribe/exemple/')
+            content.preferences_url = preferences_url()
+        contents[name] = content
+    return contents
