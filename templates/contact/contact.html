@@ -28,6 +28,10 @@
     <form method="post" novalidate class="space-y-6" x-data="{ reasonText: '' }" x-init="reasonText = $el.querySelector('select[name=reason] option:checked')?.dataset?.label || ''">
       {% csrf_token %}
 
+      {% for error in form.non_field_errors %}
+        <c-ui.alert variant="error">{{ error }}</c-ui.alert>
+      {% endfor %}
+
       {# ── Identité ── #}
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <c-form.input

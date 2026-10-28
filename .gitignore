@@ -54,3 +54,10 @@ old_index.html
 
 # Heavy media
 static/videos/
+
+media_test/
+protected_media_test/
+cache/
+.coverage
+htmlcov/
+coverage.xml

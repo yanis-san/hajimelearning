@@ -3,6 +3,8 @@ from django.core.mail import send_mail
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView
 
+from config import throttle
+
 from .forms import ContactForm
 from .models import ContactReason
 
@@ -31,6 +33,10 @@ class ContactView(FormView):
         return initial
 
     def form_valid(self, form):
+        if not throttle.allow(self.request, 'contact', limit=5, window=3600):
+            form.add_error(None, "Trop de messages envoyés. Réessayez dans une heure.")
+            return self.form_invalid(form)
+
         user = self.request.user if self.request.user.is_authenticated else None
         msg = form.save(commit=False)
         msg.user = user

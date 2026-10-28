@@ -275,3 +275,118 @@ class TestDesignConvention:
                 if 'shadow-[' in line and 'hover:-translate-y' in line and ('<a ' in line or '<button' in line):
                     offenders.append(f'{path}: {line.strip()[:80]}')
         assert not offenders, offenders
+
+
+@pytest.mark.django_db
+class TestThrottling:
+    def test_coupon_validation_is_rate_limited(self, client, course):
+        url = reverse('validate_coupon', args=[course.id])
+        for _ in range(10):
+            assert 'Trop de tentatives' not in client.post(url, {'promo_code': 'NOPE'}).content.decode()
+        assert 'Trop de tentatives' in client.post(url, {'promo_code': 'NOPE'}).content.decode()
+
+    def test_activation_code_attempts_are_rate_limited(self, client, student, course):
+        client.force_login(student)
+        url = reverse('request_access', args=[course.id])
+        for _ in range(5):
+            client.post(url, {'submit_code': '1', 'code': 'bad-code'})
+        response = client.post(url, {'submit_code': '1', 'code': 'bad-code'})
+        assert any('Trop de tentatives' in str(m) for m in response.context['messages'])
+
+
+@pytest.mark.django_db
+class TestAccessServices:
+    def test_discounted_price_and_coupon_errors(self, course):
+        from access.models import Coupon
+        from access.services import AccessError, find_valid_coupon
+
+        Coupon.objects.create(code='PROMO20', discount_percent=20)
+        coupon = find_valid_coupon(' promo20 ')
+        assert coupon.discounted_price(course.price) == 4000
+        with pytest.raises(AccessError):
+            find_valid_coupon('INCONNU')
+
+    def test_redeem_activation_code_is_single_use(self, student, course):
+        from access.models import ActivationCode
+        from access.services import AccessError, redeem_activation_code
+
+        code = ActivationCode.objects.create(course=course)
+        redeem_activation_code(student, course, str(code.code))
+        with pytest.raises(AccessError):
+            redeem_activation_code(student, course, str(code.code))
+
+
+@pytest.mark.django_db
+class TestCourseServices:
+    @pytest.fixture
+    def two_lessons(self, course):
+        module = course.modules.create(title='M', order=1)
+        first = module.lessons.create(title='1', slug='un', order=1)
+        second = module.lessons.create(title='2', slug='deux', order=2)
+        return first, second
+
+    def test_completing_every_lesson_completes_course_and_queues_certificate(
+        self, student, two_lessons, monkeypatch, django_capture_on_commit_callbacks
+    ):
+        from courses import services
+        from courses.models import CourseCompletion
+
+        queued = []
+        monkeypatch.setattr(
+            services.generate_certificate_pdf, 'delay', lambda completion_id: queued.append(completion_id)
+        )
+        first, second = two_lessons
+
+        services.complete_lesson(student, first)
+        assert not CourseCompletion.objects.exists()
+
+        with django_capture_on_commit_callbacks(execute=True):
+            progress = services.complete_lesson(student, second)
+
+        assert progress.is_complete
+        completion = CourseCompletion.objects.get()
+        assert queued == [completion.id]
+
+    def test_uncompleting_a_lesson_removes_the_completion(self, student, two_lessons, monkeypatch):
+        from courses import services
+        from courses.models import CourseCompletion
+
+        monkeypatch.setattr(services.generate_certificate_pdf, 'delay', lambda completion_id: None)
+        first, second = two_lessons
+        services.complete_lesson(student, first)
+        services.complete_lesson(student, second)
+        assert CourseCompletion.objects.exists()
+
+        services.uncomplete_lesson(student, second)
+        assert not CourseCompletion.objects.exists()
+
+    def test_record_quiz_result_rejects_inconsistent_scores(self, student, two_lessons):
+        from courses.models import ContentBlock
+        from courses.services import InvalidScore, record_quiz_result
+
+        block = ContentBlock.objects.create(lesson=two_lessons[0], type='quiz', order=1)
+        with pytest.raises(InvalidScore):
+            record_quiz_result(student, block, 5, 3)
+        record_quiz_result(student, block, 3, 5)
+        assert block.attempts.count() == 1
+
+
+@pytest.mark.django_db
+class TestContactThrottle:
+    def test_contact_form_is_rate_limited(self, client):
+        from contact.models import ContactMessage, ContactReason
+
+        reason = ContactReason.objects.create(label='Question')
+        data = {
+            'first_name': 'A',
+            'last_name': 'B',
+            'email': 'a@b.co',
+            'reason': reason.pk,
+            'message': 'Bonjour !',
+        }
+        for _ in range(5):
+            client.post(reverse('contact'), data)
+        response = client.post(reverse('contact'), data)
+
+        assert ContactMessage.objects.count() == 5
+        assert response.status_code == 200 and 'Trop de messages' in response.content.decode()

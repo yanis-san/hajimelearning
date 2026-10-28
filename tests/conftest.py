@@ -16,6 +16,32 @@ def celery_eager():
     )
 
 
+# --- FICHIERS : dossiers de médias jetables, supprimés en fin de session ---
+
+
+@pytest.fixture(scope='session', autouse=True)
+def cleanup_test_media():
+    import shutil
+
+    from django.conf import settings
+
+    yield
+    for folder in (settings.MEDIA_ROOT, settings.PROTECTED_MEDIA_ROOT):
+        shutil.rmtree(folder, ignore_errors=True)
+
+
+# --- CACHE : compteurs de limitation de débit isolés entre les tests ---
+
+
+@pytest.fixture(autouse=True)
+def clear_cache():
+    from django.core.cache import cache
+
+    cache.clear()
+    yield
+    cache.clear()
+
+
 # --- INSTRUCTEURS : inscription ouverte en tests (fermée en prod) ---
 
 

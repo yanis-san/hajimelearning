@@ -87,6 +87,14 @@ CELERY_TASK_EAGER_PROPAGATES = True
 CELERY_BROKER_URL = 'memory://'
 CELERY_RESULT_BACKEND = 'cache+memory://'
 
+# --- CACHE (partagé entre les workers Passenger : sert à la limitation de débit) ---
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': BASE_DIR / 'cache',
+    }
+}
+
 # --- OPTIMISATION STATIQUES (WhiteNoise Prod) ---
 STORAGES = {
     "staticfiles": {

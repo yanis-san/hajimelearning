@@ -1,5 +1,4 @@
 import os
-import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -196,21 +195,12 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-# Si on lance "pytest" ou "test", on configure Celery pour ne pas utiliser Redis
-if 'test' in sys.argv or 'pytest' in sys.argv[0]:
-    # Exécuter les tâches immédiatement (synchrone) sans broker
-    CELERY_TASK_ALWAYS_EAGER = True
-    CELERY_TASK_EAGER_PROPAGATES = True
-
-    # Stocker les emails en mémoire au lieu de tenter de les envoyer
-    EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
-
-    # Utiliser un système de cache en mémoire simple pour les tests
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        }
+# Cache (compteurs de limitation de débit, etc.) — surchargé en production (cache partagé entre workers)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
     }
+}
 
 # Tailwind
 TAILWIND_APP_NAME = 'theme'

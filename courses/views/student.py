@@ -19,12 +19,10 @@ from ..models import (
     Course,
     CourseCompletion,
     Lesson,
-    QuizAttempt,
-    QuizResult,
     StudentNote,
-    StudentProgress,
 )
 from ..progress import get_course_progress, get_courses_progress, record_visit
+from ..services import InvalidScore, complete_lesson, record_quiz_result, uncomplete_lesson
 from ..tasks import generate_certificate_pdf
 from ._helpers import is_course_manager, modules_queryset
 
@@ -218,13 +216,7 @@ def mark_lesson_complete(request, course_slug, lesson_slug):
         messages.error(request, "Vous n'avez pas accès à ce cours.")
         return redirect('course_detail', course_slug=course_slug)
 
-    StudentProgress.objects.get_or_create(student=request.user, lesson=current_lesson)
-
-    progress = get_course_progress(request.user, course)
-    if progress.is_complete:
-        completion, created = CourseCompletion.objects.get_or_create(student=request.user, course=course)
-        if created:
-            generate_certificate_pdf.delay(completion.id)
+    progress = complete_lesson(request.user, current_lesson)
 
     _, next_lesson = progress.neighbours(current_lesson)
     if next_lesson:
@@ -242,10 +234,7 @@ def unmark_lesson_complete(request, course_slug, lesson_slug):
         messages.error(request, "Vous n'avez pas accès à ce cours.")
         return redirect('course_detail', course_slug=course_slug)
 
-    StudentProgress.objects.filter(student=request.user, lesson=current_lesson).delete()
-
-    if not get_course_progress(request.user, course).is_complete:
-        CourseCompletion.objects.filter(student=request.user, course=course).delete()
+    uncomplete_lesson(request.user, current_lesson)
 
     return redirect('lesson_detail', course_slug=course_slug, lesson_slug=lesson_slug)
 
@@ -310,20 +299,15 @@ def save_quiz_result(request, block_id):
         score, total = int(data['score']), int(data['total'])
     except (ValueError, KeyError, TypeError):
         return JsonResponse({'status': 'error', 'message': 'Données invalides.'}, status=400)
-    if total <= 0 or not 0 <= score <= total:
-        return JsonResponse({'status': 'error', 'message': 'Score invalide.'}, status=400)
-
     block = get_object_or_404(ContentBlock.objects.select_related('lesson__module__course'), id=block_id)
     course = block.lesson.module.course
     if not is_course_manager(request.user, course) and not user_has_access(request.user, course):
         return JsonResponse({'status': 'error', 'message': 'Accès refusé.'}, status=403)
 
-    QuizResult.objects.update_or_create(
-        student=request.user,
-        block=block,
-        defaults={'score': score, 'total_questions': total},
-    )
-    QuizAttempt.objects.create(student=request.user, block=block, score=score, total_questions=total)
+    try:
+        record_quiz_result(request.user, block, score, total)
+    except InvalidScore:
+        return JsonResponse({'status': 'error', 'message': 'Score invalide.'}, status=400)
     return JsonResponse({'status': 'success'})
 
 
