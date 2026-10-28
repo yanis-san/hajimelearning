@@ -229,7 +229,7 @@ class TestReorderLandingSections:
                 'section_order': [s3.id, s1.id, s2.id],
             },
         )
-        assert resp.status_code == 200
+        assert resp.status_code == 204
         s1.refresh_from_db()
         s2.refresh_from_db()
         s3.refresh_from_db()

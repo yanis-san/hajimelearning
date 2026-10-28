@@ -1,0 +1,3 @@
+{# Réponse HTMX après l'enregistrement d'une section : liste rafraîchie + formulaire vidé (swap hors-bande) #}
+{% include "courses/manage/partials/landing_section_list.html" %}
+<div id="section-form-container" hx-swap-oob="innerHTML" class="mb-8"></div>

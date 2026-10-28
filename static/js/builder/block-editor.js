@@ -1,22 +1,33 @@
-// Alpine component for the lesson block editor: tabs plus debounced autosave.
-// Usage: x-data="blockEditor('/url/to/post/to')". Load before Alpine starts.
+// Alpine component for the lesson block editor: tabs plus debounced autosave through HTMX.
+// Usage: x-data="blockEditor('/url/to/post/to')" on the wrapper; the <form> carries
+//   x-ref="blockForm", hx-trigger="submit, autosave" and x-on:builder-saved="onSaved($event.detail)".
+// The server answers autosave requests (header X-Autosave) with the refreshed block list and an
+// HX-Trigger `builder-saved` event ({ savedAt, blockId, editUrl? }). Load before Alpine starts.
 document.addEventListener('alpine:init', () => {
   const notify = (detail) => window.dispatchEvent(new CustomEvent('builder-status', { detail }));
 
-  Alpine.data('blockEditor', (postUrl) => ({
+  Alpine.data('blockEditor', () => ({
     tab: 'edit',
     autosaveState: 'saved',
     lastSavedText: 'Tous les changements sont enregistrés',
     saveTimer: null,
     hasUnsaved: false,
-    postUrl,
 
     init() {
-      window.addEventListener('beforeunload', (e) => {
+      const form = this.$refs.blockForm;
+      const isAutosave = (event) => event.detail.requestConfig?.triggeringEvent?.type === 'autosave';
+
+      form.addEventListener('htmx:configRequest', (event) => {
+        if (event.detail.triggeringEvent?.type === 'autosave') event.detail.headers['X-Autosave'] = 'true';
+      });
+      form.addEventListener('htmx:responseError', (event) => isAutosave(event) && this.onError());
+      form.addEventListener('htmx:sendError', (event) => isAutosave(event) && this.onError());
+
+      window.addEventListener('beforeunload', (event) => {
         if (!this.hasUnsaved) return;
         this.autosave();
-        e.preventDefault();
-        e.returnValue = '';
+        event.preventDefault();
+        event.returnValue = '';
       });
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden' && this.hasUnsaved) this.autosave();
@@ -32,48 +43,29 @@ document.addEventListener('alpine:init', () => {
       this.saveTimer = setTimeout(() => this.autosave(), 1200);
     },
 
-    async autosave() {
+    autosave() {
       if (!this.hasUnsaved && this.autosaveState === 'saved') return;
       clearTimeout(this.saveTimer);
       this.autosaveState = 'saving';
       this.lastSavedText = 'Sauvegarde automatique…';
       notify({ state: 'saving' });
+      htmx.trigger(this.$refs.blockForm, 'autosave');
+    },
 
-      const formEl = this.$refs.blockForm;
-      if (!formEl) return;
-      const formData = new FormData(formEl);
-      formData.append('is_autosave', '1');
+    onSaved({ savedAt, editUrl }) {
+      this.hasUnsaved = false;
+      this.autosaveState = 'saved';
+      this.lastSavedText = `✓ Enregistré automatiquement à ${savedAt}`;
+      notify({ state: 'saved', time: savedAt });
+      // Premier enregistrement d'un nouveau bloc : les suivants vont vers l'URL d'édition.
+      if (editUrl) this.$refs.blockForm.setAttribute('hx-post', editUrl);
+    },
 
-      try {
-        const res = await fetch(this.postUrl, {
-          method: 'POST',
-          headers: { 'X-Autosave': 'true', 'X-Requested-With': 'XMLHttpRequest' },
-          body: formData,
-        });
-        if (!res.ok) throw new Error();
-        const data = await res.json();
-        if (!data.ok) throw new Error();
-
-        this.hasUnsaved = false;
-        this.autosaveState = 'saved';
-        this.lastSavedText = '✓ Enregistré automatiquement à ' + data.saved_at;
-        notify({ state: 'saved', time: data.saved_at });
-
-        // First save of a new block: later saves must go to the edit URL.
-        if (data.created && data.edit_url) {
-          this.postUrl = data.edit_url;
-          formEl.setAttribute('hx-post', data.edit_url);
-        }
-        if (data.block_list_html) {
-          const list = document.getElementById('block-list');
-          if (list) list.innerHTML = data.block_list_html;
-        }
-      } catch (e) {
-        this.autosaveState = 'error';
-        this.lastSavedText = '⚠️ Erreur de sauvegarde, nouvel essai…';
-        notify({ state: 'error' });
-        this.saveTimer = setTimeout(() => this.autosave(), 3000);
-      }
+    onError() {
+      this.autosaveState = 'error';
+      this.lastSavedText = '⚠️ Erreur de sauvegarde, nouvel essai…';
+      notify({ state: 'error' });
+      this.saveTimer = setTimeout(() => this.autosave(), 3000);
     },
   }));
 });

@@ -161,7 +161,7 @@ class TestManageModules:
             reverse('manage_module_reorder', args=[course.slug]),
             {'module_order': [m2.id, m1.id]},
         )
-        assert resp.status_code == 200
+        assert resp.status_code == 204
         m1.refresh_from_db()
         m2.refresh_from_db()
         assert m2.order < m1.order
@@ -228,7 +228,7 @@ class TestManageLessons:
             reverse('manage_lesson_reorder', args=[course.slug, module.id]),
             {'lesson_order': [l2.id, l1.id]},
         )
-        assert resp.status_code == 200
+        assert resp.status_code == 204
         l1.refresh_from_db()
         l2.refresh_from_db()
         assert l2.order < l1.order

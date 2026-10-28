@@ -1,7 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 
 from .models import Notification
@@ -22,18 +20,11 @@ def _clean_type(value):
     return value if value in _VALID_TYPES else None
 
 
-def _badge_html(request):
-    """Badge de la cloche (swap hors-bande) : notifications étudiant non lues."""
-    unread_count = Notification.objects.filter(
-        recipient=request.user,
-        is_read=False,
-        notification_type=Notification.TYPE_STUDENT,
+def _unread_student_count(user):
+    """Notifications étudiant non lues (badge de la cloche)."""
+    return Notification.objects.filter(
+        recipient=user, is_read=False, notification_type=Notification.TYPE_STUDENT
     ).count()
-    return render_to_string(
-        'notifications/partials/badge.html',
-        {'unread_count': unread_count, 'oob': True},
-        request=request,
-    )
 
 
 @login_required
@@ -73,9 +64,15 @@ def mark_notification_read(request, notification_id):
         notif.is_read = True
         notif.save(update_fields=['is_read'])
 
-    context = {'notif': notif, 'is_dropdown': request.headers.get('X-Source') == 'dropdown'}
-    notification_html = render_to_string('notifications/partials/hx_item.html', context, request=request)
-    return HttpResponse(notification_html + _badge_html(request))
+    return render(
+        request,
+        'notifications/partials/read_response.html',
+        {
+            'notif': notif,
+            'is_dropdown': request.headers.get('X-Source') == 'dropdown',
+            'unread_count': _unread_student_count(request.user),
+        },
+    )
 
 
 @login_required
@@ -97,9 +94,13 @@ def mark_all_read(request):
         return redirect('my_notifications')
 
     notifs = _notifications_for(request.user, type_filter)
-    if request.headers.get('X-Source') == 'dropdown':
-        template, context = 'notifications/partials/dropdown_inner.html', {'notifications': notifs[:10]}
-    else:
-        template, context = 'notifications/partials/notification_list.html', {'notifications': notifs}
-    html = render_to_string(template, context, request=request)
-    return HttpResponse(html + _badge_html(request))
+    is_dropdown = request.headers.get('X-Source') == 'dropdown'
+    return render(
+        request,
+        'notifications/partials/read_response.html',
+        {
+            'notifications': notifs[:10] if is_dropdown else notifs,
+            'is_dropdown': is_dropdown,
+            'unread_count': _unread_student_count(request.user),
+        },
+    )

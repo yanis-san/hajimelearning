@@ -1,8 +1,9 @@
 """Builder de leçons : blocs de contenu, questions de quiz, modules et leçons."""
 
-from django.http import HttpResponse, JsonResponse
+import json
+
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
@@ -21,7 +22,6 @@ from ..permissions import (
 from ._helpers import apply_order, is_autosave, limit_reached_response, next_order, plan_limit_reached
 
 BLOCK_LIST_TEMPLATE = 'courses/manage/partials/block_list.html'
-CLEAR_BLOCK_FORM = '<div id="block-form-container" hx-swap-oob="innerHTML" class="mb-8"></div>'
 
 
 # ── Aperçu Markdown ─────────────────────────────────
@@ -41,23 +41,21 @@ def preview_markdown(request):
 
 
 def _save_block_response(request, lesson, block, created):
-    """Réponse commune à la création / l'édition d'un bloc (auto-save JSON ou HTMX)."""
-    block_list_html = render_to_string(BLOCK_LIST_TEMPLATE, {'lesson': lesson}, request=request)
+    """
+    Réponse commune à la création / l'édition d'un bloc.
 
-    if is_autosave(request):
-        now_str = timezone.localtime().strftime('%H:%M:%S')
-        payload = {
-            'ok': True,
-            'block_id': block.id,
-            'saved_at': now_str,
-            'message': f'Enregistré à {now_str}',
-            'block_list_html': block_list_html,
-        }
-        if created:
-            payload.update(created=True, edit_url=reverse('edit_block', args=[block.id]))
-        return JsonResponse(payload)
+    Auto-enregistrement : la liste est rafraîchie et l'évènement `builder-saved` (en-tête HX-Trigger)
+    informe l'éditeur. Enregistrement explicite : la liste est rafraîchie et le formulaire fermé.
+    """
+    if not is_autosave(request):
+        return render(request, 'courses/manage/partials/block_saved.html', {'lesson': lesson})
 
-    return HttpResponse(block_list_html + CLEAR_BLOCK_FORM)
+    detail = {'savedAt': timezone.localtime().strftime('%H:%M:%S'), 'blockId': block.id}
+    if created:
+        detail['editUrl'] = reverse('edit_block', args=[block.id])
+    response = render(request, BLOCK_LIST_TEMPLATE, {'lesson': lesson})
+    response['HX-Trigger'] = json.dumps({'builder-saved': detail})
+    return response
 
 
 @builder_access_required
@@ -74,7 +72,7 @@ def add_block(request, lesson_id, block_type):
             block.save()
             return _save_block_response(request, lesson, block, created=True)
         if is_autosave(request):
-            return JsonResponse({'ok': False, 'errors': form.errors.get_json_data()}, status=400)
+            return HttpResponse(status=422)
     else:
         form = ContentBlockForm()
 
@@ -99,7 +97,7 @@ def edit_block(request, block_id):
             form.save()
             return _save_block_response(request, block.lesson, block, created=False)
         if is_autosave(request):
-            return JsonResponse({'ok': False, 'errors': form.errors.get_json_data()}, status=400)
+            return HttpResponse(status=422)
     else:
         form = ContentBlockForm(instance=block)
 
@@ -253,7 +251,7 @@ def manage_module_reorder(request, course_slug):
     """Réordonner les modules (HTMX + SortableJS)."""
     course = get_managed_course(request.user, course_slug)
     apply_order(Module.objects.filter(course=course), request.POST.getlist('module_order'))
-    return HttpResponse('OK')
+    return HttpResponse(status=204)
 
 
 # ── Leçons ──────────────────────────────────────────
@@ -345,4 +343,4 @@ def manage_lesson_reorder(request, course_slug, module_id):
     course = get_managed_course(request.user, course_slug)
     module = get_object_or_404(Module, id=module_id, course=course)
     apply_order(Lesson.objects.filter(module=module), request.POST.getlist('lesson_order'))
-    return HttpResponse('OK')
+    return HttpResponse(status=204)

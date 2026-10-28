@@ -33,10 +33,7 @@ COURSE_SORTS = frozenset(
     }
 )
 
-SAVE_OK = (
-    '<span id="save-indicator" class="text-green-500 text-sm font-medium flex items-center gap-1">🟢 Sauvegardé</span>'
-)
-SAVE_ERROR = '<span id="save-indicator" class="text-red-500 text-sm font-medium flex items-center gap-1">🔴 Erreur de sauvegarde</span>'
+SAVE_INDICATOR_TEMPLATE = 'courses/manage/partials/save_indicator.html'
 
 
 @staff_member_required
@@ -81,11 +78,11 @@ def manage_course_edit(request, course_slug):
         if form.is_valid():
             course = form.save()
             if is_htmx:
-                return HttpResponse(SAVE_OK)
+                return render(request, SAVE_INDICATOR_TEMPLATE, {'ok': True})
             messages.success(request, f'Cours « {course.title} » mis à jour.')
             return redirect('manage_course_list' if request.user.is_staff else 'instructor_dashboard')
         if is_htmx:
-            return HttpResponse(SAVE_ERROR, status=400)
+            return render(request, SAVE_INDICATOR_TEMPLATE, {'ok': False}, status=400)
     else:
         form = form_class(instance=course)
 

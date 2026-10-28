@@ -1,5 +1,5 @@
 <div class="bg-white border border-primary/30 rounded-xl p-6 shadow-sm"
-     x-data="blockEditor('{% if block %}{% url 'edit_block' block.id %}{% else %}{% url 'add_block' lesson.id block_type %}{% endif %}')">
+     x-data="blockEditor">
 
   <div class="flex items-center justify-between flex-wrap gap-2 mb-4 pb-3 border-b border-gray-100">
     <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -29,6 +29,8 @@
         x-ref="blockForm"
         x-on:input="markDirty()"
         x-on:change="markDirty()"
+        x-on:builder-saved="onSaved($event.detail)"
+        hx-trigger="submit, autosave"
         hx-post="{% if block %}{% url 'edit_block' block.id %}{% else %}{% url 'add_block' lesson.id block_type %}{% endif %}"
         hx-target="#block-list"
         hx-swap="innerHTML">

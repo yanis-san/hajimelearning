@@ -3,7 +3,6 @@
 from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
@@ -14,7 +13,6 @@ from ._helpers import apply_order, next_order
 
 SECTION_LIST_TEMPLATE = 'courses/manage/partials/landing_section_list.html'
 SECTION_FORM_TEMPLATE = 'courses/manage/partials/landing_section_form.html'
-CLEAR_SECTION_FORM = '<div id="section-form-container" hx-swap-oob="innerHTML" class="mb-8"></div>'
 
 # Sections créées par « Pré-remplir avec un modèle » (le contenu dépend du cours)
 SECTION_TEMPLATE_SPECS = (
@@ -68,8 +66,7 @@ def _section_list(request, course):
 
 def _section_saved_response(request, course):
     """Liste rafraîchie + formulaire vidé (swap hors-bande)."""
-    html = render_to_string(SECTION_LIST_TEMPLATE, {'course': course}, request=request)
-    return HttpResponse(html + CLEAR_SECTION_FORM)
+    return render(request, 'courses/manage/partials/landing_section_saved.html', {'course': course})
 
 
 @builder_access_required
@@ -154,7 +151,7 @@ def reorder_landing_sections(request, course_slug):
     """Réordonner les sections (HTMX + SortableJS)."""
     course = get_managed_course(request.user, course_slug)
     apply_order(LandingSection.objects.filter(course=course), request.POST.getlist('section_order'))
-    return HttpResponse('OK')
+    return HttpResponse(status=204)
 
 
 @builder_access_required

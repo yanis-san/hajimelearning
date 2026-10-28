@@ -1,0 +1,9 @@
+{# Réponse HTMX : contenu mis à jour + badge de la cloche (swap hors-bande) #}
+{% if notif %}
+  {% include "notifications/partials/hx_item.html" %}
+{% elif is_dropdown %}
+  {% include "notifications/partials/dropdown_inner.html" %}
+{% else %}
+  {% include "notifications/partials/notification_list.html" %}
+{% endif %}
+{% include "notifications/partials/badge.html" with oob=True %}

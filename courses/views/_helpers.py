@@ -51,7 +51,7 @@ def limit_reached_response(request, redirect_url):
 
 def is_autosave(request):
     """La requête provient-elle de l'auto-enregistrement du builder ?"""
-    return request.headers.get('X-Autosave') == 'true' or request.POST.get('is_autosave') == '1'
+    return request.headers.get('X-Autosave') == 'true'
 
 
 def next_order(queryset):

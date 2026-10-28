@@ -390,3 +390,37 @@ class TestContactThrottle:
 
         assert ContactMessage.objects.count() == 5
         assert response.status_code == 200 and 'Trop de messages' in response.content.decode()
+
+
+@pytest.mark.django_db
+class TestBuilderAutosaveContract:
+    @pytest.fixture
+    def lesson(self, course):
+        module = course.modules.create(title='M', order=1)
+        return module.lessons.create(title='L', slug='l', order=1)
+
+    def test_autosave_returns_block_list_and_trigger_header(self, client, admin_user, lesson):
+        client.force_login(admin_user)
+        url = reverse('add_block', args=[lesson.id, 'text'])
+        response = client.post(url, {'text_content': 'Bonjour'}, headers={'X-Autosave': 'true', 'HX-Request': 'true'})
+
+        assert response.status_code == 200
+        block = ContentBlock.objects.get(lesson=lesson)
+        detail = json.loads(response['HX-Trigger'])['builder-saved']
+        assert detail['blockId'] == block.id
+        assert detail['editUrl'] == reverse('edit_block', args=[block.id])
+        assert 'hx-swap-oob' not in response.content.decode()  # le formulaire reste ouvert
+
+    def test_explicit_save_closes_the_form(self, client, admin_user, lesson):
+        client.force_login(admin_user)
+        response = client.post(reverse('add_block', args=[lesson.id, 'text']), {'text_content': 'Bonjour'})
+
+        assert 'HX-Trigger' not in response
+        assert 'id="block-form-container" hx-swap-oob="innerHTML"' in response.content.decode()
+
+    def test_invalid_autosave_is_rejected_without_swapping(self, client, admin_user, lesson):
+        client.force_login(admin_user)
+        response = client.post(
+            reverse('add_block', args=[lesson.id, 'text']), {'video_id': 'x' * 500}, headers={'X-Autosave': 'true'}
+        )
+        assert response.status_code == 422 and ContentBlock.objects.count() == 0
