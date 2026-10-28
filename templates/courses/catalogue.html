@@ -7,11 +7,7 @@
 {% block content %}
 
   <section class="bg-white"
-           x-data="{
-             active:   '{{ current_category }}',
-             sort:     '{{ current_sort }}',
-             sortNext(current, asc, desc) { return current === asc ? desc : asc }
-           }">
+           x-data="catalogueFilters('{{ current_category }}', '{{ current_sort }}')">
     <div class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-8 pt-12 pb-6">
 
       {# ── Header ── #}

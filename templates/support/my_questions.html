@@ -4,10 +4,7 @@
 
 {% block content %}
 <div class="max-w-5xl mx-auto py-10 px-4 space-y-8"
-     x-data="{
-       activeCourse: '{{ courses_data.0.course.slug|default:'all' }}',
-       filter: 'all'
-     }">
+     x-data="supportHub('{{ courses_data.0.course.slug|default:'all' }}')">
 
   {# ── En-tête ── #}
   <div class="flex items-start justify-between gap-4 flex-wrap">
@@ -37,7 +34,7 @@
 
       {% for cd in courses_data %}
       <button type="button"
-              x-on:click="activeCourse = '{{ cd.course.slug }}'; filter = 'all'"
+              x-on:click="select('{{ cd.course.slug }}')"
               :class="activeCourse === '{{ cd.course.slug }}' ? 'bg-primary/5 text-primary-dark border-primary/30' : 'text-gray-600 hover:bg-gray-50 border-transparent'"
               class="w-full text-left flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-sm transition cursor-pointer">
         <span class="truncate font-medium">{{ cd.course.title }}</span>

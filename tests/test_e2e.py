@@ -13,9 +13,8 @@ import pytest
 os.environ.setdefault('DJANGO_ALLOW_ASYNC_UNSAFE', 'true')
 
 pytest.importorskip('playwright')
-from playwright.sync_api import expect, sync_playwright  # noqa: E402
-
 from django.urls import reverse  # noqa: E402
+from playwright.sync_api import expect, sync_playwright  # noqa: E402
 
 from access.models import AccessRequest  # noqa: E402
 from courses.models import ContentBlock, QuizResult, StudentNote  # noqa: E402
@@ -131,3 +130,29 @@ def test_course_form_tabs_switch(page, admin_user, course):
     page.get_by_role('button', name='SEO').click()
     expect(page.locator('[x-show="tab === \'seo\'"]')).to_be_visible()
     expect(page.locator('[x-show="tab === \'infos\'"]')).to_be_hidden()
+
+
+def test_collapse_all_blocks_button(page, student, course, lesson):
+    ContentBlock.objects.create(lesson=lesson, type='text', title='Bloc A', text_content='Contenu visible', order=1)
+    login_as(page, student)
+    page.goto(lesson_url(page, course, lesson))
+
+    expect(page.get_by_text('Contenu visible')).to_be_visible()
+    page.get_by_role('button', name='Tout replier').click()
+    expect(page.get_by_text('Contenu visible')).to_be_hidden()
+    page.get_by_role('button', name='Tout déplier').click()
+    expect(page.get_by_text('Contenu visible')).to_be_visible()
+
+
+def test_catalogue_category_filter_updates_the_grid(page, course, free_course):
+    from courses.models import Category
+
+    category = Category.objects.create(name='Langues', slug='langues')
+    course.category = category
+    course.save()
+
+    page.goto(page.live_server_url + reverse('catalogue'))
+    expect(page.get_by_text(free_course.title).first).to_be_visible()
+    page.get_by_role('button', name='Langues').or_(page.get_by_text('Langues', exact=True)).first.click()
+    expect(page.get_by_text(free_course.title)).to_have_count(0)
+    expect(page.get_by_text(course.title).first).to_be_visible()

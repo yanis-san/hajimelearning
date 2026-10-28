@@ -1,9 +1,7 @@
 {% load md %}
 <c-vars block="" />
 
-<div x-data="{ open: true }"
-     @expand-all-blocks.window="open = true"
-     @collapse-all-blocks.window="open = false"
+<div x-data="collapsibleBlock"
      class="border border-gray-300 rounded-2xl bg-white shadow-[2px_2px_0_0_rgba(17,24,39,0.08)] overflow-hidden manga-drawn" {{ attrs }}>
 
   {# ── Header cliquable ── #}
