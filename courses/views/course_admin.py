@@ -10,6 +10,8 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
+from access.models import AccessRequest
+
 from ..forms import CourseForm, InstructorCourseForm
 from ..models import ContentBlock, Course, Lesson, Module, QuizResult, StudentProgress
 from ..permissions import builder_access_required, get_managed_course
@@ -104,7 +106,7 @@ def manage_course_students(request, course_slug):
     course = get_managed_course(request.user, course_slug)
 
     students = User.objects.filter(
-        Q(accessrequest__course=course, accessrequest__status='APPROVED')
+        Q(accessrequest__course=course, accessrequest__status=AccessRequest.Status.APPROVED)
         | Q(activationcode__course=course, activationcode__is_used=True)
         | Q(enrollments__course=course)
     ).distinct()

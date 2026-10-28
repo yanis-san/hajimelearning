@@ -76,8 +76,8 @@ def question_detail(request, question_id):
                 response.save()
 
                 # Si c'est l'étudiant qui répond, on peut remettre en OPEN si c'était RESOLVED
-                if is_author and question.status == 'RESOLVED':
-                    question.status = 'OPEN'
+                if is_author and question.status == Question.Status.RESOLVED:
+                    question.status = Question.Status.OPEN
                     question.save()
 
                 messages.success(request, "Réponse publiée.")
@@ -105,7 +105,7 @@ def question_detail(request, question_id):
 def my_questions(request):
     """Hub support étudiant : ses questions + celles des autres par cours inscrit."""
     enrolled_ids = Enrollment.objects.filter(student=request.user).values_list('course_id', flat=True)
-    approved_ids = AccessRequest.objects.filter(student=request.user, status='APPROVED').values_list(
+    approved_ids = AccessRequest.objects.filter(student=request.user, status=AccessRequest.Status.APPROVED).values_list(
         'course_id', flat=True
     )
     activation_ids = ActivationCode.objects.filter(used_by=request.user, is_used=True).values_list(
@@ -142,7 +142,7 @@ def my_questions(request):
                 'my_questions': my_questions,
                 'total': len(all_questions),
                 'my_count': len(my_questions),
-                'open_count': sum(1 for q in all_questions if q.status != 'RESOLVED'),
+                'open_count': sum(1 for q in all_questions if q.status != Question.Status.RESOLVED),
             }
         )
 
@@ -161,7 +161,9 @@ def my_questions(request):
         {
             'courses_data': courses_data,
             'my_other_questions': list(my_other_qs),
-            'total_open': Question.objects.filter(student=request.user).exclude(status='RESOLVED').count(),
+            'total_open': Question.objects.filter(student=request.user)
+            .exclude(status=Question.Status.RESOLVED)
+            .count(),
         },
     )
 
@@ -174,8 +176,8 @@ def mark_resolved(request, question_id):
     is_course_instructor = _is_course_instructor(request.user, question.course)
 
     if request.user == question.student or request.user.is_staff or is_course_instructor:
-        if question.status != 'RESOLVED':
-            question.status = 'RESOLVED'
+        if question.status != Question.Status.RESOLVED:
+            question.status = Question.Status.RESOLVED
             question.save()
             messages.success(request, "La discussion a été marquée comme résolue.")
     else:
@@ -197,12 +199,12 @@ def instructor_course_questions(request, course_slug):
     questions_qs = Question.objects.filter(course=course).select_related('student', 'lesson').order_by('-updated_at')
 
     if status_filter == 'resolved':
-        questions = questions_qs.filter(status='RESOLVED')
+        questions = questions_qs.filter(status=Question.Status.RESOLVED)
     else:
-        questions = questions_qs.exclude(status='RESOLVED')
+        questions = questions_qs.exclude(status=Question.Status.RESOLVED)
 
-    open_count = questions_qs.exclude(status='RESOLVED').count()
-    resolved_count = questions_qs.filter(status='RESOLVED').count()
+    open_count = questions_qs.exclude(status=Question.Status.RESOLVED).count()
+    resolved_count = questions_qs.filter(status=Question.Status.RESOLVED).count()
 
     return render(
         request,

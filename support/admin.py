@@ -25,4 +25,4 @@ class QuestionAdmin(ModelAdmin):
 
     @admin.action(description='Marquer comme Résolu')
     def mark_as_resolved(self, request, queryset):
-        queryset.update(status='RESOLVED')
+        queryset.update(status=Question.Status.RESOLVED)

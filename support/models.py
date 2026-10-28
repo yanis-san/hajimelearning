@@ -5,11 +5,10 @@ from courses.models import Course, Lesson
 
 
 class Question(models.Model):
-    STATUS_CHOICES = (
-        ('OPEN', 'En attente'),
-        ('RESOLVED', 'Résolu'),
-        ('CLOSED', 'Fermé'),
-    )
+    class Status(models.TextChoices):
+        OPEN = 'OPEN', 'En attente'
+        RESOLVED = 'RESOLVED', 'Résolu'
+        CLOSED = 'CLOSED', 'Fermé'
 
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='questions')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -20,9 +19,15 @@ class Question(models.Model):
     title = models.CharField("Sujet", max_length=200)
     content = models.TextField("Votre question")
 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='OPEN')
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.OPEN)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['course', 'status'], name='question_course_status_idx'),
+            models.Index(fields=['student', 'status'], name='question_student_status_idx'),
+        ]
 
     def __str__(self):
         return f"{self.title} ({self.student.email})"

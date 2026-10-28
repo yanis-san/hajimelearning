@@ -43,11 +43,10 @@ class Coupon(models.Model):
 
 # --- MODÈLE DEMANDE D'ACCÈS ---
 class AccessRequest(models.Model):
-    STATUS_CHOICES = (
-        ('PENDING', 'En attente de validation'),
-        ('APPROVED', 'Validé (Accès donné)'),
-        ('REJECTED', 'Refusé'),
-    )
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', 'En attente de validation'
+        APPROVED = 'APPROVED', 'Validé (Accès donné)'
+        REJECTED = 'REJECTED', 'Refusé'
 
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -62,12 +61,18 @@ class AccessRequest(models.Model):
         ],
     )
 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     admin_note = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     final_price = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
     applied_coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['student', 'status'], name='access_student_status_idx'),
+            models.Index(fields=['course', 'status'], name='access_course_status_idx'),
+        ]
 
     def __str__(self):
         return f"{self.student.email} -> {self.course.title}"
@@ -102,7 +107,7 @@ class Enrollment(models.Model):
     enrolled_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('student', 'course')
+        constraints = [models.UniqueConstraint(fields=['student', 'course'], name='unique_enrollment_student_course')]
         verbose_name = "Inscription"
         verbose_name_plural = "Inscriptions"
 
@@ -124,7 +129,7 @@ def user_has_access(user, course):
         return Enrollment.objects.filter(student=user, course=course).exists()
 
     # Cours payant : demande approuvée ou code d'activation
-    if AccessRequest.objects.filter(student=user, course=course, status='APPROVED').exists():
+    if AccessRequest.objects.filter(student=user, course=course, status=AccessRequest.Status.APPROVED).exists():
         return True
 
     return ActivationCode.objects.filter(used_by=user, course=course, is_used=True).exists()

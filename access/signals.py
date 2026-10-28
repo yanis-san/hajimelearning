@@ -37,5 +37,5 @@ def trigger_access_email(sender, instance, created, **kwargs):
     Ne se redéclenche pas si l'admin ré-enregistre un accès déjà approuvé.
     """
     previous = getattr(instance, '_previous_status', None)
-    if instance.status == 'APPROVED' and previous != 'APPROVED':
+    if instance.status == AccessRequest.Status.APPROVED and previous != AccessRequest.Status.APPROVED:
         _dispatch(send_access_confirmation_email, instance.id)

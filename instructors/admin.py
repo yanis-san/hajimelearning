@@ -22,15 +22,17 @@ class InstructorRequestAdmin(ModelAdmin):
     @admin.action(description="✅ Approuver les demandes sélectionnées")
     def approve_requests(self, request, queryset):
         approved = 0
-        for req in queryset.filter(status='PENDING'):
-            req.status = 'APPROVED'
+        for req in queryset.filter(status=InstructorRequest.Status.PENDING):
+            req.status = InstructorRequest.Status.APPROVED
             req.save()  # le signal post_save crée le profil
             approved += 1
         self.message_user(request, f"{approved} demande(s) approuvée(s).")
 
     @admin.action(description="❌ Refuser les demandes sélectionnées")
     def reject_requests(self, request, queryset):
-        rejected = queryset.filter(status='PENDING').update(status='REJECTED')
+        rejected = queryset.filter(status=InstructorRequest.Status.PENDING).update(
+            status=InstructorRequest.Status.REJECTED
+        )
         self.message_user(request, f"{rejected} demande(s) refusée(s).")
 
 

@@ -52,6 +52,9 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ['-created_at']  # Les plus récentes en premier
+        indexes = [
+            models.Index(fields=['recipient', 'is_read', 'notification_type'], name='notif_recipient_unread_idx'),
+        ]
 
     def __str__(self):
         titre_aff = self.title if self.title else "Notification"

@@ -118,6 +118,9 @@ class Course(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        indexes = [models.Index(fields=['is_published', 'is_featured'], name='course_published_featured_idx')]
+
     def __str__(self):
         return self.title
 
@@ -134,6 +137,7 @@ class Module(models.Model):
     class Meta:
         ordering = ['order']
         verbose_name = "Module"
+        indexes = [models.Index(fields=['course', 'order'], name='module_course_order_idx')]
 
     def __str__(self):
         return f"{self.course.title} - {self.title}"
@@ -155,7 +159,7 @@ class Lesson(models.Model):
 
     class Meta:
         ordering = ['order']
-        unique_together = ['module', 'slug']
+        constraints = [models.UniqueConstraint(fields=['module', 'slug'], name='unique_lesson_slug_per_module')]
         verbose_name = "Leçon"
 
     def __str__(self):
@@ -232,6 +236,7 @@ class ContentBlock(models.Model):
     class Meta:
         ordering = ['order']
         verbose_name = "Bloc de contenu"
+        indexes = [models.Index(fields=['lesson', 'order'], name='block_lesson_order_idx')]
 
     def __str__(self):
         return f"Bloc {self.type} - {self.lesson.title}"
@@ -268,7 +273,7 @@ class QuizResult(models.Model):
     completed_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['student', 'block']
+        constraints = [models.UniqueConstraint(fields=['student', 'block'], name='unique_quiz_result_student_block')]
 
     def __str__(self):
         return f"{self.student.email} - Quiz {self.block.id}: {self.score}/{self.total_questions}"
@@ -363,7 +368,9 @@ class StudentProgress(models.Model):
     completed_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ['student', 'lesson']
+        constraints = [
+            models.UniqueConstraint(fields=['student', 'lesson'], name='unique_student_progress_student_lesson')
+        ]
         ordering = ['-completed_at']
 
     def __str__(self):
@@ -379,7 +386,9 @@ class CourseActivity(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['student', 'course']
+        constraints = [
+            models.UniqueConstraint(fields=['student', 'course'], name='unique_course_activity_student_course')
+        ]
         ordering = ['-updated_at']
         verbose_name = "Activité de cours"
         verbose_name_plural = "Activités de cours"
@@ -411,7 +420,9 @@ class CourseCompletion(models.Model):
     )
 
     class Meta:
-        unique_together = ['student', 'course']
+        constraints = [
+            models.UniqueConstraint(fields=['student', 'course'], name='unique_course_completion_student_course')
+        ]
         ordering = ['-completed_at']
         verbose_name = "Complétion de cours"
         verbose_name_plural = "Complétions de cours"
@@ -429,7 +440,7 @@ class StudentNote(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['student', 'block']
+        constraints = [models.UniqueConstraint(fields=['student', 'block'], name='unique_student_note_student_block')]
         ordering = ['-updated_at']
         verbose_name = "Note personnelle"
         verbose_name_plural = "Notes personnelles"

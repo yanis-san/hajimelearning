@@ -76,11 +76,10 @@ class InstructorRequest(models.Model):
     Même flow que AccessRequest pour les étudiants.
     """
 
-    STATUS_CHOICES = (
-        ('PENDING', 'En attente'),
-        ('APPROVED', 'Approuvé'),
-        ('REJECTED', 'Refusé'),
-    )
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', 'En attente'
+        APPROVED = 'APPROVED', 'Approuvé'
+        REJECTED = 'REJECTED', 'Refusé'
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -103,8 +102,8 @@ class InstructorRequest(models.Model):
     )
     status = models.CharField(
         max_length=20,
-        choices=STATUS_CHOICES,
-        default='PENDING',
+        choices=Status.choices,
+        default=Status.PENDING,
     )
     admin_note = models.TextField("Note admin", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -113,6 +112,7 @@ class InstructorRequest(models.Model):
         ordering = ['-created_at']
         verbose_name = "Demande instructeur"
         verbose_name_plural = "Demandes instructeur"
+        indexes = [models.Index(fields=['user', 'status'], name='instreq_user_status_idx')]
 
     def __str__(self):
         return f"{self.user.email} → {self.plan.name} ({self.get_status_display()})"

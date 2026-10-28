@@ -168,7 +168,11 @@ def user_dashboard(request):
     my_courses = list(
         Course.objects.filter(
             Q(id__in=Enrollment.objects.filter(student=user).values('course_id'))
-            | Q(id__in=AccessRequest.objects.filter(student=user, status='APPROVED').values('course_id'))
+            | Q(
+                id__in=AccessRequest.objects.filter(student=user, status=AccessRequest.Status.APPROVED).values(
+                    'course_id'
+                )
+            )
             | Q(id__in=ActivationCode.objects.filter(used_by=user, is_used=True).values('course_id'))
             | Q(instructor=user),
             is_published=True,

@@ -101,7 +101,7 @@ def notify_student_on_resolved(sender, instance, **kwargs):
         return
 
     # Ne déclenche que si le statut change vers RESOLVED
-    if previous.status != 'RESOLVED' and instance.status == 'RESOLVED':
+    if previous.status != Question.Status.RESOLVED and instance.status == Question.Status.RESOLVED:
         Notification.objects.create(
             recipient=instance.student,
             notification_type=S,

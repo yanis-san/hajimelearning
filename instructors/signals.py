@@ -10,7 +10,7 @@ def create_instructor_profile_on_approval(sender, instance, **kwargs):
     Quand une demande est approuvée, créer (ou réactiver) le profil instructeur.
     Les limites sont snapshotées depuis le plan au moment de l'approbation.
     """
-    if instance.status != 'APPROVED':
+    if instance.status != InstructorRequest.Status.APPROVED:
         return
 
     plan = instance.plan

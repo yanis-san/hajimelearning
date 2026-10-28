@@ -58,10 +58,10 @@ def request_course_access(request, course_id):
     # Gestion de la demande existante (Reset si rejetée)
     existing_req = AccessRequest.objects.filter(student=request.user, course=course).first()
 
-    if existing_req and existing_req.status == 'PENDING':
+    if existing_req and existing_req.status == AccessRequest.Status.PENDING:
         return render(request, 'access/request_pending.html', {'course': course})
 
-    if existing_req and existing_req.status == 'REJECTED':
+    if existing_req and existing_req.status == AccessRequest.Status.REJECTED:
         proof_form = AccessRequestForm(instance=existing_req)
     else:
         proof_form = AccessRequestForm()
@@ -71,7 +71,7 @@ def request_course_access(request, course_id):
     if request.method == 'POST':
         # --- CAS A : PAIEMENT PREUVE ---
         if 'submit_proof' in request.POST:
-            if existing_req and existing_req.status == 'REJECTED':
+            if existing_req and existing_req.status == AccessRequest.Status.REJECTED:
                 proof_form = AccessRequestForm(request.POST, request.FILES, instance=existing_req)
             else:
                 proof_form = AccessRequestForm(request.POST, request.FILES)
@@ -86,7 +86,7 @@ def request_course_access(request, course_id):
                 req = proof_form.save(commit=False)
                 req.student = request.user
                 req.course = course
-                req.status = 'PENDING'
+                req.status = AccessRequest.Status.PENDING
                 req.admin_note = ""
 
                 # Gestion Coupon
@@ -163,7 +163,7 @@ def download_receipt(request, request_id):
         AccessRequest.objects.select_related('course', 'applied_coupon'),
         id=request_id,
         student=request.user,
-        status='APPROVED',
+        status=AccessRequest.Status.APPROVED,
     )
 
     # Génération du PDF

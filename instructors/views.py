@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
+from access.models import AccessRequest
 from courses.forms import InstructorCourseForm
 from courses.models import Course
 
@@ -39,7 +40,9 @@ def instructor_plans(request):
         profile = InstructorProfile.objects.filter(user=request.user, is_active=True).first()
         has_profile = profile is not None
         current_plan = profile.plan if profile else None
-        has_pending = InstructorRequest.objects.filter(user=request.user, status='PENDING').exists()
+        has_pending = InstructorRequest.objects.filter(
+            user=request.user, status=InstructorRequest.Status.PENDING
+        ).exists()
 
     return render(
         request,
@@ -66,7 +69,7 @@ def instructor_request(request, plan_slug):
         return redirect('instructor_dashboard')
 
     # Demande déjà en cours ?
-    if InstructorRequest.objects.filter(user=request.user, status='PENDING').exists():
+    if InstructorRequest.objects.filter(user=request.user, status=InstructorRequest.Status.PENDING).exists():
         messages.info(request, "Vous avez déjà une demande en cours de validation.")
         return redirect('instructor_request_pending')
 
@@ -98,7 +101,7 @@ def instructor_request(request, plan_slug):
 @login_required
 def instructor_request_pending(request):
     """Page d'attente après soumission de la demande."""
-    pending = InstructorRequest.objects.filter(user=request.user, status='PENDING').first()
+    pending = InstructorRequest.objects.filter(user=request.user, status=InstructorRequest.Status.PENDING).first()
     return render(
         request,
         'instructors/request_pending.html',
@@ -120,7 +123,7 @@ def instructor_dashboard(request):
             lessons_count=Count('modules__lessons', distinct=True),
             students_count=Count(
                 'accessrequest',
-                filter=Q(accessrequest__status='APPROVED'),
+                filter=Q(accessrequest__status=AccessRequest.Status.APPROVED),
                 distinct=True,
             )
             + Count('enrollments', distinct=True),
