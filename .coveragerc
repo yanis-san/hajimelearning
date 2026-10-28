@@ -1,0 +1,22 @@
+[run]
+source = .
+branch = True
+omit =
+    */migrations/*
+    tests/*
+    .venv/*
+    manage.py
+    config/asgi.py
+    config/wsgi.py
+    config/settings/dev.py
+    config/settings/prod.py
+    */management/commands/*
+
+[report]
+fail_under = 83
+show_missing = False
+skip_covered = True
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+    raise NotImplementedError
