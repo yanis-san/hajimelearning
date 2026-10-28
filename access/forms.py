@@ -1,4 +1,5 @@
 from django import forms
+
 from .models import AccessRequest
 
 TAILWIND_INPUT = 'w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition text-sm'
@@ -20,7 +21,7 @@ class AccessRequestForm(forms.ModelForm):
 
 class CodeActivationForm(forms.Form):
     code = forms.CharField(
-        max_length=50, 
+        max_length=50,
         label="Code d'activation",
         widget=forms.TextInput(attrs={
             'placeholder': 'Ex: CODE-PROMO-2025',

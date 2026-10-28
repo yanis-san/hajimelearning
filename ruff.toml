@@ -1,0 +1,16 @@
+target-version = "py312"
+line-length = 120
+extend-exclude = ["migrations", "staticfiles", "media"]
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "DJ"]
+ignore = [
+    "E501",   # lignes longues : gérées par le formateur
+    "DJ001",  # null=True sur champs texte : choix de modélisation existants
+    "DJ008",  # __str__ manquant sur certains modèles techniques
+    "B904",
+]
+
+[lint.per-file-ignores]
+"tests/*" = ["B", "SIM"]
+"config/settings/*" = ["F403", "F405"]

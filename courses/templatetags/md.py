@@ -1,7 +1,9 @@
+import re
+
 from django import template
+from django.utils.html import escape, json_script
 from django.utils.safestring import mark_safe
 from markdownx.utils import markdownify
-import re
 
 register = template.Library()
 
@@ -26,7 +28,7 @@ def convert_furigana(text):
         if '|' in reading:
             parts = [p.strip() for p in reading.split('|')]
             if len(base) == len(parts):
-                return ''.join(f'<ruby>{k}<rt>{r}</rt></ruby>' for k, r in zip(base, parts))
+                return ''.join(f'<ruby>{k}<rt>{r}</rt></ruby>' for k, r in zip(base, parts, strict=True))
         return f'<ruby>{base}<rt>{reading}</rt></ruby>'
 
     # 1. Syntaxe {kanji|furigana}
@@ -65,7 +67,23 @@ def furigana_filter(value):
     """Convertit les annotations furigana en HTML sécurisé."""
     if not value:
         return ""
-    return mark_safe(convert_furigana(str(value)))
+    return mark_safe(convert_furigana(escape(str(value))))
+
+
+@register.simple_tag
+def quiz_data(block):
+    """Questions d'un bloc quiz, sérialisées en JSON pour le composant Alpine `quiz`."""
+    questions = []
+    for q in block.questions.all():
+        choices = {'a': q.choice_a, 'b': q.choice_b, 'c': q.choice_c, 'd': q.choice_d}
+        questions.append({
+            'text': convert_furigana(escape(q.question_text)),
+            'duration': q.duration,
+            'correct': q.correct_answer,
+            'explanation': convert_furigana(escape(q.explanation)),
+            'choices': {key: convert_furigana(escape(text)) for key, text in choices.items() if text},
+        })
+    return json_script(questions, f'quiz-data-{block.id}')
 
 
 @register.filter(name="md")

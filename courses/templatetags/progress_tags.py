@@ -19,13 +19,13 @@ def _as_id_set(ids):
 def done_count(lessons, completed_ids):
     """Nombre de leçons terminées dans une liste/queryset de leçons."""
     done = _as_id_set(completed_ids)
-    return sum(1 for l in lessons if l.id in done)
+    return sum(1 for entry in lessons if entry.id in done)
 
 
 @register.filter
 def total_minutes(lessons):
     """Somme des durées estimées d'une liste de leçons."""
-    return sum((l.duration_minutes or 0) for l in lessons)
+    return sum((entry.duration_minutes or 0) for entry in lessons)
 
 
 @register.filter

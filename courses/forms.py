@@ -1,16 +1,20 @@
+import re
+
 from django import forms
 from django.utils.text import slugify
-from .models import Course, Module, Lesson, ContentBlock, QuizQuestion, LandingSection
+
+from .models import ContentBlock, Course, LandingSection, Lesson, Module, QuizQuestion
+
 
 # Formulaire du Bloc (Parent)
 class ContentBlockForm(forms.ModelForm):
     class Meta:
         model = ContentBlock
         fields = ['title','text_content', 'video_id', 'file_content','related_file', 'quiz_title']
-    
+
     def clean_title(self):
         return self.cleaned_data.get('title') or None
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Styling Tailwind
@@ -32,7 +36,7 @@ class QuizQuestionForm(forms.ModelForm):
     class Meta:
         model = QuizQuestion
         fields = ['question_text', 'duration', 'choice_a', 'choice_b', 'choice_c', 'choice_d', 'correct_answer', 'explanation']
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields:
@@ -64,6 +68,35 @@ TAILWIND_FILE = (
 
 
 class CourseForm(forms.ModelForm):
+    MONO = 'font-mono text-sm leading-relaxed'
+    FIELD_ATTRS = {
+        'title': {'class': 'font-bold text-base', 'placeholder': 'Ex: Japonais Débutant - JLPT N5'},
+        'slug': {'class': 'font-mono text-sm', 'placeholder': 'japonais-n5'},
+        'price': {'class': 'font-bold text-base', 'placeholder': '0'},
+        'short_description': {
+            'rows': 3,
+            'placeholder': "Courte phrase d'accroche (visible sur la carte du cours en page d'accueil)...",
+        },
+        'description': {
+            'class': MONO, 'rows': 12,
+            'placeholder': 'Description complète et détaillée de la formation (Markdown supporté)...',
+        },
+        'what_you_will_learn': {
+            'class': MONO, 'rows': 6,
+            'placeholder': '- Première compétence ou acquis\n- Deuxième compétence\n- Troisième point fort...',
+        },
+        'prerequisites': {
+            'class': MONO, 'rows': 4,
+            'placeholder': 'Ex: Aucun prérequis, idéal pour débutant complet.',
+        },
+        'trailer_video_id': {'class': 'font-mono text-sm', 'placeholder': 'Ex: dQw4w9WgXcQ (ID YouTube ou lien)'},
+        'meta_description': {
+            'rows': 3, 'maxlength': '160',
+            'placeholder': 'Résumé percutant pour Google et les moteurs de recherche (max 160 caractères)...',
+        },
+        'keywords': {'placeholder': 'japonais, n5, jlpt, vocabulaire, kanji, cours'},
+    }
+
     class Meta:
         model = Course
         fields = [
@@ -85,7 +118,7 @@ class CourseForm(forms.ModelForm):
         self.fields['slug'].required = False
         self.fields['slug'].help_text = 'URL du cours. Généré automatiquement si vide.'
 
-        for name, field in self.fields.items():
+        for field in self.fields.values():
             widget = field.widget
             if isinstance(widget, forms.CheckboxInput):
                 widget.attrs['class'] = TAILWIND_CHECKBOX
@@ -99,63 +132,15 @@ class CourseForm(forms.ModelForm):
             else:
                 widget.attrs['class'] = TAILWIND_INPUT
 
-        # Personnalisations précises et délimitées de chaque champ
-        if 'title' in self.fields:
-            self.fields['title'].widget.attrs.update({
-                'class': TAILWIND_INPUT + ' font-bold text-base',
-                'placeholder': 'Ex: Japonais Débutant - JLPT N5',
-            })
-        if 'slug' in self.fields:
-            self.fields['slug'].widget.attrs.update({
-                'class': TAILWIND_INPUT + ' font-mono text-sm',
-                'placeholder': 'japonais-n5',
-            })
-        if 'price' in self.fields:
-            self.fields['price'].widget.attrs.update({
-                'class': TAILWIND_INPUT + ' font-bold text-base',
-                'placeholder': '0',
-            })
-        if 'short_description' in self.fields:
-            self.fields['short_description'].widget.attrs.update({
-                'class': TAILWIND_TEXTAREA,
-                'rows': 3,
-                'placeholder': 'Courte phrase d\'accroche (visible sur la carte du cours en page d\'accueil)...',
-            })
-        if 'description' in self.fields:
-            self.fields['description'].widget.attrs.update({
-                'class': TAILWIND_TEXTAREA + ' font-mono text-sm leading-relaxed',
-                'rows': 12,
-                'placeholder': 'Description complète et détaillée de la formation (Markdown supporté)...',
-            })
-        if 'what_you_will_learn' in self.fields:
-            self.fields['what_you_will_learn'].widget.attrs.update({
-                'class': TAILWIND_TEXTAREA + ' font-mono text-sm leading-relaxed',
-                'rows': 6,
-                'placeholder': '- Première compétence ou acquis\n- Deuxième compétence\n- Troisième point fort...',
-            })
-        if 'prerequisites' in self.fields:
-            self.fields['prerequisites'].widget.attrs.update({
-                'class': TAILWIND_TEXTAREA + ' font-mono text-sm leading-relaxed',
-                'rows': 4,
-                'placeholder': 'Ex: Aucun prérequis, idéal pour débutant complet.',
-            })
-        if 'trailer_video_id' in self.fields:
-            self.fields['trailer_video_id'].widget.attrs.update({
-                'class': TAILWIND_INPUT + ' font-mono text-sm',
-                'placeholder': 'Ex: dQw4w9WgXcQ (ID YouTube ou lien)',
-            })
-        if 'meta_description' in self.fields:
-            self.fields['meta_description'].widget.attrs.update({
-                'class': TAILWIND_TEXTAREA,
-                'rows': 3,
-                'maxlength': '160',
-                'placeholder': 'Résumé percutant pour Google et les moteurs de recherche (max 160 caractères)...',
-            })
-        if 'keywords' in self.fields:
-            self.fields['keywords'].widget.attrs.update({
-                'class': TAILWIND_INPUT,
-                'placeholder': 'japonais, n5, jlpt, vocabulaire, kanji, cours',
-            })
+        # Personnalisations par champ (classes additionnelles, lignes, placeholder)
+        for name, attrs in self.FIELD_ATTRS.items():
+            if name in self.fields:
+                widget = self.fields[name].widget
+                attrs = dict(attrs)
+                extra_class = attrs.pop('class', '')
+                widget.attrs.update(attrs)
+                if extra_class:
+                    widget.attrs['class'] = f"{widget.attrs['class']} {extra_class}"
 
     def clean_slug(self):
         slug = self.cleaned_data.get('slug')
@@ -167,7 +152,6 @@ class CourseForm(forms.ModelForm):
         val = self.cleaned_data.get('trailer_video_id', '')
         if val:
             val = val.strip()
-            import re
             m = re.search(r'(?:v=|\/|youtu\.be\/)([a-zA-Z0-9_-]{11})', val)
             if m:
                 return m.group(1)
@@ -239,7 +223,7 @@ class LandingSectionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for name, field in self.fields.items():
+        for field in self.fields.values():
             widget = field.widget
             if isinstance(widget, forms.FileInput):
                 widget.attrs['class'] = TAILWIND_FILE

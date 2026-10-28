@@ -3,9 +3,11 @@ Permissions pour le builder de cours.
 Permet aux staff ET aux instructeurs (propriétaires) d'utiliser le builder.
 """
 from functools import wraps
-from django.shortcuts import get_object_or_404, redirect
+
 from django.http import Http404
-from .models import Course, ContentBlock, LandingSection, QuizQuestion, Module, Lesson
+from django.shortcuts import get_object_or_404, redirect
+
+from .models import ContentBlock, Course, LandingSection, Lesson, QuizQuestion
 
 
 def _has_builder_access(user):

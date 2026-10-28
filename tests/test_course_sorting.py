@@ -4,11 +4,11 @@ Critères de tri : title, price, created_at, is_published, modules_count.
 Chaque critère peut être ascendant ou descendant (?sort=field / ?sort=-field).
 HTMX partial : si HX-Request, seul le tbody est renvoyé.
 """
+
 import pytest
 from django.urls import reverse
+
 from courses.models import Course, Module
-from datetime import timedelta
-from django.utils import timezone
 
 
 @pytest.fixture

@@ -1,8 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from unfold.admin import ModelAdmin, TabularInline
-from .models import User
+
 from access.models import AccessRequest, ActivationCode
+
+from .models import User
+
 
 # Inlines (Garde tes accès comme avant)
 class AccessRequestInline(TabularInline):

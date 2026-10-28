@@ -1,7 +1,8 @@
-from django.db import models
 from django.conf import settings
-from django.core.validators import FileExtensionValidator, MinValueValidator, MaxValueValidator
-from courses.validators import get_upload_path, FileSizeValidator, IMAGE_EXTENSIONS
+from django.core.validators import FileExtensionValidator, MaxValueValidator, MinValueValidator
+from django.db import models
+
+from courses.validators import IMAGE_EXTENSIONS, FileSizeValidator, get_upload_path
 
 
 class InstructorPlan(models.Model):
@@ -12,7 +13,7 @@ class InstructorPlan(models.Model):
     name = models.CharField("Nom de l'offre", max_length=100)
     slug = models.SlugField(unique=True)
     price = models.DecimalField("Prix (DA)", max_digits=10, decimal_places=0)
-    
+
     # Limites
     max_courses = models.PositiveIntegerField(
         "Nombre max de formations",
@@ -154,6 +155,17 @@ class InstructorProfile(models.Model):
         from courses.models import Course
         used = Course.objects.filter(instructor=self.user).count()
         return max(0, self.max_courses - used)
+
+    def modules_limit_reached(self, course):
+        """Le plan interdit-il d'ajouter un module à ce cours ? (0 = illimité)"""
+        limit = self.max_modules_per_course
+        return limit > 0 and course.modules.count() >= limit
+
+    def lessons_limit_reached(self, course):
+        """Le plan interdit-il d'ajouter une leçon à ce cours ? (0 = illimité)"""
+        from courses.models import Lesson
+        limit = self.max_lessons_per_course
+        return limit > 0 and Lesson.objects.filter(module__course=course).count() >= limit
 
     @property
     def can_create_course(self):

@@ -1,151 +1,97 @@
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
+from django.views.decorators.http import require_POST
+
 from .models import Notification
 
 # Valeurs autorisées pour le filtre ?type=
 _VALID_TYPES = {Notification.TYPE_STUDENT, Notification.TYPE_INSTRUCTOR}
 
 
+def _notifications_for(user, type_filter=None):
+    """Notifications de l'utilisateur (récentes d'abord), éventuellement filtrées par espace."""
+    qs = Notification.objects.filter(recipient=user)
+    if type_filter:
+        qs = qs.filter(notification_type=type_filter)
+    return qs.order_by('-created_at')
+
+
+def _clean_type(value):
+    return value if value in _VALID_TYPES else None
+
+
+def _badge_html(request):
+    """Badge de la cloche (swap hors-bande) : notifications étudiant non lues."""
+    unread_count = Notification.objects.filter(
+        recipient=request.user, is_read=False, notification_type=Notification.TYPE_STUDENT,
+    ).count()
+    return render_to_string(
+        'notifications/partials/badge.html', {'unread_count': unread_count, 'oob': True}, request=request,
+    )
+
+
 @login_required
 def my_notifications(request):
-    """Affiche la liste complète des notifications (page dédiée).
-
-    Supporte le filtre ?type=student|instructor pour n'afficher
-    que les notifications d'un espace donné.
-    """
-    type_filter = request.GET.get('type')
-    if type_filter not in _VALID_TYPES:
-        type_filter = None  # "Tout"
-
-    base_qs = Notification.objects.filter(recipient=request.user)
-    if type_filter:
-        notifs = base_qs.filter(notification_type=type_filter).order_by('-created_at')
-    else:
-        notifs = base_qs.order_by('-created_at')
-
-    is_instructor = False
-    try:
-        is_instructor = request.user.instructor_profile.is_active
-    except Exception:
-        pass
+    """Liste complète des notifications ; filtre ?type=student|instructor."""
+    type_filter = _clean_type(request.GET.get('type'))
+    profile = getattr(request.user, 'instructor_profile', None)
 
     return render(request, 'notifications/list.html', {
-        'notifications': notifs,
+        'notifications': _notifications_for(request.user, type_filter),
         'current_type': type_filter,
-        'is_instructor': is_instructor,
+        'is_instructor': bool(profile and profile.is_active),
     })
 
-@login_required
-def mark_read_and_redirect(request, notification_id):
-    """ 
-    ANCIENNE MÉTHODE (Fallback) :
-    Clic sur la cloche -> Marque lu -> Redirige (Rechargement de page complet)
-    Utile si le JS est désactivé ou pour les liens dans les emails.
-    """
-    notif = get_object_or_404(Notification, id=notification_id)
-    
-    if notif.recipient == request.user:
-        if not notif.is_read:
-            notif.is_read = True
-            notif.save()
-        return redirect(notif.link)
-    
-    return redirect('user_dashboard')
 
-# --- NOUVELLE VUE POUR HTMX + ALPINE ---
+@login_required
+@require_POST
+def mark_read_and_redirect(request, notification_id):
+    """Marque une notification lue puis redirige vers sa cible."""
+    notif = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+    if not notif.is_read:
+        notif.is_read = True
+        notif.save(update_fields=['is_read'])
+    return redirect(notif.link)
+
 
 @login_required
 @require_POST
 def mark_notification_read(request, notification_id):
+    """Marque une notification lue (HTMX) et met à jour le badge."""
     notif = get_object_or_404(Notification, id=notification_id, recipient=request.user)
-    
-    # On marque uniquement comme lu (pas de toggle)
     if not notif.is_read:
         notif.is_read = True
-        notif.save()
+        notif.save(update_fields=['is_read'])
 
-    # Recalcul du compteur pour le badge (uniquement notifs étudiant → cloche)
-    unread_count = request.user.notifications.filter(
-        is_read=False,
-        notification_type=Notification.TYPE_STUDENT,
-    ).count()
-
-    # Mise à jour du Badge (OOB) — le compteur sur la cloche
-    if unread_count > 0:
-        badge_html = f"""
-        <div id="notification-badge" hx-swap-oob="true">
-            <span class="absolute top-1 right-1 inline-flex items-center justify-center w-4 h-4 text-xs font-bold leading-none text-white bg-red-500 rounded-full border-2 border-white">
-                {unread_count}
-            </span>
-        </div>
-        """
-    else:
-        badge_html = '<div id="notification-badge" hx-swap-oob="true"></div>'
-
-    # Rendu de la notification mise à jour
-    is_dropdown = request.headers.get('X-Source') == 'dropdown'
-    context = {'notif': notif, 'is_dropdown': is_dropdown}
+    context = {'notif': notif, 'is_dropdown': request.headers.get('X-Source') == 'dropdown'}
     notification_html = render_to_string('notifications/partials/hx_item.html', context, request=request)
-    
-    return HttpResponse(notification_html + badge_html)
+    return HttpResponse(notification_html + _badge_html(request))
+
 
 @login_required
 @require_POST
 def mark_all_read(request):
-    """Marque tout comme lu d'un coup.
-
-    Accepte un champ POST `type` (student|instructor) pour ne marquer
-    que les notifications d'un espace.  Sans ce champ, marque tout.
     """
-    type_filter = request.POST.get('type')
-    if type_filter not in _VALID_TYPES:
-        type_filter = None
+    Marque tout comme lu d'un coup.
 
-    qs = Notification.objects.filter(recipient=request.user, is_read=False)
+    Un champ POST `type` (student|instructor) restreint l'opération à un espace.
+    """
+    type_filter = _clean_type(request.POST.get('type'))
+
+    unread = Notification.objects.filter(recipient=request.user, is_read=False)
     if type_filter:
-        qs = qs.filter(notification_type=type_filter)
-    qs.update(is_read=True)
+        unread = unread.filter(notification_type=type_filter)
+    unread.update(is_read=True)
 
-    # Badge OOB (vider/recalculer le compteur dans la navbar)
-    student_unread = Notification.objects.filter(
-        recipient=request.user,
-        is_read=False,
-        notification_type=Notification.TYPE_STUDENT,
-    ).count()
-    if student_unread > 0:
-        badge_html = (
-            f'<div id="notification-badge" hx-swap-oob="true">'
-            f'<span class="absolute top-1 right-1 inline-flex items-center justify-center '
-            f'w-4 h-4 text-xs font-bold leading-none text-white bg-red-500 rounded-full '
-            f'border-2 border-white">{student_unread}</span>'
-            f'</div>'
-        )
+    if not getattr(request, 'htmx', False):
+        return redirect('my_notifications')
+
+    notifs = _notifications_for(request.user, type_filter)
+    if request.headers.get('X-Source') == 'dropdown':
+        template, context = 'notifications/partials/dropdown_inner.html', {'notifications': notifs[:10]}
     else:
-        badge_html = '<div id="notification-badge" hx-swap-oob="true"></div>'
-
-    if getattr(request, 'htmx', False):
-        # Re-rendre la liste filtrée dans le même contexte
-        all_qs = Notification.objects.filter(recipient=request.user)
-        if type_filter:
-            notifs = all_qs.filter(notification_type=type_filter).order_by('-created_at')
-        else:
-            notifs = all_qs.order_by('-created_at')
-
-        if request.headers.get('X-Source') == 'dropdown':
-            html = render_to_string(
-                'notifications/partials/dropdown_inner.html',
-                {'notifications': notifs[:10]},
-                request=request,
-            )
-        else:
-            html = render_to_string(
-                'notifications/partials/notification_list.html',
-                {'notifications': notifs},
-                request=request,
-            )
-        return HttpResponse(html + badge_html)
-
-    return redirect('my_notifications')
+        template, context = 'notifications/partials/notification_list.html', {'notifications': notifs}
+    html = render_to_string(template, context, request=request)
+    return HttpResponse(html + _badge_html(request))

@@ -8,7 +8,8 @@ HTMX partial pour rechargement dynamique de la grille.
 """
 import pytest
 from django.urls import reverse
-from courses.models import Course, Module, Category
+
+from courses.models import Category, Course, Module
 
 
 @pytest.fixture

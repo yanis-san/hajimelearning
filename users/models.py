@@ -1,12 +1,15 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.core.validators import FileExtensionValidator
+from django.db import models
+
 # Assure-toi que le fichier validators.py existe bien dans l'app courses
-from courses.validators import get_upload_path, FileSizeValidator, IMAGE_EXTENSIONS
+from courses.validators import IMAGE_EXTENSIONS, FileSizeValidator, get_upload_path
+
 from .managers import CustomUserManager
 
+
 class User(AbstractUser):
-    
+
     # --- LISTE DES PAYS ---
     class Country(models.TextChoices):
         # Afrique du Nord & Moyen-Orient
@@ -17,7 +20,7 @@ class User(AbstractUser):
         SAUDI_ARABIA = 'SA', 'Arabie Saoudite'
         UAE = 'AE', 'Émirats Arabes Unis'
         QATAR = 'QA', 'Qatar'
-        
+
         # Europe
         FRANCE = 'FR', 'France'
         BELGIUM = 'BE', 'Belgique'
@@ -26,24 +29,24 @@ class User(AbstractUser):
         UK = 'GB', 'Royaume-Uni'
         SPAIN = 'ES', 'Espagne'
         ITALY = 'IT', 'Italie'
-        
+
         # Amériques
         CANADA = 'CA', 'Canada'
         USA = 'US', 'États-Unis'
         BRAZIL = 'BR', 'Brésil'
-        
+
         # Asie
         CHINA = 'CN', 'Chine'
         JAPAN = 'JP', 'Japon'
         TURKEY = 'TR', 'Turquie'
         MALAYSIA = 'MY', 'Malaisie'
         INDONESIA = 'ID', 'Indonésie'
-        
+
         # Afrique (Autres)
         SENEGAL = 'SN', 'Sénégal'
         IVORY_COAST = 'CI', 'Côte d\'Ivoire'
         MALI = 'ML', 'Mali'
-        
+
         # Reste du monde
         OTHER = 'OTHER', 'Autre pays'
 
@@ -52,9 +55,9 @@ class User(AbstractUser):
         FEMALE = 'F', 'Femme'
 
     # --- CHAMPS DE BASE ---
-    username = None 
+    username = None
     email = models.EmailField('adresse email', unique=True)
-    
+
     # --- PHOTO DE PROFIL (AVATAR) ---
     avatar = models.ImageField(
         "Photo de profil",
@@ -70,11 +73,11 @@ class User(AbstractUser):
     phone_number = models.CharField("Téléphone", max_length=20, blank=True, help_text="Format: +213...")
     address = models.CharField("Adresse", max_length=255, blank=True)
     city = models.CharField("Ville", max_length=100, blank=True)
-    
+
     country = models.CharField(
         "Pays",
-        max_length=5, 
-        choices=Country.choices, 
+        max_length=5,
+        choices=Country.choices,
         default=Country.ALGERIA
     )
 
@@ -84,7 +87,7 @@ class User(AbstractUser):
 
     # --- CONFIG DJANGO ---
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = [] 
+    REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
 

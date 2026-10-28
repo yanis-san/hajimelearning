@@ -10,10 +10,10 @@ import pytest
 from django.test import Client
 from django.urls import reverse
 
-from courses.models import Course, Module, Lesson
 from access.models import AccessRequest
-from users.models import User
+from courses.models import Course, Lesson, Module
 from instructors.models import InstructorPlan, InstructorProfile
+from users.models import User
 
 
 @pytest.fixture

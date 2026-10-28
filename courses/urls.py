@@ -1,19 +1,17 @@
 from django.urls import path
-from django.conf import settings
-from django.conf.urls.static import static
-from . import views
 
+from . import views
 
 urlpatterns = [
     # Page d'accueil (Liste des cours)
     path('', views.course_list, name='course_list'),
     # Page catalogue dédiée
     path('catalogue/', views.catalogue, name='catalogue'),
-    
+
     path('dashboard/', views.user_dashboard, name='user_dashboard'),
     # Page d'un cours (ex: /course/python-debutant/)
     path('course/<slug:course_slug>/', views.course_detail, name='course_detail'),
-    
+
     # Page d'une leçon (ex: /course/python-debutant/lesson/installation/)
     path('course/<slug:course_slug>/lesson/<slug:lesson_slug>/', views.lesson_detail, name='lesson_detail'),
     path('course/<slug:course_slug>/lesson/<slug:lesson_slug>/complete/', views.mark_lesson_complete, name='mark_lesson_complete'),
@@ -49,7 +47,7 @@ urlpatterns = [
 
     # ── Builder existant ──
     path('manage/course/<slug:course_slug>/lesson/<slug:lesson_slug>/', views.manage_lesson_content, name='manage_lesson_content'),
-    
+
     path('manage/block/add/<int:lesson_id>/<str:block_type>/', views.add_block, name='add_block'),
     path('manage/block/edit/<int:block_id>/', views.edit_block, name='edit_block'),
     path('manage/block/delete/<int:block_id>/', views.delete_block, name='delete_block'),
@@ -61,14 +59,4 @@ urlpatterns = [
     path('manage/course/<slug:course_slug>/stats/', views.manage_course_students, name='manage_course_students'),
     path('manage/preview-markdown/', views.preview_markdown, name='preview_markdown'),
 ]
-
-from django.views.static import serve
-from django.urls import re_path
-
-# On laisse Django servir les médias en production sur cPanel
-# car configurer Apache pour servir le dossier media peut être complexe en hébergement mutualisé.
-urlpatterns += [
-    re_path(r'^media/(?P<path>.*)$', serve, {
-        'document_root': settings.MEDIA_ROOT,
-    }),
-]
+

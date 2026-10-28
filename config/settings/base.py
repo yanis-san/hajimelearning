@@ -1,4 +1,5 @@
 
+import os
 import sys
 from pathlib import Path
 
@@ -19,12 +20,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # 3rd Party
     'django_cotton',
     'django_htmx',
     'tailwind',
-    
+
     # Local
     'theme',
 
@@ -32,7 +33,7 @@ INSTALLED_APPS = [
 
     'markdownx',
     'allauth',
-    'allauth.account', 
+    'allauth.account',
     # 'allauth.socialaccount',
     'users',
     'courses',
@@ -48,14 +49,14 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     # Whitenoise 2nd
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
+
     # HTMX Middleware
     'django_htmx.middleware.HtmxMiddleware',
 
@@ -129,22 +130,22 @@ AUTHENTICATION_BACKENDS = [
 # 1. Formulaires Custom
 ACCOUNT_FORMS = {
     'signup': 'users.forms.CustomSignupForm',
-    'login': 'users.forms.CustomLoginForm', 
-    'reset_password': 'users.forms.CustomResetPasswordForm',       
+    'login': 'users.forms.CustomLoginForm',
+    'reset_password': 'users.forms.CustomResetPasswordForm',
     'reset_password_from_key': 'users.forms.CustomResetPasswordKeyForm'
 }
 
 # 2. Méthodes de Connexion (Nouvelle Syntaxe)
 ACCOUNT_LOGIN_METHODS = {'email'} # Remplace ACCOUNT_AUTHENTICATION_METHOD
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None 
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 
 # 3. Champs requis à l'inscription (Nouvelle Syntaxe)
 # Cette liste remplace EMAIL_REQUIRED, USERNAME_REQUIRED, PASSWORD_REQUIRED
 # Le fait de ne mettre 'password' qu'une fois désactive la confirmation "Enter Twice".
 ACCOUNT_SIGNUP_FIELDS = [
-    'email*', 
-    'password1', 
-]   
+    'email*',
+    'password1',
+]
 
 # 4. Vérification Email
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
@@ -209,10 +210,10 @@ if 'test' in sys.argv or 'pytest' in sys.argv[0]:
     # Exécuter les tâches immédiatement (synchrone) sans broker
     CELERY_TASK_ALWAYS_EAGER = True
     CELERY_TASK_EAGER_PROPAGATES = True
-    
+
     # Stocker les emails en mémoire au lieu de tenter de les envoyer
     EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
-    
+
     # Utiliser un système de cache en mémoire simple pour les tests
     CACHES = {
         'default': {
@@ -234,6 +235,9 @@ MARKDOWNX_MARKDOWN_EXTENSIONS = [
     'markdown.extensions.fenced_code',
     'markdown.extensions.nl2br',
 ]
+
+# URL publique du site (liens dans les emails) — surchargée par la variable d'env SITE_URL
+SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000').rstrip('/')
 
 # Email de destination pour le formulaire de contact
 CONTACT_EMAIL = 'contact@hajimelearning.com'

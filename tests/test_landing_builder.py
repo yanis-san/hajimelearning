@@ -2,8 +2,8 @@
 import pytest
 from django.test import Client
 from django.urls import reverse
-from courses.models import Course, LandingSection
 
+from courses.models import Course, LandingSection
 
 pytestmark = pytest.mark.django_db
 
@@ -25,7 +25,7 @@ def course():
 @pytest.fixture
 def admin_client():
     from users.models import User
-    user = User.objects.create_superuser(email='admin@test.com', password='pass123')
+    User.objects.create_superuser(email='admin@test.com', password='pass123')
     client = Client()
     client.login(email='admin@test.com', password='pass123')
     return client

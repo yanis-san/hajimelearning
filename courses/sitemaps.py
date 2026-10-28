@@ -1,5 +1,7 @@
 from django.contrib.sitemaps import Sitemap
+
 from .models import Course
+
 
 class CourseSitemap(Sitemap):
     changefreq = "weekly" # Google repassera chaque semaine

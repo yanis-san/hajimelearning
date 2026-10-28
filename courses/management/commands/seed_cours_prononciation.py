@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.utils.text import slugify
-from courses.models import Course, Module, Lesson, ContentBlock, QuizQuestion
+
+from courses.models import ContentBlock, Course, Lesson, Module, QuizQuestion
 
 
 class Command(BaseCommand):

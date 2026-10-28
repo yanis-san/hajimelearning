@@ -1,7 +1,10 @@
+from datetime import timedelta
+
 import pytest
 from django.utils import timezone
-from datetime import timedelta
+
 from access.models import Coupon
+
 
 @pytest.mark.django_db
 class TestCouponLogic:

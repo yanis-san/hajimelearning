@@ -1,4 +1,5 @@
 import os
+
 from celery import Celery
 
 # 1. On dit à Celery où sont les settings Django

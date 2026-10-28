@@ -1,8 +1,10 @@
 import pytest
 from django.contrib.auth import get_user_model
-from courses.models import Course, Module, Lesson, StudentProgress
-from support.models import Question
+
+from courses.models import Course, Lesson, Module, StudentProgress
 from notifications.models import Notification
+from support.models import Question
+
 
 @pytest.mark.django_db
 class TestFullNotifications:
@@ -10,10 +12,10 @@ class TestFullNotifications:
     def test_admin_notified_on_question(self, client, student):
         """ Vérifie que l'admin reçoit une notif quand un élève pose une question """
         User = get_user_model()
-        
+
         # CORRECTION : On ne met PAS username, seulement email et password
         admin = User.objects.create_superuser(email="admin@test.com", password="pwd")
-        
+
         # Setup Cours
         course = Course.objects.create(title="Maths", slug="maths")
         module = Module.objects.create(course=course, title="Algèbre")
@@ -21,7 +23,7 @@ class TestFullNotifications:
 
         # L'étudiant pose une question
         Question.objects.create(
-            student=student, course=course, lesson=lesson, 
+            student=student, course=course, lesson=lesson,
             title="Help", content="Besoin d'aide"
         )
 
@@ -35,9 +37,9 @@ class TestFullNotifications:
         assert "Maths" in notif.message
 
     def test_course_completion_notification(self, student):
-        """ 
-        Vérifie que si un cours a 2 leçons et qu'on finit la 2ème, 
-        on reçoit la notif 'Cours Terminé'. 
+        """
+        Vérifie que si un cours a 2 leçons et qu'on finit la 2ème,
+        on reçoit la notif 'Cours Terminé'.
         """
         course = Course.objects.create(title="Python Expert", slug="python-expert")
         module = Module.objects.create(course=course, title="Module Unique")

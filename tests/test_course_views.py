@@ -1,7 +1,9 @@
 import pytest
 from django.urls import reverse
+
 from access.models import AccessRequest
-from courses.models import Course, Category
+from courses.models import Category, Course
+
 
 @pytest.mark.django_db
 class TestCourseDetailView:
@@ -10,15 +12,15 @@ class TestCourseDetailView:
         """ Scénario 1 : Un inconnu voit la page de vente (Prix, Trailer) """
         url = reverse('course_detail', args=[course.slug])
         response = client.get(url)
-        
+
         assert response.status_code == 200
         content = response.content.decode()
-        
+
         # Il doit voir le prix et le marketing
         assert "Prix :" in content or "DA" in content
         assert "Débloquer l'accès" in content or "Rejoindre" in content
         assert course.short_description in content
-        
+
         # Il ne doit PAS voir le badge inscrit
         assert "Inscrit" not in content
 
@@ -27,7 +29,7 @@ class TestCourseDetailView:
         client.force_login(student)
         url = reverse('course_detail', args=[course.slug])
         response = client.get(url)
-        
+
         # Il doit toujours voir le bouton payer
         assert "Débloquer l'accès" in response.content.decode()
         assert "Inscrit" not in response.content.decode()
@@ -36,14 +38,14 @@ class TestCourseDetailView:
         """ Scénario 3 : Un étudiant qui a payé voit le Dashboard """
         # On simule le paiement validé
         AccessRequest.objects.create(student=student, course=course, status='APPROVED')
-        
+
         client.force_login(student)
         url = reverse('course_detail', args=[course.slug])
         response = client.get(url)
         content = response.content.decode()
-        
-        assert "Inscrit" in content 
-        
+
+        assert "Inscrit" in content
+
         # On vérifie qu'on ne voit PLUS le prix (preuve qu'on est en mode étudiant)
         assert "Prix :" not in content
 
@@ -54,7 +56,7 @@ class TestCourseDetailView:
         client.force_login(student)
         url = reverse('course_detail', args=[free_course.slug])
         response = client.get(url)
-        
+
         # Inscrit = Accès accordé
         assert "Inscrit" in response.content.decode()
 

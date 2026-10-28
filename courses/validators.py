@@ -1,7 +1,9 @@
 import os
 import uuid
+
 from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
+
 
 # 1. FONCTION DE RENOMMAGE (Sécurité Maximale)
 # Cette fonction transforme "mon_cv.pdf" en "a1b2-c3d4-e5f6.pdf"

@@ -1,5 +1,8 @@
-from .base import *
 import os
+
+import pymysql
+
+from .base import *
 
 # ==============================================================================
 # 🚀 GUIDE DE DÉPLOIEMENT CPANEL
@@ -9,7 +12,7 @@ import os
 #    1. DJANGO_SETTINGS_MODULE = config.settings.prod  <-- CRITIQUE
 #    2. DJANGO_SECRET_KEY      = (Générez une longue chaîne aléatoire)
 #    3. DJANGO_ALLOWED_HOSTS   = mondomaine.com www.mondomaine.com
-#    
+#
 #    [Base de données MySQL cPanel] :
 #    4. DB_NAME     = (Nom de la base cPanel)
 #    5. DB_USER     = (Utilisateur cPanel)
@@ -41,7 +44,6 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost').split(' ')
 
 # --- BASE DE DONNÉES (MySQL via PyMySQL) ---
 # En production, on impose MySQL.
-import pymysql
 pymysql.install_as_MySQLdb()
 
 DATABASES = {
@@ -78,7 +80,7 @@ CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', 'contact@hajimelearning.com')
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Hajime Learning] "
 
 # --- CELERY (Désactivé / Mode Synchrone sur cPanel) ---
-# On exécute les tâches immédiatement dans le même thread 
+# On exécute les tâches immédiatement dans le même thread
 # pour éviter d'avoir besoin d'un worker Celery et de Redis sur cPanel.
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
@@ -99,7 +101,6 @@ STORAGES = {
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 # HSTS — force HTTPS pendant 1 an
 SECURE_HSTS_SECONDS = 31_536_000

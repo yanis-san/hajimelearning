@@ -1,10 +1,13 @@
-from django.db import models
-from django.conf import settings
-from courses.models import Course
-from django.core.validators import MinValueValidator, MaxValueValidator, FileExtensionValidator
-from courses.validators import get_upload_path, FileSizeValidator, IMAGE_EXTENSIONS
-from django.utils import timezone
 import uuid
+
+from django.conf import settings
+from django.core.validators import FileExtensionValidator, MaxValueValidator, MinValueValidator
+from django.db import models
+from django.utils import timezone
+
+from courses.models import Course
+from courses.validators import IMAGE_EXTENSIONS, FileSizeValidator, get_upload_path
+
 
 # --- MODÈLE COUPON ---
 class Coupon(models.Model):
@@ -15,7 +18,7 @@ class Coupon(models.Model):
         help_text="Pourcentage de réduction (ex: 20 pour 20%)"
     )
     is_active = models.BooleanField("Actif ?", default=True)
-    
+
     valid_from = models.DateTimeField("Valable à partir du", default=timezone.now, help_text="Date de début")
     valid_until = models.DateTimeField("Valable jusqu'au", null=True, blank=True, help_text="Laisser vide pour illimité")
 
@@ -29,9 +32,11 @@ class Coupon(models.Model):
             return False
         if self.valid_from and now < self.valid_from:
             return False
-        if self.valid_until and now > self.valid_until:
-            return False
-        return True
+        return not (self.valid_until and now > self.valid_until)
+
+    def discounted_price(self, price):
+        """Prix après application de la réduction."""
+        return price - (price * self.discount_percent) / 100
 
 # --- MODÈLE DEMANDE D'ACCÈS ---
 class AccessRequest(models.Model):
@@ -43,7 +48,7 @@ class AccessRequest(models.Model):
 
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    
+
     # SÉCURITÉ RENFORCÉE ICI
     payment_proof = models.ImageField(
         upload_to=get_upload_path, # Renommage UUID
@@ -53,11 +58,11 @@ class AccessRequest(models.Model):
             FileSizeValidator(max_mb=5) # Max 5 Mo
         ]
     )
-    
+
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     admin_note = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     final_price = models.DecimalField(max_digits=10, decimal_places=0, null=True, blank=True)
     applied_coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
 
@@ -105,7 +110,7 @@ def user_has_access(user, course):
         return False
     if user.is_staff:
         return True
-    if course.instructor == user:
+    if course.instructor_id == user.id:
         return True
 
     # Cours gratuit : inscription explicite requise
@@ -116,7 +121,4 @@ def user_has_access(user, course):
     if AccessRequest.objects.filter(student=user, course=course, status='APPROVED').exists():
         return True
 
-    if ActivationCode.objects.filter(used_by=user, course=course, is_used=True).exists():
-        return True
-
-    return False
+    return ActivationCode.objects.filter(used_by=user, course=course, is_used=True).exists()

@@ -1,16 +1,17 @@
 from functools import wraps
 
 from django.conf import settings
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404, redirect, render
 
-from courses.models import Course, Module, Lesson
 from courses.forms import InstructorCourseForm
-from .models import InstructorPlan, InstructorRequest, InstructorProfile
-from .forms import InstructorRequestForm
+from courses.models import Course
+
 from .decorators import instructor_required
+from .forms import InstructorRequestForm
+from .models import InstructorPlan, InstructorProfile, InstructorRequest
 
 
 def signup_open_required(view_func):

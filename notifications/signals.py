@@ -1,16 +1,17 @@
+from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.urls import reverse
-from django.contrib.auth import get_user_model
+
+from courses.models import Lesson, StudentProgress
+from support.models import Question, Response
 
 from .models import Notification
-from courses.models import StudentProgress, Lesson
-from support.models import Response, Question
 
 User = get_user_model()
 
 S = Notification.TYPE_STUDENT
-I = Notification.TYPE_INSTRUCTOR
+INSTR = Notification.TYPE_INSTRUCTOR
 P = Notification.CATEGORY_PROGRESS
 SUP = Notification.CATEGORY_SUPPORT
 INS = Notification.CATEGORY_INSTRUCTOR
@@ -132,7 +133,7 @@ def notify_instructors_on_new_question(sender, instance, created, **kwargs):
         recipients_seen.add(course.instructor.pk)
         Notification.objects.create(
             recipient=course.instructor,
-            notification_type=I,
+            notification_type=INSTR,
             category=INS,
             title="Nouvelle question 🙋",
             message=f"{nom_etudiant} a posé une question dans « {course.title} ».",
@@ -148,7 +149,7 @@ def notify_instructors_on_new_question(sender, instance, created, **kwargs):
         recipients_seen.add(admin.pk)
         Notification.objects.create(
             recipient=admin,
-            notification_type=I,
+            notification_type=INSTR,
             category=INS,
             title="Nouvelle question élève 🙋",
             message=f"{nom_etudiant} a posé une question dans « {course.title} ».",

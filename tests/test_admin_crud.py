@@ -1,6 +1,7 @@
 import pytest
 from django.urls import reverse
-from courses.models import Course, Module, Lesson
+
+from courses.models import Course, Lesson, Module
 
 
 @pytest.mark.django_db
@@ -93,8 +94,8 @@ class TestManageCourseEdit:
             'price': 4000,
         }
         resp = client.post(
-            reverse('manage_course_edit', args=[course.slug]), 
-            data, 
+            reverse('manage_course_edit', args=[course.slug]),
+            data,
             HTTP_HX_REQUEST='true'
         )
         assert resp.status_code == 200
@@ -110,8 +111,8 @@ class TestManageCourseEdit:
             'slug': course.slug,
         }
         resp = client.post(
-            reverse('manage_course_edit', args=[course.slug]), 
-            data, 
+            reverse('manage_course_edit', args=[course.slug]),
+            data,
             HTTP_HX_REQUEST='true'
         )
         assert resp.status_code == 400

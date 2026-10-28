@@ -1,10 +1,10 @@
-from django.views.generic import FormView, TemplateView
-from django.urls import reverse_lazy
-from django.core.mail import send_mail
 from django.conf import settings
+from django.core.mail import send_mail
+from django.urls import reverse_lazy
+from django.views.generic import FormView, TemplateView
 
 from .forms import ContactForm
-from .models import ContactMessage
+from .models import ContactReason
 
 
 class ContactView(FormView):
@@ -20,17 +20,14 @@ class ContactView(FormView):
             initial['first_name'] = user.first_name
             initial['last_name']  = user.last_name
             initial['email']      = user.email
-            
+
         reason_label = self.request.GET.get('reason')
         if reason_label:
-            from .models import ContactReason
-            # On cherche de manière insensible à la casse
-            reason = ContactReason.objects.filter(label__iexact=reason_label).first()
-            if not reason:
-                # Création automatique du motif pour éviter les erreurs
-                reason = ContactReason.objects.create(label=reason_label, order=10, is_active=True)
-            initial['reason'] = reason.id
-            
+            # Recherche insensible à la casse parmi les motifs existants (jamais de création via GET)
+            reason = ContactReason.objects.filter(label__iexact=reason_label, is_active=True).first()
+            if reason:
+                initial['reason'] = reason.id
+
         return initial
 
     def form_valid(self, form):

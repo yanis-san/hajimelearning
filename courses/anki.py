@@ -1,4 +1,5 @@
 """Lecture des decks Anki (.apkg) : comptage des cartes."""
+import contextlib
 import io
 import logging
 import os
@@ -57,9 +58,7 @@ def count_apkg_cards(fileobj):
         return None
     finally:
         if hasattr(fileobj, 'seek'):
-            try:
+            with contextlib.suppress(Exception):
                 fileobj.seek(0)
-            except Exception:
-                pass
         if tmp_path and os.path.exists(tmp_path):
             os.remove(tmp_path)

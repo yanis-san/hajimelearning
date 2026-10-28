@@ -6,7 +6,7 @@ pour que les URLs soient copiables directement depuis le terminal.
 """
 
 import quopri
-import sys
+
 from django.core.mail.backends.console import EmailBackend as ConsoleBackend
 
 

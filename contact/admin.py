@@ -1,8 +1,7 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from unfold.decorators import action
 
-from .models import ContactReason, ContactMessage
+from .models import ContactMessage, ContactReason
 
 
 @admin.register(ContactReason)

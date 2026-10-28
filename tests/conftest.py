@@ -1,9 +1,8 @@
 import pytest
-from users.models import User
-from courses.models import Course, Module, Lesson
-from access.models import AccessRequest
-from config.celery import app as celery_app
 
+from config.celery import app as celery_app
+from courses.models import Course
+from users.models import User
 
 # --- CELERY : exécution synchrone en tests (pas de broker requis) ---
 
@@ -29,7 +28,7 @@ def instructor_signup_enabled(settings):
 def student():
     """ Un étudiant lambda """
     return User.objects.create_user(
-        email='etudiant@test.com', 
+        email='etudiant@test.com',
         password='password123',
         first_name='Yanis',
         last_name='Test'
@@ -39,7 +38,7 @@ def student():
 def admin_user():
     """ Un super admin """
     return User.objects.create_superuser(
-        email='admin@test.com', 
+        email='admin@test.com',
         password='password123'
     )
 

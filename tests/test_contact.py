@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
 
-from contact.models import ContactReason, ContactMessage
+from contact.models import ContactMessage, ContactReason
 
 
 @pytest.fixture

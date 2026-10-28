@@ -28,14 +28,12 @@ def user_notifications(request):
 
     # Badge instructeur uniquement si l'utilisateur a un profil actif
     navbar_instructor_unread_count = 0
-    try:
-        if request.user.instructor_profile.is_active:
-            navbar_instructor_unread_count = base_qs.filter(
-                notification_type=Notification.TYPE_INSTRUCTOR,
-                is_read=False,
-            ).count()
-    except Exception:
-        pass
+    profile = getattr(request.user, 'instructor_profile', None)
+    if profile and profile.is_active:
+        navbar_instructor_unread_count = base_qs.filter(
+            notification_type=Notification.TYPE_INSTRUCTOR,
+            is_read=False,
+        ).count()
 
     return {
         'navbar_notifications': navbar_notifications,

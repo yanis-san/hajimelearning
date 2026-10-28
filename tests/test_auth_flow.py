@@ -1,8 +1,10 @@
 import pytest
+from allauth.account.models import EmailAddress
 from django.core import mail
 from django.urls import reverse
-from allauth.account.models import EmailAddress
+
 from users.models import User
+
 
 @pytest.mark.django_db
 class TestAuthFlow:
@@ -16,14 +18,14 @@ class TestAuthFlow:
             'last_name': 'User',
             'gender': 'M',
             'birth_date': '2000-01-01',
-            'phone_number': '0550000000', 
-            'country': 'DZ',             
-            'city': 'Alger',             
+            'phone_number': '0550000000',
+            'country': 'DZ',
+            'city': 'Alger',
             'password1': 'Password123!Secure', # Mot de passe + complexe
         }
-        
+
         # On poste le formulaire
-        response = client.post(url, data)
+        client.post(url, data)
 
         # 1. L'utilisateur est créé
         assert User.objects.count() == 1
@@ -40,12 +42,12 @@ class TestAuthFlow:
         # student est créé via la fixture, mais sans EmailAddress lié
         # On crée l'entrée EmailAddress pour dire "Non vérifié"
         email_address = EmailAddress.objects.create(
-            user=student, 
-            email=student.email, 
-            verified=False, 
+            user=student,
+            email=student.email,
+            verified=False,
             primary=True
         )
-        
+
         assert email_address.verified is False
         # Note: Le test de "Login bloqué" dépend de ta config settings 'mandatory'
         # C'est difficile à tester unitairement sans simuler un navigateur complet,

@@ -1,5 +1,6 @@
 import pytest
 from django.urls import reverse
+
 from notifications.models import Notification
 
 
@@ -57,10 +58,10 @@ class TestNotificationFlow:
         n1 = Notification.objects.create(
             recipient=student, title="N1", is_read=False
         )
-        n2 = Notification.objects.create(
+        Notification.objects.create(
             recipient=student, title="N2", is_read=False
         )
-        n3 = Notification.objects.create(
+        Notification.objects.create(
             recipient=student, title="N3", is_read=True
         )
 
@@ -75,7 +76,7 @@ class TestNotificationFlow:
         # Il doit contenir le chiffre "1" (car il reste N2)
         assert 'id="notification-badge"' in html
         assert 'hx-swap-oob="true"' in html
-        assert "bg-red-500" in html  # Le point rouge doit être là
+        assert "bg-primary" in html  # Le badge doit être là
         assert "1" in html  # Le compteur doit afficher 1
 
     def test_mark_read_idempotent(self, client, student):

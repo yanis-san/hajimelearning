@@ -1,14 +1,13 @@
+import logging
+
 from celery import shared_task
-from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
 from django.urls import reverse
-import os
-import logging
 
 logger = logging.getLogger(__name__)
 
-SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000').rstrip('/')
 
 
 @shared_task
@@ -41,7 +40,7 @@ def send_question_notification_email(question_id):
     if not recipients:
         return "Aucun destinataire"
 
-    question_url = f"{SITE_URL}{reverse('question_detail', args=[question.id])}"
+    question_url = f"{settings.SITE_URL}{reverse('question_detail', args=[question.id])}"
     lesson_info = f" (Leçon : {question.lesson.title})" if question.lesson else ""
 
     subject = f"[Hajime Learning] 🙋 Nouvelle question : {question.title}"
@@ -91,7 +90,7 @@ def send_response_notification_email(response_id):
     author = response.author
     author_name = "Votre Sensei" if response.is_instructor else (author.get_full_name() or author.first_name or author.email)
 
-    question_url = f"{SITE_URL}{reverse('question_detail', args=[question.id])}"
+    question_url = f"{settings.SITE_URL}{reverse('question_detail', args=[question.id])}"
 
     # 1. Notifier l'étudiant qui a posé la question (s'il ne s'est pas répondu à lui-même)
     if question.student != author and question.student.email:

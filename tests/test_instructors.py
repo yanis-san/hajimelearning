@@ -1,9 +1,9 @@
 import pytest
 from django.urls import reverse
-from django.test import override_settings
-from instructors.models import InstructorPlan, InstructorRequest, InstructorProfile
+
+from courses.models import Course, Lesson, Module
 from instructors.decorators import is_instructor
-from courses.models import Course, Module, Lesson, ContentBlock, LandingSection
+from instructors.models import InstructorPlan, InstructorProfile, InstructorRequest
 
 pytestmark = pytest.mark.django_db
 
@@ -145,7 +145,7 @@ class TestApprovalSignal:
 
     def test_approval_updates_existing_profile(self, instructor_user, pro_plan):
         """Si l'instructeur upgrade, le profil est mis à jour."""
-        req = InstructorRequest.objects.create(
+        InstructorRequest.objects.create(
             user=instructor_user, plan=pro_plan, payment_proof='test.jpg',
             status='APPROVED',
         )
@@ -474,7 +474,7 @@ class TestCourseEditView:
 
     def test_cannot_edit_others_course(self, client, instructor_user, admin_user, starter_plan):
         # Créer un autre instructeur
-        other_profile = InstructorProfile.objects.create(
+        InstructorProfile.objects.create(
             user=admin_user, plan=starter_plan,
             max_courses=5, revenue_percent=70,
         )
@@ -546,9 +546,10 @@ class TestPlanUpgrade:
 
     def test_instructor_can_request_upgrade(self, client, instructor_user, pro_plan):
         """Un instructeur peut envoyer une demande d'upgrade."""
+        import io
+
         from django.core.files.uploadedfile import SimpleUploadedFile
         from PIL import Image
-        import io
         # Créer une vraie image
         buf = io.BytesIO()
         Image.new('RGB', (10, 10), color='red').save(buf, format='JPEG')

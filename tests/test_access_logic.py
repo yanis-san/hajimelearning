@@ -1,5 +1,6 @@
 import pytest
-from access.models import user_has_access, AccessRequest, ActivationCode, Enrollment
+
+from access.models import AccessRequest, ActivationCode, Enrollment, user_has_access
 
 '''
 Sécurité de base : Un étudiant lambda ne peut pas voir un cours payant (refused_by_default).
@@ -40,8 +41,8 @@ class TestAccessLogic:
         """ Cas 4 : Accès via paiement validé (CCP) """
         # On simule une demande VALIDÉE
         AccessRequest.objects.create(
-            student=student, 
-            course=course, 
+            student=student,
+            course=course,
             status='APPROVED'
         )
         assert user_has_access(student, course) is True
@@ -49,8 +50,8 @@ class TestAccessLogic:
     def test_access_refused_with_pending_request(self, student, course):
         """ Cas 5 : Accès refusé si paiement en attente """
         AccessRequest.objects.create(
-            student=student, 
-            course=course, 
+            student=student,
+            course=course,
             status='PENDING'
         )
         assert user_has_access(student, course) is False

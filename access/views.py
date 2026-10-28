@@ -1,16 +1,17 @@
 import logging
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from courses.models import Course
-from .models import AccessRequest, ActivationCode, Coupon, Enrollment, user_has_access
+
 from .forms import AccessRequestForm, CodeActivationForm
+from .models import AccessRequest, ActivationCode, Coupon, Enrollment, user_has_access
 from .utils import generate_receipt_pdf
 
 logger = logging.getLogger(__name__)
@@ -18,9 +19,8 @@ logger = logging.getLogger(__name__)
 @require_POST
 def validate_coupon(request, course_id):
     course = get_object_or_404(Course, id=course_id)
-    
+
     code_input = request.POST.get('promo_code', '').strip()
-    logger.debug("Validate coupon: code='%s'", code_input)
 
     context = {'course': course}
 
@@ -33,10 +33,7 @@ def validate_coupon(request, course_id):
             context['success'] = False
         else:
             logger.debug("Coupon '%s' valid, applying discount.", coupon.code)
-            remise = (course.price * coupon.discount_percent) / 100
-            new_price = course.price - remise
-
-            context['new_price'] = int(new_price)
+            context['new_price'] = int(coupon.discounted_price(course.price))
             context['coupon'] = coupon
             context['success'] = True
 
@@ -51,7 +48,7 @@ def validate_coupon(request, course_id):
 @login_required
 @transaction.atomic # <--- SÉCURITÉ 1 : Tout ou rien
 def request_course_access(request, course_id):
-    course = get_object_or_404(Course, id=course_id)
+    course = get_object_or_404(Course, id=course_id, is_published=True)
 
     if user_has_access(request.user, course):
         messages.info(request, "Vous avez déjà accès.")
@@ -59,7 +56,7 @@ def request_course_access(request, course_id):
 
     # Gestion de la demande existante (Reset si rejetée)
     existing_req = AccessRequest.objects.filter(student=request.user, course=course).first()
-    
+
     if existing_req and existing_req.status == 'PENDING':
         return render(request, 'access/request_pending.html', {'course': course})
 
@@ -67,11 +64,11 @@ def request_course_access(request, course_id):
         proof_form = AccessRequestForm(instance=existing_req)
     else:
         proof_form = AccessRequestForm()
-        
+
     code_form = CodeActivationForm()
 
     if request.method == 'POST':
-        
+
         # --- CAS A : PAIEMENT PREUVE ---
         if 'submit_proof' in request.POST:
             if existing_req and existing_req.status == 'REJECTED':
@@ -90,11 +87,11 @@ def request_course_access(request, course_id):
                 req.student = request.user
                 req.course = course
                 req.status = 'PENDING'
-                req.admin_note = "" 
-                
+                req.admin_note = ""
+
                 # Gestion Coupon
                 coupon_id = request.POST.get('valid_coupon_id')
-                req.final_price = course.price 
+                req.final_price = course.price
 
                 if coupon_id:
                     try:
@@ -102,11 +99,10 @@ def request_course_access(request, course_id):
                         coupon = Coupon.objects.select_for_update().get(id=coupon_id)
                         if coupon.is_valid:
                             req.applied_coupon = coupon
-                            remise = (course.price * coupon.discount_percent) / 100
-                            req.final_price = course.price - remise
+                            req.final_price = coupon.discounted_price(course.price)
                     except Coupon.DoesNotExist:
                         pass
-                
+
                 req.save()
                 return render(request, 'access/request_success.html', {'course': course})
 
@@ -120,7 +116,7 @@ def request_course_access(request, course_id):
                     # Ça dit à la base de données : "Bloque cette ligne tant que je n'ai pas fini"
                     # Si quelqu'un d'autre essaie de lire ce code en même temps, il doit attendre.
                     activation = ActivationCode.objects.select_for_update().get(code=code_input)
-                    
+
                     if activation.course != course:
                         messages.error(request, "Code valide mais pour un autre cours.")
                     elif activation.is_used:
@@ -130,14 +126,14 @@ def request_course_access(request, course_id):
                         activation.used_by = request.user
                         activation.used_at = timezone.now()
                         activation.save()
-                        
+
                         # Nettoyage si demande existante
                         if existing_req:
                             existing_req.delete()
-                            
+
                         messages.success(request, "Accès débloqué !")
                         return redirect('course_detail', course_slug=course.slug)
-                        
+
                 except ActivationCode.DoesNotExist:
                     messages.error(request, "Code invalide.")
 
@@ -164,16 +160,15 @@ def enroll_free_course(request, course_id):
 
 @login_required
 def download_receipt(request, request_id):
-    # On récupère la demande (ou 404 si elle n'existe pas)
-    access_req = get_object_or_404(AccessRequest, id=request_id)
-    
-    # SÉCURITÉ : C'est bien mon reçu ?
-    if access_req.student != request.user:
-        return redirect('user_dashboard')
-        
+    # Seul l'étudiant concerné peut télécharger un reçu, et uniquement une fois le paiement validé
+    access_req = get_object_or_404(
+        AccessRequest.objects.select_related('course', 'applied_coupon'),
+        id=request_id, student=request.user, status='APPROVED',
+    )
+
     # Génération du PDF
     pdf_content = generate_receipt_pdf(access_req)
-    
+
     response = HttpResponse(pdf_content, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="Recu_{access_req.id}.pdf"'
     return response

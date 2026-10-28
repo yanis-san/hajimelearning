@@ -22,4 +22,4 @@ INTERNAL_IPS = [
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True  # les exceptions remontent normalement
 CELERY_BROKER_URL = 'memory://'
-CELERY_BACKEND = 'cache+memory://'
+CELERY_RESULT_BACKEND = 'cache+memory://'

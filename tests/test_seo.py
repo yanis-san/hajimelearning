@@ -1,6 +1,8 @@
 import pytest
 from django.urls import reverse
+
 from courses.models import Course
+
 
 @pytest.mark.django_db
 class TestSEO:
@@ -18,7 +20,7 @@ class TestSEO:
     def test_sitemap_xml_is_generated(self, client, published_course):
         """ Vérifie que le fichier sitemap.xml existe et contient le cours """
         response = client.get('/sitemap.xml')
-        
+
         assert response.status_code == 200
         assert 'application/xml' in response['Content-Type'] or 'text/xml' in response['Content-Type']
         # On vérifie que l'URL du cours est dans le XML
@@ -29,7 +31,7 @@ class TestSEO:
         url = reverse('course_detail', args=[published_course.slug])
         response = client.get(url)
         content = response.content.decode()
-        
+
         # Vérif Title
         assert f"<title>{published_course.title} | Hajime Learning</title>" in content
         # Vérif Description

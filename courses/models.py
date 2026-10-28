@@ -1,10 +1,18 @@
-from django.db import models
 from django.conf import settings
-from markdownx.models import MarkdownxField
 from django.core.validators import FileExtensionValidator
-from .validators import get_upload_path, FileSizeValidator, IMAGE_EXTENSIONS, DOC_EXTENSIONS, AUDIO_EXTENSIONS, ANKI_EXTENSIONS
-from .storage import protected_storage
+from django.db import models
 from django.urls import reverse
+from markdownx.models import MarkdownxField
+
+from .storage import protected_storage
+from .validators import (
+    ANKI_EXTENSIONS,
+    AUDIO_EXTENSIONS,
+    DOC_EXTENSIONS,
+    IMAGE_EXTENSIONS,
+    FileSizeValidator,
+    get_upload_path,
+)
 
 
 class Category(models.Model):
@@ -40,15 +48,15 @@ class Course(models.Model):
         related_name='courses',
         verbose_name="Catégorie",
     )
-    
+
     # 1. POUR LA CARTE (ACCUEIL)
     # On renomme l'ancien usage en "short_description" pour être clair
     short_description = models.TextField("Phrase d'accroche (Carte)", help_text="Ce texte s'affiche sur la page d'accueil (court).")
-    
+
     # 2. POUR LA PAGE DE VENTE (LANDING PAGE)
     # On utilise Markdown pour pouvoir mettre du gras, des titres, des listes...
     description = MarkdownxField("Page de Vente (Détails)", help_text="Description longue et détaillée pour convaincre.")
-    
+
     # 3. ARGUMENTS MARKETING
     what_you_will_learn = MarkdownxField("Ce que vous allez apprendre", help_text="Liste à puces", blank=True)
     prerequisites = MarkdownxField("Pré-requis", help_text="Matériel nécessaire", blank=True, default="Aucun.")
@@ -56,13 +64,13 @@ class Course(models.Model):
 
     meta_description = models.CharField("Meta Description (Google)", max_length=160, blank=True, help_text="Résumé pour Google (160 caractères max).")
     keywords = models.CharField("Mots-clés", max_length=255, blank=True, help_text="Séparés par des virgules (ex: python, django, code)")
-    
+
     # Pour le sitemap (date de dernière modif)
     updated_at = models.DateTimeField(auto_now=True)
 
     # INFOS
     price = models.DecimalField("Prix (DA)", max_digits=10, decimal_places=0, default=0)
-    
+
     thumbnail = models.ImageField(
         "Image carte (catalogue / accueil)",
         upload_to=get_upload_path,
@@ -77,7 +85,7 @@ class Course(models.Model):
         validators=[FileExtensionValidator(allowed_extensions=IMAGE_EXTENSIONS)],
         help_text="Grande image affichée sur la page de vente (vitrine)."
     )
-    
+
     is_published = models.BooleanField("Publié ?", default=False)
     is_featured = models.BooleanField(
         "Afficher sur l'accueil",
@@ -128,7 +136,7 @@ class Lesson(models.Model):
         "Durée estimée (min)", null=True, blank=True,
         help_text="Affichée à l'étudiant dans le sommaire (optionnel).",
     )
-    
+
     class Meta:
         ordering = ['order']
         unique_together = ['module', 'slug']
@@ -155,25 +163,25 @@ class ContentBlock(models.Model):
         ('video', '🎬 Vidéo (YouTube)'),
         ('audio', '🎧 Audio (MP3)'),
         ('file', '📎 Fichier à télécharger'),
-        ('quiz', '🧠 Quiz / Examen'), 
+        ('quiz', '🧠 Quiz / Examen'),
         ('anki', '🗂️ Deck Anki'),
     )
 
     lesson = models.ForeignKey(Lesson, related_name='blocks', on_delete=models.CASCADE)
     type = models.CharField(max_length=10, choices=CONTENT_TYPES)
     order = models.PositiveIntegerField(default=0)
-    
+
     # Titre générique (Nom du fichier, Titre de l'audio...)
     title = models.CharField("Titre du bloc", max_length=200, blank=True, null=True)
 
     # Champs Contenu
     text_content = MarkdownxField("Contenu", blank=True, null=True)
     video_id = models.CharField("ID Vidéo", max_length=100, blank=True)
-    
+
     # Fichier principal (Audio, Doc ou Deck Anki) - PROTÉGÉ (hors MEDIA_ROOT)
     file_content = models.FileField(
-        "Fichier Principal", 
-        upload_to=get_upload_path, 
+        "Fichier Principal",
+        upload_to=get_upload_path,
         storage=protected_storage,
         blank=True, null=True,
         validators=[
@@ -184,8 +192,8 @@ class ContentBlock(models.Model):
 
     # Fichier correction (Caché) - PROTÉGÉ
     related_file = models.FileField(
-        "Fichier associé (Correction)", 
-        upload_to=get_upload_path, 
+        "Fichier associé (Correction)",
+        upload_to=get_upload_path,
         storage=protected_storage,
         blank=True, null=True,
         validators=[
@@ -196,7 +204,7 @@ class ContentBlock(models.Model):
 
     # Deck Anki : nombre de cartes (calculé automatiquement à l'upload, modifiable)
     card_count = models.PositiveIntegerField("Nombre de cartes", null=True, blank=True)
-    
+
     # Titre du Quiz
     quiz_title = models.CharField("Titre du Quiz", max_length=200, blank=True, null=True)
     pass_percent = models.PositiveSmallIntegerField(
@@ -214,17 +222,17 @@ class ContentBlock(models.Model):
 class QuizQuestion(models.Model):
     block = models.ForeignKey(ContentBlock, related_name='questions', on_delete=models.CASCADE)
     order = models.PositiveIntegerField(default=0)
-    
+
     question_text = models.CharField("Question", max_length=500)
-    
+
     choice_a = models.CharField("A", max_length=200)
     choice_b = models.CharField("B", max_length=200)
     choice_c = models.CharField("C", max_length=200, blank=True, null=True)
     choice_d = models.CharField("D", max_length=200, blank=True, null=True)
-    
+
     CORRECT_ANSWERS = (('a', 'A'), ('b', 'B'), ('c', 'C'), ('d', 'D'))
     correct_answer = models.CharField("Réponse", max_length=1, choices=CORRECT_ANSWERS)
-    
+
     explanation = models.TextField("Explication", blank=True)
     duration = models.PositiveIntegerField("Durée (secondes)", default=20, help_text="Temps pour répondre")
 
@@ -232,7 +240,7 @@ class QuizQuestion(models.Model):
         ordering = ['order']
 
 class QuizResult(models.Model):
-    """Meilleur résultat d'un étudiant à un quiz (une ligne par étudiant/quiz)."""
+    """Dernier résultat d'un étudiant à un quiz (une ligne par étudiant/quiz)."""
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='quiz_results')
     block = models.ForeignKey(ContentBlock, on_delete=models.CASCADE)
     score = models.IntegerField()
@@ -240,14 +248,14 @@ class QuizResult(models.Model):
     completed_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['student', 'block'] 
+        unique_together = ['student', 'block']
 
     def __str__(self):
         return f"{self.student.email} - Quiz {self.block.id}: {self.score}/{self.total_questions}"
 
 
 class QuizAttempt(models.Model):
-    """Historique de chaque tentative (score corrigé côté serveur)."""
+    """Historique de chaque tentative d'un étudiant à un quiz."""
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='quiz_attempts')
     block = models.ForeignKey(ContentBlock, on_delete=models.CASCADE, related_name='attempts')
     score = models.PositiveIntegerField()
@@ -261,7 +269,7 @@ class QuizAttempt(models.Model):
 
     def __str__(self):
         return f"{self.student.email} - Quiz {self.block_id}: {self.score}/{self.total_questions}"
-        
+
 class LandingSection(models.Model):
     """Section libre pour la page vitrine d'un cours (page-builder léger)."""
 
@@ -377,6 +385,7 @@ class CourseCompletion(models.Model):
     certificate_pdf = models.FileField(
         "Certificat PDF",
         upload_to='certificates/',
+        storage=protected_storage,  # données personnelles : jamais servi par /media/
         blank=True,
         null=True,
     )

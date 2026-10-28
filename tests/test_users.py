@@ -11,7 +11,7 @@ class TestUserModel:
         email = "test@normal.com"
         password = "password123"
         user = User.objects.create_user(email=email, password=password, first_name="John")
-        
+
         assert user.email == email
         assert user.check_password(password) is True
         assert user.is_active is True
@@ -24,7 +24,7 @@ class TestUserModel:
         email = "admin@boss.com"
         password = "password123"
         user = User.objects.create_superuser(email=email, password=password)
-        
+
         assert user.is_staff is True
         assert user.is_superuser is True
         assert user.is_active is True

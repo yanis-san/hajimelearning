@@ -1,6 +1,9 @@
 import pytest
 from django.urls import reverse
+
+from access.models import AccessRequest
 from support.models import Question, Response
+
 
 @pytest.mark.django_db
 class TestSupportSystem:
@@ -23,13 +26,14 @@ class TestSupportSystem:
         """ Un étudiant peut poster une question """
         module = course.modules.create(title="Mod", order=1)
         lesson = module.lessons.create(title="Lec", slug="lec", order=1)
-        
+
+        AccessRequest.objects.create(student=student, course=course, status='APPROVED')
         client.force_login(student)
         url = reverse('ask_question', args=[lesson.id])
-        
+
         data = {'title': 'Bug Python', 'content': 'Erreur ligne 40'}
         response = client.post(url, data, follow=True)
-        
+
         assert response.status_code == 200
         assert Question.objects.count() == 1
         q = Question.objects.first()
@@ -39,13 +43,13 @@ class TestSupportSystem:
     def test_instructor_reply_marks_as_official(self, client, admin_user, lesson_with_question):
         """ Une réponse de l'admin doit être marquée 'is_instructor' """
         lesson, question = lesson_with_question
-        
+
         client.force_login(admin_user)
         url = reverse('question_detail', args=[question.id])
-        
+
         data = {'content': 'Voici la solution...'}
         client.post(url, data)
-        
+
         assert Response.objects.count() == 1
         reply = Response.objects.first()
         assert reply.is_instructor is True
@@ -75,8 +79,8 @@ class TestSupportSystem:
     def test_peer_student_with_course_access_can_reply_when_enabled(self, client, student, course, lesson_with_question, settings):
         """Un camarade inscrit au même cours peut voir et répondre si l'entraide est activée."""
         settings.ALLOW_STUDENT_REPLIES = True
-        from users.models import User
         from access.models import AccessRequest
+        from users.models import User
 
         peer = User.objects.create_user(email='camarade@test.com', password='password123', first_name='Karim')
         # Donner accès au cours payant au camarade
@@ -120,8 +124,8 @@ class TestSupportSystem:
     def test_peer_cannot_reply_when_replies_disabled(self, client, course, lesson_with_question, settings):
         """Si ALLOW_STUDENT_REPLIES est False, le camarade ne peut pas poster de réponse."""
         settings.ALLOW_STUDENT_REPLIES = False
-        from users.models import User
         from access.models import AccessRequest
+        from users.models import User
 
         peer = User.objects.create_user(email='camarade2@test.com', password='password123')
         AccessRequest.objects.create(student=peer, course=course, status='APPROVED')
@@ -131,7 +135,7 @@ class TestSupportSystem:
         client.force_login(peer)
         url = reverse('question_detail', args=[question.id])
 
-        res = client.post(url, {'content': 'Je veux répondre'})
+        client.post(url, {'content': 'Je veux répondre'})
         assert Response.objects.count() == 0
 
     def test_new_question_sends_email_to_instructor(self, client, student, course, mailoutbox):
@@ -144,6 +148,7 @@ class TestSupportSystem:
         module = course.modules.create(title="Mod", order=1)
         lesson = module.lessons.create(title="Lec", slug="lec", order=1)
 
+        AccessRequest.objects.create(student=student, course=course, status='APPROVED')
         client.force_login(student)
         url = reverse('ask_question', args=[lesson.id])
         client.post(url, {'title': 'Question urgente', 'content': 'Comment installer pip ?'})
@@ -176,8 +181,8 @@ class TestSupportSystem:
     def test_peer_reply_sends_email_to_author_and_instructor(self, client, student, course, lesson_with_question, mailoutbox, settings):
         """Quand un camarade répond, l'étudiant auteur et l'instructeur sont notifiés par email."""
         settings.ALLOW_STUDENT_REPLIES = True
-        from users.models import User
         from access.models import AccessRequest
+        from users.models import User
 
         instructor = User.objects.create_user(email='prof2@test.com', password='password123')
         course.instructor = instructor
@@ -204,3 +209,14 @@ class TestSupportSystem:
         # 3. Le camarade qui a écrit la réponse ne reçoit PAS d'email
         peer_emails = [m for m in mailoutbox if peer.email in m.to]
         assert len(peer_emails) == 0
+
+
+    def test_student_without_access_cannot_ask_question(self, client, student, course):
+        """Sans accès au cours (et leçon non gratuite), aucune question ne peut être posée."""
+        module = course.modules.create(title="Mod", order=1)
+        lesson = module.lessons.create(title="Lec", slug="lec", order=1)
+
+        client.force_login(student)
+        client.post(reverse('ask_question', args=[lesson.id]), {'title': 'Spam', 'content': 'Spam'})
+
+        assert Question.objects.count() == 0

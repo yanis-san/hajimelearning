@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.db import models  # <--- C'EST CETTE LIGNE QUI MANQUAIT
-from unfold.admin import ModelAdmin, StackedInline, TabularInline
 from markdownx.widgets import AdminMarkdownxWidget
-from .models import Category, Course, Module, Lesson, ContentBlock
-from .models import QuizResult, CourseCompletion, StudentProgress
+from unfold.admin import ModelAdmin, StackedInline, TabularInline
+
+from .models import Category, ContentBlock, Course, CourseCompletion, Lesson, Module, QuizResult
 
 
 @admin.register(Category)
@@ -18,14 +18,14 @@ class ContentBlockInline(StackedInline):
     model = ContentBlock
     extra = 0 # On commence vide
     fields = ['order', 'type', 'text_content', 'video_id', 'file_content']
-    
+
     # On applique l'éditeur Markdown uniquement pour les champs TextField (text_content)
     formfield_overrides = {
         models.TextField: {'widget': AdminMarkdownxWidget},
     }
-    
+
     # On replie les blocs pour que ce soit plus lisible
-    classes = ['collapse'] 
+    classes = ['collapse']
 
 # 2. Admin des Leçons (Avec le constructeur de page)
 @admin.register(Lesson)
@@ -33,7 +33,7 @@ class LessonAdmin(ModelAdmin):
     list_display = ['title', 'module', 'is_free']
     search_fields = ['title']
     prepopulated_fields = {"slug": ("title",)}
-    
+
     # On injecte les blocs ici
     inlines = [ContentBlockInline]
 
@@ -73,13 +73,13 @@ class CourseAdmin(ModelAdmin):
 class QuizResultAdmin(ModelAdmin):
     # Colonnes à afficher
     list_display = ['student', 'get_course', 'get_quiz_name', 'score_display', 'completed_at']
-    
+
     # Filtres sur la droite (Optimisés pour filtrer par Cours)
     list_filter = ['block__lesson__module__course', 'completed_at']
-    
+
     # Barre de recherche (Cherche par email ou titre du quiz)
     search_fields = ['student__email', 'block__quiz_title', 'block__lesson__title']
-    
+
     # --- OPTIMISATION PERFORMANCE (Le Secret) ---
     def get_queryset(self, request):
         # On charge toutes les relations en une seule requête SQL
@@ -92,7 +92,7 @@ class QuizResultAdmin(ModelAdmin):
         )
 
     # --- Colonnes personnalisées ---
-    
+
     def get_course(self, obj):
         # Grâce au select_related, ceci ne déclenche pas de nouvelle requête SQL
         return obj.block.lesson.module.course.title

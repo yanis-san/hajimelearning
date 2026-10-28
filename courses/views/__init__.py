@@ -1,0 +1,63 @@
+"""Vues de l'app courses, regroupées par domaine et ré-exportées pour `urls.py`."""
+from .builder import (
+    add_block,
+    add_quiz_question,
+    delete_block,
+    delete_quiz_question,
+    edit_block,
+    manage_course_modules,
+    manage_lesson_content,
+    manage_lesson_delete,
+    manage_lesson_edit,
+    manage_lesson_reorder,
+    manage_module_delete,
+    manage_module_edit,
+    manage_module_lessons,
+    manage_module_reorder,
+    order_block,
+    preview_markdown,
+    update_block_order,
+)
+from .course_admin import (
+    manage_course_create,
+    manage_course_delete,
+    manage_course_edit,
+    manage_course_list,
+    manage_course_students,
+)
+from .landing import (
+    add_landing_section,
+    delete_landing_section,
+    duplicate_landing_section,
+    edit_landing_section,
+    manage_course_landing,
+    prefill_landing_template,
+    reorder_landing_sections,
+    toggle_landing_section_visibility,
+)
+from .student import (
+    catalogue,
+    course_detail,
+    course_list,
+    download_certificate,
+    download_protected_media,
+    lesson_detail,
+    mark_lesson_complete,
+    save_block_note,
+    save_quiz_result,
+    unmark_lesson_complete,
+    user_dashboard,
+)
+
+__all__ = [
+    'add_block', 'add_landing_section', 'add_quiz_question', 'catalogue', 'course_detail', 'course_list',
+    'delete_block', 'delete_landing_section', 'delete_quiz_question', 'download_certificate',
+    'download_protected_media', 'duplicate_landing_section', 'edit_block', 'edit_landing_section',
+    'lesson_detail', 'manage_course_create', 'manage_course_delete', 'manage_course_edit',
+    'manage_course_landing', 'manage_course_list', 'manage_course_modules', 'manage_course_students',
+    'manage_lesson_content', 'manage_lesson_delete', 'manage_lesson_edit', 'manage_lesson_reorder',
+    'manage_module_delete', 'manage_module_edit', 'manage_module_lessons', 'manage_module_reorder',
+    'mark_lesson_complete', 'order_block', 'prefill_landing_template', 'preview_markdown',
+    'reorder_landing_sections', 'save_block_note', 'save_quiz_result',
+    'toggle_landing_section_visibility', 'unmark_lesson_complete', 'update_block_order', 'user_dashboard',
+]

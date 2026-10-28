@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
-from instructors.models import InstructorPlan
 
+from instructors.models import InstructorPlan
 
 PLANS = [
     {

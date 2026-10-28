@@ -1,6 +1,7 @@
 import pytest
 from django.urls import reverse
-from courses.models import StudentProgress, CourseCompletion, Module, Lesson
+
+from courses.models import CourseCompletion, StudentProgress
 
 
 @pytest.mark.django_db

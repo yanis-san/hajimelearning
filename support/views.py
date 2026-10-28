@@ -1,50 +1,55 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.db.models import Q
-from django.conf import settings
+from collections import defaultdict
 
-from courses.models import Lesson, Course
-from access.models import AccessRequest, Enrollment, ActivationCode, user_has_access
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
+
+from access.models import AccessRequest, ActivationCode, Enrollment, user_has_access
+from courses.models import Course, Lesson
+
 from .forms import QuestionForm, ResponseForm
-from .models import Question, Response
+from .models import Question
 
 
 def _is_course_instructor(user, course):
     """Vérifie si l'utilisateur est instructeur ou staff de ce cours."""
     if not user.is_authenticated:
         return False
-    return user.is_staff or (hasattr(course, 'instructor') and course.instructor == user)
+    return user.is_staff or course.instructor_id == user.id
 
 
 @login_required
+@require_POST
 def ask_question(request, lesson_id):
-    """ Traite le formulaire envoyé depuis une leçon """
-    lesson = get_object_or_404(Lesson, id=lesson_id)
+    """Traite le formulaire de question envoyé depuis une leçon."""
+    lesson = get_object_or_404(Lesson.objects.select_related('module__course'), id=lesson_id)
     course = lesson.module.course
+    lesson_url = redirect('lesson_detail', course_slug=course.slug, lesson_slug=lesson.slug)
 
-    if request.method == 'POST':
-        form = QuestionForm(request.POST)
-        if form.is_valid():
-            question = form.save(commit=False)
-            question.student = request.user
-            question.course = course
-            question.lesson = lesson
-            question.save()
-            
-            messages.success(request, "Votre question a été envoyée ! Un instructeur vous répondra bientôt.")
-            # On retourne sur la leçon
-            return redirect('lesson_detail', course_slug=course.slug, lesson_slug=lesson.slug)
-    
-    # Si on essaie d'accéder à cette URL sans POST, on renvoie à la leçon
-    return redirect('lesson_detail', course_slug=course.slug, lesson_slug=lesson.slug)
+    # Seuls les étudiants ayant accès au cours (ou à une leçon gratuite) peuvent poser une question
+    if not (lesson.is_free or user_has_access(request.user, course)):
+        messages.error(request, "Vous devez avoir accès à ce cours pour poser une question.")
+        return redirect('course_detail', course_slug=course.slug)
+
+    form = QuestionForm(request.POST)
+    if form.is_valid():
+        question = form.save(commit=False)
+        question.student = request.user
+        question.course = course
+        question.lesson = lesson
+        question.save()
+        messages.success(request, "Votre question a été envoyée ! Un instructeur vous répondra bientôt.")
+    return lesson_url
 
 
 @login_required
 def question_detail(request, question_id):
     """ Page de discussion : Question + Réponses """
     question = get_object_or_404(Question, id=question_id)
-    
+
     is_author = request.user == question.student
     is_staff = request.user.is_staff
     is_course_instructor = _is_course_instructor(request.user, question.course)
@@ -69,12 +74,12 @@ def question_detail(request, question_id):
                 response.author = request.user
                 response.is_instructor = is_staff or is_course_instructor
                 response.save()
-                
+
                 # Si c'est l'étudiant qui répond, on peut remettre en OPEN si c'était RESOLVED
                 if is_author and question.status == 'RESOLVED':
                     question.status = 'OPEN'
                     question.save()
-                    
+
                 messages.success(request, "Réponse publiée.")
                 return redirect('question_detail', question_id=question.id)
         else:
@@ -104,20 +109,24 @@ def my_questions(request):
         is_published=True,
     ).distinct().order_by('title')
 
-    # Pour chaque cours : toutes les questions (pas seulement les siennes)
+    # Une seule requête pour toutes les questions des cours suivis, regroupées en Python
+    questions_by_course = defaultdict(list)
+    for question in Question.objects.filter(course__in=enrolled_courses).select_related(
+        'student', 'lesson'
+    ).prefetch_related('responses').order_by('-updated_at'):
+        questions_by_course[question.course_id].append(question)
+
     courses_data = []
     for course in enrolled_courses:
-        all_qs = Question.objects.filter(course=course).select_related(
-            'student', 'lesson'
-        ).prefetch_related('responses').order_by('-updated_at')
-        my_qs = all_qs.filter(student=request.user)
+        all_questions = questions_by_course[course.id]
+        my_questions = [q for q in all_questions if q.student_id == request.user.id]
         courses_data.append({
             'course': course,
-            'all_questions': list(all_qs),
-            'my_questions': list(my_qs),
-            'total': all_qs.count(),
-            'my_count': my_qs.count(),
-            'open_count': all_qs.exclude(status='RESOLVED').count(),
+            'all_questions': all_questions,
+            'my_questions': my_questions,
+            'total': len(all_questions),
+            'my_count': len(my_questions),
+            'open_count': sum(1 for q in all_questions if q.status != 'RESOLVED'),
         })
 
     # Questions hors cours inscrit (cours gratuits ou edge cases)
@@ -135,9 +144,10 @@ def my_questions(request):
 
 
 @login_required
+@require_POST
 def mark_resolved(request, question_id):
     question = get_object_or_404(Question, id=question_id)
-    
+
     is_course_instructor = _is_course_instructor(request.user, question.course)
 
     if request.user == question.student or request.user.is_staff or is_course_instructor:
@@ -147,7 +157,7 @@ def mark_resolved(request, question_id):
             messages.success(request, "La discussion a été marquée comme résolue.")
     else:
         messages.error(request, "Vous n'avez pas la permission de fermer ce ticket.")
-    
+
     return redirect('question_detail', question_id=question.id)
 
 

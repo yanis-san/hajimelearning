@@ -1,5 +1,7 @@
 import pytest
-from courses.models import StudentProgress, Lesson
+
+from courses.models import StudentProgress
+
 
 @pytest.mark.django_db
 class TestProgression:
@@ -26,10 +28,10 @@ class TestProgression:
 
         # Première validation
         StudentProgress.objects.create(student=student, lesson=lesson)
-        
+
         # Deuxième validation (via get_or_create comme dans la vue)
         obj, created = StudentProgress.objects.get_or_create(student=student, lesson=lesson)
-        
+
         # Ça ne doit pas avoir créé une nouvelle ligne
         assert created is False
         assert StudentProgress.objects.filter(student=student, lesson=lesson).count() == 1
