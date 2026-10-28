@@ -73,3 +73,41 @@ class TestPagesRender:
         html = client.get(reverse('lesson_detail', args=[course.slug, lesson.slug])).content.decode()
         for marker in ('Tout replier', 'quiz-data-', reverse('ask_question', args=[lesson.id])):
             assert marker in html, marker
+
+
+@pytest.mark.django_db
+def test_every_template_compiles():
+    """Aucun template (composants Cotton compris) ne doit contenir d'erreur de syntaxe."""
+    from pathlib import Path
+
+    from django.template.loader import get_template
+
+    broken = []
+    for path in sorted(Path('templates').rglob('*.html')):
+        name = path.relative_to('templates').as_posix()
+        try:
+            get_template(name)
+        except Exception as exc:
+            broken.append(f'{name}: {exc}')
+    assert not broken, broken
+
+
+@pytest.mark.django_db
+def test_lesson_renders_every_block_type(client, student, course):
+    from django.core.files.base import ContentFile
+
+    module = course.modules.create(title='M', order=1)
+    lesson = module.lessons.create(title='L', slug='l', order=1, is_free=True)
+    ContentBlock.objects.create(lesson=lesson, type='text', text_content='texte', order=1)
+    ContentBlock.objects.create(lesson=lesson, type='video', video_id='dQw4w9WgXcQ', order=2)
+    for order, (kind, filename) in enumerate([('audio', 'a.mp3'), ('file', 'f.pdf'), ('anki', 'd.apkg')], start=3):
+        block = ContentBlock.objects.create(lesson=lesson, type=kind, order=order)
+        block.file_content.save(filename, ContentFile(b'x'))
+        if kind == 'audio':
+            block.related_file.save('t.pdf', ContentFile(b'%PDF'))
+    ContentBlock.objects.create(lesson=lesson, type='quiz', order=6)
+
+    client.force_login(student)
+    response = client.get(reverse('lesson_detail', args=[course.slug, lesson.slug]))
+    assert response.status_code == 200
+    assert b'Voir la correction' in response.content
