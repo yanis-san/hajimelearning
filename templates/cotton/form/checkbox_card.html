@@ -1,0 +1,10 @@
+{# Case à cocher présentée comme une carte cliquable : titre + description. #}
+<c-vars field title="" description="" />
+
+<label class="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-gray-900 bg-stone-50/50 hover:bg-white transition cursor-pointer" {{ attrs }}>
+  <div class="pt-0.5">{{ field }}</div>
+  <div class="space-y-0.5">
+    <span class="block text-sm font-bold text-gray-900">{{ title }}</span>
+    <span class="block text-xs text-gray-500">{{ description }}</span>
+  </div>
+</label>

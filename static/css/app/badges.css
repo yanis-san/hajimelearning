@@ -1,0 +1,55 @@
+/*
+ * Badges (composant <c-ui.badge />).
+ *
+ *  tone    : solid (défaut) étiquette « manga » criarde — cartes, héros ;
+ *            soft           pastille teintée discrète — formulaires, tableaux de bord.
+ *  variant : gray | primary | green | blue | yellow | orange | red | purple
+ */
+.badge {
+  --badge-bg: #fff;
+  --badge-fg: #09090b;
+  --badge-border: #09090b;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--badge-fg);
+  background-color: var(--badge-bg);
+  border: 1px solid var(--badge-border);
+}
+
+.badge-solid {
+  padding: 0.25rem 0.75rem;
+  border-width: 2px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: 2px 2px 0 0 #111827;
+}
+
+.badge-soft {
+  padding: 0.25rem 0.625rem;
+  font-weight: 700;
+  border-radius: 0.5rem;
+}
+
+/* Variante « solid » : couleurs franches */
+.badge-solid.badge-gray { --badge-bg: #fff; --badge-fg: #09090b; }
+.badge-solid.badge-primary,
+.badge-solid.badge-red { --badge-bg: #e6003a; --badge-fg: #fff; --badge-border: #e6003a; }
+.badge-solid.badge-green { --badge-bg: #00e676; }
+.badge-solid.badge-blue { --badge-bg: #00e5ff; }
+.badge-solid.badge-yellow { --badge-bg: #ffea00; }
+.badge-solid.badge-orange { --badge-bg: #ff9100; }
+.badge-solid.badge-purple { --badge-bg: #d8b4fe; }
+
+/* Variante « soft » : fond -100, texte -800, contour -200 */
+.badge-soft.badge-gray { --badge-bg: #f3f4f6; --badge-fg: #374151; --badge-border: #e5e7eb; }
+.badge-soft.badge-primary { --badge-bg: rgb(230 0 58 / 0.1); --badge-fg: #b30030; --badge-border: rgb(230 0 58 / 0.3); }
+.badge-soft.badge-red { --badge-bg: #fee2e2; --badge-fg: #991b1b; --badge-border: #fecaca; }
+.badge-soft.badge-green { --badge-bg: #dcfce7; --badge-fg: #166534; --badge-border: #bbf7d0; }
+.badge-soft.badge-blue { --badge-bg: #dbeafe; --badge-fg: #1e40af; --badge-border: #bfdbfe; }
+.badge-soft.badge-yellow { --badge-bg: #fef3c7; --badge-fg: #92400e; --badge-border: #fde68a; }
+.badge-soft.badge-orange { --badge-bg: #ffedd5; --badge-fg: #9a3412; --badge-border: #fed7aa; }
+.badge-soft.badge-purple { --badge-bg: #f3e8ff; --badge-fg: #6b21a8; --badge-border: #e9d5ff; }

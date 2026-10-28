@@ -96,64 +96,24 @@
 
         {# Carte 2 : Points forts & Pré-requis #}
         <c-ui.card class="space-y-6">
-          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
-            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
-              <span>🎯</span> Arguments marketing & Pré-requis
-            </h2>
-            <span class="text-xs font-bold px-2.5 py-1 bg-amber-100 text-amber-800 rounded-lg border border-amber-200">
-              Convaincre
-            </span>
-          </div>
+          <c-ui.card-header icon="🎯" title="Arguments marketing & Pré-requis"><c-ui.badge tone="soft" variant="yellow">Convaincre</c-ui.badge></c-ui.card-header>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             {# Ce que vous allez apprendre #}
-            <div>
-              <label for="id_what_you_will_learn" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between">
-                <span>Ce que vous allez apprendre</span>
-                <span class="text-xs font-semibold text-gray-500">Puces Markdown</span>
-              </label>
-              {{ form.what_you_will_learn }}
-              {% if form.what_you_will_learn.errors %}
-                <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
-                  <span>⚠️</span> {{ form.what_you_will_learn.errors.0 }}
-                </p>
-              {% else %}
-                <p class="text-xs text-gray-500 font-medium mt-1.5">
-                  Inscrivez une compétence par ligne (ex: <code>- Maîtriser 100 kanji</code>).
-                </p>
-              {% endif %}
-            </div>
+            <c-form.field :field="form.what_you_will_learn" label="Ce que vous allez apprendre" aside="Puces Markdown">
+  <c-slot name="hint">Inscrivez une compétence par ligne (ex: <code>- Maîtriser 100 kanji</code>).</c-slot>
+</c-form.field>
 
             {# Pré-requis #}
-            <div>
-              <label for="id_prerequisites" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between">
-                <span>Pré-requis recommandés</span>
-                <span class="text-xs font-semibold text-gray-500">Pour les élèves</span>
-              </label>
-              {{ form.prerequisites }}
-              {% if form.prerequisites.errors %}
-                <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
-                  <span>⚠️</span> {{ form.prerequisites.errors.0 }}
-                </p>
-              {% else %}
-                <p class="text-xs text-gray-500 font-medium mt-1.5">
-                  Connaissances ou matériel préalables (ex: <code>Aucun, ouvert à tous</code>).
-                </p>
-              {% endif %}
-            </div>
+            <c-form.field :field="form.prerequisites" label="Pré-requis recommandés" aside="Pour les élèves">
+  <c-slot name="hint">Connaissances ou matériel préalables (ex: <code>Aucun, ouvert à tous</code>).</c-slot>
+</c-form.field>
           </div>
         </c-ui.card>
 
         {# Carte 3 : Trailer Vidéo YouTube #}
         <c-ui.card class="space-y-4">
-          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
-            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
-              <span>🎬</span> Vidéo de présentation (Trailer YouTube)
-            </h2>
-            <span class="text-xs font-bold px-2.5 py-1 bg-red-100 text-red-800 rounded-lg border border-red-200">
-              YouTube
-            </span>
-          </div>
+          <c-ui.card-header icon="🎬" title="Vidéo de présentation (Trailer YouTube)"><c-ui.badge tone="soft" variant="red">YouTube</c-ui.badge></c-ui.card-header>
 
           <div class="max-w-xl">
             <label for="id_trailer_video_id" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5">

@@ -15,7 +15,7 @@
           <span class="text-[11px] bg-gray-100 text-gray-600 font-semibold px-2 py-0.5 rounded-md">Auteur</span>
         {% else %}
           <span class="text-sm font-medium text-gray-800">{{ response.author.first_name|default:response.author.email }}</span>
-          <span class="text-[11px] bg-blue-50 text-blue-700 border border-blue-200 font-semibold px-2 py-0.5 rounded-md">Camarade</span>
+          <c-ui.badge tone="soft" variant="blue">Camarade</c-ui.badge>
         {% endif %}
       </div>
     </div>

@@ -5,14 +5,7 @@
 
         {# Carte 1 : Meta Description & Google SERP Preview #}
         <c-ui.card class="space-y-6">
-          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
-            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
-              <span>🔍</span> Optimisation Google & Référencement (SEO)
-            </h2>
-            <span class="text-xs font-bold px-2.5 py-1 bg-blue-100 text-blue-800 rounded-lg border border-blue-200">
-              Moteurs de recherche
-            </span>
-          </div>
+          <c-ui.card-header icon="🔍" title="Optimisation Google & Référencement (SEO)"><c-ui.badge tone="soft" variant="blue">Moteurs de recherche</c-ui.badge></c-ui.card-header>
 
           <div>
             <div class="flex items-center justify-between mb-1.5">
@@ -59,27 +52,11 @@
 
         {# Carte 2 : Mots-clés (Keywords) #}
         <c-ui.card class="space-y-4">
-          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
-            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
-              <span>🏷️</span> Mots-clés ciblés (Meta Keywords)
-            </h2>
-          </div>
+          <c-ui.card-header icon="🏷️" title="Mots-clés ciblés (Meta Keywords)" />
 
-          <div>
-            <label for="id_keywords" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5">
-              Mots-clés de recherche
-            </label>
-            {{ form.keywords }}
-            {% if form.keywords.errors %}
-              <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
-                <span>⚠️</span> {{ form.keywords.errors.0 }}
-              </p>
-            {% else %}
-              <p class="text-xs text-gray-500 font-medium mt-1.5">
-                Séparez les mots-clés par des virgules (ex: <code>japonais, n5, débutant, jlpt, kanji, cours en ligne</code>).
-              </p>
-            {% endif %}
-          </div>
+          <c-form.field :field="form.keywords" label="Mots-clés de recherche">
+  <c-slot name="hint">Séparez les mots-clés par des virgules (ex: <code>japonais, n5, débutant, jlpt, kanji, cours en ligne</code>).</c-slot>
+</c-form.field>
         </c-ui.card>
 
       </div>

@@ -1,10 +1,4 @@
-<c-vars variant="gray" />
+{# Badge. Variantes et tons : static/css/app/badges.css #}
+<c-vars variant="gray" tone="solid" class="" />
 
-<span class="inline-flex items-center px-3 py-1 border-2 border-dark font-black uppercase tracking-widest text-xs shadow-brutal-sm
-             {% if variant == 'green' %}bg-[#00E676] text-dark
-             {% elif variant == 'red' %}bg-primary text-white border-primary shadow-brutal-sm
-             {% elif variant == 'blue' %}bg-[#00E5FF] text-dark
-             {% elif variant == 'orange' %}bg-[#FF9100] text-dark
-             {% elif variant == 'yellow' %}bg-[#FFEA00] text-dark
-             {% else %}bg-white text-dark{% endif %}"
-     {{ attrs }}>{{ slot }}</span>
+<span class="badge badge-{{ tone }} badge-{{ variant }} {{ class }}" {{ attrs }}>{{ slot }}</span>

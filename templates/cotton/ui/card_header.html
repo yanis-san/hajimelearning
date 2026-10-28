@@ -1,0 +1,10 @@
+{# En-tête de carte : icône + titre en capitales, contenu optionnel à droite (badge, action). #}
+<c-vars icon="" title="" />
+
+<div class="flex items-center justify-between border-b-2 border-gray-100 pb-3" {{ attrs }}>
+  <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+    {% if icon %}<span>{{ icon }}</span>{% endif %}
+    {{ title }}
+  </h2>
+  {{ slot }}
+</div>

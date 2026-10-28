@@ -34,7 +34,7 @@
   {# ── Pastille prix (coin haut droit) ── #}
   <div class="absolute top-3 right-3 z-10">
     {% if course.price == 0 %}
-      <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-green-100 text-green-800 border-2 border-green-200 rounded-md shadow-sm">Gratuit</span>
+      <c-ui.badge tone="soft" variant="green">Gratuit</c-ui.badge>
     {% else %}
       <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-white text-gray-900 border-2 border-gray-200 rounded-md shadow-sm">{{ course.price|floatformat:0 }} DA</span>
     {% endif %}
