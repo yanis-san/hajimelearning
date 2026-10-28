@@ -1,0 +1,13 @@
+{# Lignes de vitesse manga animées (fond de héros). `focus` : center (défaut) | right. Styles : speed-lines.css #}
+<c-vars focus="center" />
+
+<div class="speed-lines{% if focus == 'right' %} speed-lines--right{% endif %}" aria-hidden="true" {{ attrs }}>
+  <div class="speed-lines__rays speed-lines__rays--fine"></div>
+  <div class="speed-lines__rays speed-lines__rays--bold"></div>
+  <div class="speed-lines__streaks">
+    <span class="speed-lines__streak"></span><span class="speed-lines__streak"></span>
+    <span class="speed-lines__streak"></span><span class="speed-lines__streak"></span>
+    <span class="speed-lines__streak"></span><span class="speed-lines__streak"></span>
+    <span class="speed-lines__streak"></span><span class="speed-lines__streak"></span>
+  </div>
+</div>

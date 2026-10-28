@@ -1,0 +1,146 @@
+/*
+ * Lignes de vitesse « manga / publicité japonaise » (composant <c-ui.speed-lines />).
+ *
+ * Trois effets superposés, 100 % CSS (aucun JavaScript) :
+ *  1. des lignes qui convergent vers un point focal et « foncent » vers le spectateur (zoom répété) ;
+ *  2. un scintillement par à-coups, comme des lignes dessinées à la main image par image ;
+ *  3. des traînées diagonales qui traversent l'écran + un éclat qui pulse au point focal.
+ *
+ * Le point focal se règle avec la variante : --center (défaut) ou --right (colonne de droite du hero, sur grand écran).
+ * Les animations sont coupées pour les personnes qui demandent moins de mouvement.
+ */
+.speed-lines {
+  --focus-x: 50%;
+  --focus-y: 50%;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+@media (min-width: 1024px) {
+  .speed-lines--right {
+    --focus-x: 72%;
+  }
+}
+
+/* ── 1. Lignes convergentes ── */
+.speed-lines__rays {
+  position: absolute;
+  left: var(--focus-x);
+  top: var(--focus-y);
+  width: 280vmax;
+  height: 280vmax;
+  translate: -50% -50%;
+  border-radius: 50%;
+  /* le centre reste dégagé : on lit le contenu, les lignes jaillissent autour */
+  mask-image: radial-gradient(circle, transparent 7%, #000 30%);
+  -webkit-mask-image: radial-gradient(circle, transparent 7%, #000 30%);
+  will-change: scale, opacity, rotate;
+}
+
+/* Traits fins, espacement irrégulier (deux pas différents superposés) */
+.speed-lines__rays--fine {
+  background:
+    repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.55) 0 0.3deg, transparent 0.3deg 2.3deg),
+    repeating-conic-gradient(from 1.1deg, rgba(255, 255, 255, 0.35) 0 0.55deg, transparent 0.55deg 3.9deg),
+    repeating-conic-gradient(from 0.4deg, rgba(110, 0, 30, 0.3) 0 0.4deg, transparent 0.4deg 5.3deg);
+  animation:
+    speed-rush 1.4s cubic-bezier(0.5, 0, 0.9, 0.6) infinite,
+    speed-flicker 0.42s steps(1, end) infinite;
+}
+
+/* Gros traits : clairs et sombres, plus espacés, en décalage de phase pour un flux continu */
+.speed-lines__rays--bold {
+  background:
+    repeating-conic-gradient(from 6deg, rgba(255, 255, 255, 0.8) 0 0.9deg, transparent 0.9deg 10.5deg),
+    repeating-conic-gradient(from 11deg, rgba(110, 0, 30, 0.45) 0 1.1deg, transparent 1.1deg 14deg);
+  animation:
+    speed-rush 1.4s cubic-bezier(0.5, 0, 0.9, 0.6) -0.7s infinite,
+    speed-flicker 0.56s steps(1, end) infinite reverse;
+}
+
+@keyframes speed-rush {
+  0% {
+    scale: 0.35;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    scale: 1.15;
+    opacity: 0;
+  }
+}
+
+/* ── 2. Scintillement image par image ── */
+@keyframes speed-flicker {
+  0% { rotate: 0deg; }
+  25% { rotate: 1.3deg; }
+  50% { rotate: -0.9deg; }
+  75% { rotate: 0.7deg; }
+  100% { rotate: 0deg; }
+}
+
+/* ── 3. Éclat central qui pulse ── */
+.speed-lines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--focus-x) var(--focus-y), rgba(255, 255, 255, 0.28), transparent 42%);
+  animation: speed-glow 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes speed-glow {
+  from { opacity: 0.25; }
+  to { opacity: 1; }
+}
+
+/* ── 3b. Traînées diagonales ── */
+.speed-lines__streaks {
+  position: absolute;
+  inset: -20% 0;
+  rotate: -9deg;
+}
+
+.speed-lines__streak {
+  position: absolute;
+  left: -60%;
+  width: 55%;
+  height: 3px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.95) 70%, #fff);
+  animation: speed-streak 1.1s linear infinite;
+}
+
+.speed-lines__streak:nth-child(1) { top: 6%;  width: 40%; animation-duration: 0.9s;  animation-delay: -0.2s; }
+.speed-lines__streak:nth-child(2) { top: 16%; width: 62%; animation-duration: 1.3s;  animation-delay: -0.9s; height: 2px; }
+.speed-lines__streak:nth-child(3) { top: 27%; width: 35%; animation-duration: 0.8s;  animation-delay: -0.5s; }
+.speed-lines__streak:nth-child(4) { top: 38%; width: 70%; animation-duration: 1.5s;  animation-delay: -1.2s; height: 4px; }
+.speed-lines__streak:nth-child(5) { top: 52%; width: 45%; animation-duration: 1s;    animation-delay: -0.1s; height: 2px; }
+.speed-lines__streak:nth-child(6) { top: 63%; width: 58%; animation-duration: 1.2s;  animation-delay: -0.7s; }
+.speed-lines__streak:nth-child(7) { top: 76%; width: 38%; animation-duration: 0.85s; animation-delay: -0.4s; height: 2px; }
+.speed-lines__streak:nth-child(8) { top: 88%; width: 66%; animation-duration: 1.4s;  animation-delay: -1s; height: 4px; }
+
+@keyframes speed-streak {
+  from { translate: 0 0; }
+  to { translate: 380% 0; }
+}
+
+/* ── Moins de mouvement : lignes fixes, sans traînées ── */
+@media (prefers-reduced-motion: reduce) {
+  .speed-lines__rays,
+  .speed-lines::after {
+    animation: none !important;
+  }
+
+  .speed-lines__rays {
+    scale: 0.7;
+    opacity: 0.55;
+  }
+
+  .speed-lines__streaks {
+    display: none;
+  }
+}

@@ -199,6 +199,7 @@ Ces dix règles résument tout. Le reste du document les détaille.
 | `<c-ui.title>` | `size` lg·md·sm · `as` h1·h2·h3 | **Tous** les titres de page (échelle unique) |
 | `<c-ui.link>` | `href` | Lien textuel de marque |
 | `<c-ui.kicker>` · `<c-ui.tape>` · `<c-ui.marquee>` (+`marquee-item`) | | Décors « manga » de la vitrine |
+| `<c-ui.speed-lines>` | `focus` center·right | Lignes de vitesse animées du héros (CSS pur, `prefers-reduced-motion` respecté) |
 | `<c-ui.progress-bar>` | `percent` · `color` · `size` · `show_label` · `manga` | Toute progression (`<progress>`) |
 | `<c-ui.alert>` · `avatar` · `empty-state` · `page-header` · `logo` | | Éléments d'interface |
 | `<c-form.field>` | `:field` · `label` · `hint` · `aside` · `required` · `variant` caps·plain·compact · slot = contrôle personnalisé | **Tout** champ de formulaire Django (libellé + champ + erreur/aide) |

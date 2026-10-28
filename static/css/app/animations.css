@@ -1,24 +1,4 @@
-/* Animations : hero et bandeau défilant */
-
-/* ── Hero : rayons rotatifs ── */
-@keyframes slow-spin {
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-.elegant-sunburst {
-  position: absolute;
-  width: 200vw;
-  height: 200vw;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: repeating-conic-gradient(
-    from 0deg at 50% 50%,
-    rgba(255, 255, 255, 0.04) 0deg 2deg,
-    transparent 2deg 6deg
-  );
-  animation: slow-spin 90s linear infinite;
-}
+/* Animations : bandeau défilant (les lignes de vitesse du hero sont dans speed-lines.css) */
 
 /* ── Bandeau défilant ── */
 @keyframes marquee {
