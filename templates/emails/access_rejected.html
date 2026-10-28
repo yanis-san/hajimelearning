@@ -1,0 +1,13 @@
+<c-email.layout preheader="Nous n'avons pas pu valider votre paiement. Vous pouvez renvoyer une preuve.">
+  <c-email.heading>Votre paiement n'a pas pu être validé</c-email.heading>
+  <c-email.paragraph>Bonjour {{ first_name }},</c-email.paragraph>
+  <c-email.paragraph>
+    Nous n'avons malheureusement pas pu valider la preuve de paiement envoyée pour la formation
+    <strong>{{ course.title }}</strong>.
+  </c-email.paragraph>
+  {% if admin_note %}
+    <c-email.quote label="Motif indiqué">{{ admin_note|linebreaksbr }}</c-email.quote>
+  {% endif %}
+  <c-email.paragraph>Vous pouvez renvoyer une preuve de paiement valide depuis la page de la formation.</c-email.paragraph>
+  <c-email.button href="{{ cta_url }}">Renvoyer une preuve</c-email.button>
+</c-email.layout>

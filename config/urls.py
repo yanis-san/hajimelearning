@@ -49,7 +49,11 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    from notifications.views import email_preview
+
     urlpatterns += [
         path("__reload__/", include("django_browser_reload.urls")),
+        path("__emails__/", email_preview, name="email_preview"),
+        path("__emails__/<str:name>/", email_preview, name="email_preview_detail"),
     ]
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

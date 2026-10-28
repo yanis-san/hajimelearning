@@ -3,10 +3,13 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.urls import reverse
 
+from access.models import AccessRequest
 from courses.models import Lesson, StudentProgress
+from instructors.models import InstructorRequest
 from support.models import Question, Response
 
 from .models import Notification
+from .tasks import dispatch_email
 
 User = get_user_model()
 
@@ -160,3 +163,113 @@ def notify_instructors_on_new_question(sender, instance, created, **kwargs):
             message=f"{nom_etudiant} a posé une question dans « {course.title} ».",
             link=lien,
         )
+
+
+# ── 4. E-MAILS ET NOTIFICATIONS DÉCLENCHÉS PAR UN CHANGEMENT D'ÉTAT ───────────────
+
+
+@receiver(pre_save, sender=AccessRequest)
+@receiver(pre_save, sender=InstructorRequest)
+def remember_previous_status(sender, instance, **kwargs):
+    """Mémorise le statut avant l'enregistrement : on ne réagit qu'aux TRANSITIONS, jamais à une simple resauvegarde."""
+    instance._previous_status = (
+        sender.objects.filter(pk=instance.pk).values_list('status', flat=True).first() if instance.pk else None
+    )
+
+
+@receiver(post_save, sender=AccessRequest)
+def on_access_request_saved(sender, instance, **kwargs):
+    """Demande de paiement : reçue → accusé + alerte équipe ; validée ou refusée → e-mail + notification à l'étudiant."""
+    status, previous = instance.status, getattr(instance, '_previous_status', None)
+    if status == previous:
+        return
+    course = instance.course
+
+    if status == AccessRequest.Status.PENDING:
+        dispatch_email('access_received', instance.pk)
+        dispatch_email('access_admin_alert', instance.pk)
+        for admin in User.objects.filter(is_superuser=True).exclude(pk=instance.student_id):
+            Notification.objects.create(
+                recipient=admin,
+                notification_type=INSTR,
+                category=INS,
+                title="Paiement à valider 💳",
+                message=f"{instance.student.get_full_name() or instance.student.email} : « {course.title} ».",
+                link=reverse('admin:access_accessrequest_change', args=[instance.pk]),
+            )
+
+    elif status == AccessRequest.Status.APPROVED:
+        dispatch_email('access_approved', instance.pk)
+        Notification.objects.create(
+            recipient=instance.student,
+            notification_type=S,
+            category=P,
+            title="Accès accordé ✅",
+            message=f"Votre paiement est validé : « {course.title} » est ouvert.",
+            link=reverse('course_detail', args=[course.slug]),
+        )
+
+    elif status == AccessRequest.Status.REJECTED and previous is not None:
+        dispatch_email('access_rejected', instance.pk)
+        Notification.objects.create(
+            recipient=instance.student,
+            notification_type=S,
+            category=P,
+            title="Paiement non validé",
+            message=f"Votre preuve pour « {course.title} » n'a pas pu être validée.",
+            link=reverse('request_access', args=[course.pk]),
+        )
+
+
+@receiver(post_save, sender=InstructorRequest)
+def on_instructor_request_saved(sender, instance, **kwargs):
+    """Demande d'espace instructeur : acceptée ou refusée → e-mail + notification au demandeur."""
+    status, previous = instance.status, getattr(instance, '_previous_status', None)
+    if status == previous:
+        return
+
+    if status == InstructorRequest.Status.APPROVED:
+        dispatch_email('instructor_approved', instance.pk)
+        Notification.objects.create(
+            recipient=instance.user,
+            notification_type=S,
+            category=INS,
+            title="Espace instructeur activé 🎓",
+            message=f"Votre offre « {instance.plan.name} » est active.",
+            link=reverse('instructor_dashboard'),
+        )
+    elif status == InstructorRequest.Status.REJECTED and previous is not None:
+        dispatch_email('instructor_rejected', instance.pk)
+        Notification.objects.create(
+            recipient=instance.user,
+            notification_type=S,
+            category=INS,
+            title="Demande instructeur refusée",
+            message=f"Votre demande pour l'offre « {instance.plan.name} » n'a pas été acceptée.",
+            link=reverse('instructor_plans'),
+        )
+
+
+@receiver(post_save, sender=Question)
+def email_new_question(sender, instance, created, **kwargs):
+    if created:
+        dispatch_email('question_new', instance.pk)
+
+
+@receiver(post_save, sender=Response)
+def email_new_reply(sender, instance, created, **kwargs):
+    if created:
+        dispatch_email('question_reply', instance.pk)
+
+
+def notify_certificate_ready(completion):
+    """Certificat généré : notification dans le site + e-mail (appelé par la tâche de génération)."""
+    Notification.objects.create(
+        recipient=completion.student,
+        notification_type=S,
+        category=P,
+        title="Certificat prêt 🎓",
+        message=f"Votre certificat pour « {completion.course.title} » est disponible.",
+        link=reverse('user_dashboard'),
+    )
+    dispatch_email('certificate_ready', completion.pk)

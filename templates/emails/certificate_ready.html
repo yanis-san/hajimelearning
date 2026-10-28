@@ -1,0 +1,8 @@
+<c-email.layout preheader="Bravo, vous avez terminé la formation. Votre certificat est disponible.">
+  <c-email.heading>Votre certificat est prêt 🎓</c-email.heading>
+  <c-email.paragraph>Bravo {{ first_name }} !</c-email.paragraph>
+  <c-email.paragraph>
+    Vous avez terminé la formation <strong>{{ course.title }}</strong>. Votre certificat de réussite est disponible au téléchargement.
+  </c-email.paragraph>
+  <c-email.button href="{{ cta_url }}">Télécharger mon certificat</c-email.button>
+</c-email.layout>

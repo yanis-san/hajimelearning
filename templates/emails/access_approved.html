@@ -1,0 +1,14 @@
+<c-email.layout preheader="Votre accès à la formation est ouvert. Votre reçu est en pièce jointe.">
+  <c-email.heading>Votre accès est ouvert 🎉</c-email.heading>
+  <c-email.paragraph>Bonjour {{ first_name }},</c-email.paragraph>
+  <c-email.paragraph>
+    Votre paiement a bien été validé : vous pouvez dès maintenant suivre la formation <strong>{{ course.title }}</strong>.
+    {% if has_receipt %}Votre reçu de paiement est joint à cet e-mail.{% endif %}
+  </c-email.paragraph>
+  <c-email.details>
+    <c-email.detail label="Formation">{{ course.title }}</c-email.detail>
+    <c-email.detail label="Montant payé">{{ amount }} DA</c-email.detail>
+    {% if coupon_code %}<c-email.detail label="Code promo">{{ coupon_code }}</c-email.detail>{% endif %}
+  </c-email.details>
+  <c-email.button href="{{ cta_url }}">Accéder à la formation</c-email.button>
+</c-email.layout>

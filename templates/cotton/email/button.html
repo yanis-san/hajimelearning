@@ -1,0 +1,11 @@
+{# Bouton d'action « à toute épreuve » (tableau + lien) : s'affiche correctement dans Outlook, Gmail, Apple Mail. #}
+<c-vars href="" tone="primary" />
+
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 24px 0;">
+  <tr>
+    <td align="center" bgcolor="{% if tone == 'dark' %}#111827{% else %}#e6003a{% endif %}" style="border-radius:10px;border:2px solid #111827;">
+      <a href="{{ href }}" target="_blank" style="display:inline-block;padding:13px 28px;font-size:16px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:8px;">{{ slot }}</a>
+    </td>
+  </tr>
+</table>
+<p style="margin:0 0 16px 0;font-size:12px;line-height:1.5;color:#6b7280;">Le bouton ne fonctionne pas ? Copiez ce lien dans votre navigateur :<br><a href="{{ href }}" style="color:#b30030;word-break:break-all;">{{ href }}</a></p>

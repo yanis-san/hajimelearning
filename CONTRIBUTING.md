@@ -112,6 +112,8 @@ Ces dix règles résument tout. Le reste du document les détaille.
 
 1. **Jamais de `<style>`, `style="…"`, `onclick=`/`on*=` ni de `<script>` avec du code dans un template.**
    Seuls `<script src>` et `<script type="application/json">` sont admis. (Test.)
+   *Seule exception :* les gabarits d'**e-mail** (`templates/emails/`, `templates/cotton/email/`, `templates/account/email/`)
+   exigent des styles en ligne (clients de messagerie) — voir § 8.1.
 2. **Composants Cotton partout.** Un bouton, une carte, un badge, un titre, un champ de formulaire, un libellé,
    une barre de progression = un composant. On ne recrée jamais leur balisage. (Tests.)
 3. **Tailwind d'abord**, CSS écrit à la main seulement si Tailwind ne peut pas l'exprimer
@@ -203,6 +205,7 @@ Ces dix règles résument tout. Le reste du document les détaille.
 | `<c-form.label>` · `error` · `hint` | | Briques de `field` ; libellé isolé |
 | `<c-form.check>` · `checkbox-card` · `upload` | | Cases, cases-cartes, zones d'upload |
 | `<c-form.input>` · `select` · `textarea` · `coupon-field` | | Champs non liés à un `form` Django |
+| `<c-email.layout>` · `heading` · `paragraph` · `button` · `quote` · `details` · `detail` | `preheader`, `href`, `tone`, `label` | Briques des e-mails (styles en ligne autorisés) |
 | `<c-layout.container>` | `size` md·lg·2xl·3xl·4xl·5xl·6xl·7xl | **Toute** page : largeur + marges responsives |
 | `<c-layout.navbar>` · `footer` · `nav-link` · `footer-link` · `footer-heading` · `social-link` · `auth-card` · `auth-switch` · `flash-messages` · `admin-card` · `course-builder` | | Structure du site |
 | `<c-course.block-frame>` | `icon` · `tone` · slot `title` · slot `footer` | Cadre commun des blocs de leçon |
@@ -267,6 +270,25 @@ Source visuelle : le style « manga / néo-brutaliste » (contours encre, ombres
   déjà appliquée ; les données de référence passent par une migration de données (`RunPython`).
 - **Style** : Ruff (`ruff.toml`). Pas de `except Exception` large sans journalisation, pas d'import dans une fonction
   sauf cycle d'import avéré, noms explicites (pas de `l`, `I`).
+
+### 8.1 E-mails et notifications
+
+- **Tout e-mail est HTML + texte**, jamais du texte brut écrit à la main. Gabarit dans `templates/emails/<nom>.html`,
+  écrit avec les composants `<c-email.layout>`, `heading`, `paragraph`, `button`, `quote`, `details`/`detail`
+  (styles **en ligne** : seule exception à la règle « pas de style inline »). La version texte est générée automatiquement.
+- **Un e-mail = un `build_*` dans `notifications/emails.py`** (retourne des `EmailContent`, n'envoie rien) enregistré dans
+  `EMAILS`. On le déclenche avec `notifications.tasks.dispatch_email('nom', pk)` — **jamais** avec `send_mail`.
+- **Chaque e-mail d'action a un bouton** (`cta_url` absolu via `absolute_url(reverse(...))`) ; un test vérifie que
+  les 11 e-mails du catalogue ont un bouton absolu repris dans la version texte.
+- **Un échec d'envoi ne casse jamais l'action de l'utilisateur** : `send_email` journalise et retourne `False`,
+  `dispatch_email` n'élève rien. Ne contourne pas ces fonctions.
+- **Réagir à une TRANSITION d'état, pas à une sauvegarde** : voir `remember_previous_status` et `on_*_saved`
+  dans `notifications/signals.py` (jamais d'e-mail en double quand un admin resauvegarde une demande).
+- **Notification dans le site + e-mail vont ensemble** pour les événements importants (accès, certificat, instructeur, support).
+- Contenu saisi par un utilisateur : toujours affiché via `{{ x|linebreaksbr }}` (échappé) — jamais `|safe`.
+- Les e-mails d'allauth (confirmation, mot de passe) sont dans `templates/account/email/` (`.html` + `.txt`).
+- **Prévisualisation** en développement : `/__emails__/` (HTML) et `/__emails__/<nom>/?text=1` (version texte).
+- En production, `SITE_URL` (https) est **obligatoire** : sans elle, les liens des e-mails seraient faux (le démarrage échoue).
 
 ## 9. Sécurité
 

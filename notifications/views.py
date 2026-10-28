@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -104,3 +106,24 @@ def mark_all_read(request):
             'unread_count': _unread_student_count(request.user),
         },
     )
+
+
+def email_preview(request, name=None):
+    """Prévisualisation des e-mails (développement uniquement) : liste, rendu HTML et version texte (?text=1)."""
+    if not settings.DEBUG:
+        raise Http404
+
+    from config.emailing import html_to_text, render_html
+
+    from .previews import preview_contents
+
+    contents = preview_contents()
+    if name is None:
+        links = ''.join(f'<li><a href="{n}/">{n}</a> — <a href="{n}/?text=1">texte</a></li>' for n in contents)
+        return HttpResponse(f'<h1>E-mails du site</h1><ul>{links}</ul>')
+    if name not in contents:
+        raise Http404
+    markup = render_html(contents[name])
+    if request.GET.get('text'):
+        return HttpResponse(html_to_text(markup), content_type='text/plain; charset=utf-8')
+    return HttpResponse(markup)

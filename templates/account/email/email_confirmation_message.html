@@ -1,0 +1,14 @@
+<c-email.layout preheader="Confirmez votre adresse e-mail pour activer votre compte.">
+  <c-email.heading>Confirmez votre adresse e-mail</c-email.heading>
+  <c-email.paragraph>Bonjour{% if user.first_name %} {{ user.first_name }}{% endif %},</c-email.paragraph>
+  <c-email.paragraph>
+    Merci de votre inscription sur <strong>{{ current_site.name }}</strong>.
+    {% if code %}Saisissez le code ci-dessous pour confirmer votre adresse e-mail.{% else %}Cliquez sur le bouton pour confirmer votre adresse e-mail et activer votre compte.{% endif %}
+  </c-email.paragraph>
+  {% if code %}
+    <c-email.quote label="Votre code de vérification"><strong style="font-size:24px;letter-spacing:4px;color:#111827;">{{ code }}</strong></c-email.quote>
+  {% else %}
+    <c-email.button href="{{ activate_url }}">Confirmer mon adresse e-mail</c-email.button>
+  {% endif %}
+  <c-email.paragraph>Si vous n'êtes pas à l'origine de cette inscription, ignorez simplement cet e-mail.</c-email.paragraph>
+</c-email.layout>

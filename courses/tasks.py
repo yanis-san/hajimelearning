@@ -17,6 +17,8 @@ def generate_certificate_pdf(completion_id):
     Déclenché à la complétion du cours (vue `mark_lesson_complete`) ou à la demande si le fichier manque.
     """
     try:
+        from notifications.signals import notify_certificate_ready
+
         from .models import CourseCompletion
 
         completion = CourseCompletion.objects.select_related('student', 'course').get(id=completion_id)
@@ -35,7 +37,10 @@ def generate_certificate_pdf(completion_id):
             return
 
         filename = f"certificat_{completion.student.id}_{completion.course.slug}.pdf"
+        first_generation = not completion.certificate_pdf  # une régénération ne re-notifie pas
         completion.certificate_pdf.save(filename, ContentFile(pdf_content), save=True)
+        if first_generation:
+            notify_certificate_ready(completion)
         logger.info(
             "Certificat généré : complétion #%s (%s - %s)",
             completion_id,

@@ -1,0 +1,7 @@
+<c-email.layout preheader="Nous avons bien reçu votre message et vous répondrons au plus vite.">
+  <c-email.heading>Nous avons bien reçu votre message</c-email.heading>
+  <c-email.paragraph>Bonjour {{ message.first_name }},</c-email.paragraph>
+  <c-email.paragraph>Merci de nous avoir écrit. Nous reviendrons vers vous à cette adresse dès que possible.</c-email.paragraph>
+  <c-email.quote label="Votre message ({{ reason }})">{{ message.message|linebreaksbr }}</c-email.quote>
+  <c-email.button href="{{ cta_url }}" tone="dark">Découvrir les formations</c-email.button>
+</c-email.layout>

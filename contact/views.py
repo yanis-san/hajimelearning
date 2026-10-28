@@ -1,9 +1,8 @@
-from django.conf import settings
-from django.core.mail import send_mail
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView
 
 from config import throttle
+from notifications.tasks import dispatch_email
 
 from .forms import ContactForm
 from .models import ContactReason
@@ -42,16 +41,9 @@ class ContactView(FormView):
         msg.user = user
         msg.save()
 
-        # Notification email (console en dev, SMTP en prod)
-        subject = f"[Hajime Learning] Contact : {msg.reason or 'Sans motif'}"
-        body = f"De : {msg.first_name} {msg.last_name} <{msg.email}>\nMotif : {msg.reason or '-'}\n\n{msg.message}"
-        send_mail(
-            subject,
-            body,
-            settings.DEFAULT_FROM_EMAIL,
-            [settings.CONTACT_EMAIL],
-            fail_silently=True,
-        )
+        # E-mail à l'équipe (Reply-To = expéditeur) + accusé de réception à l'expéditeur
+        dispatch_email('contact_message', msg.pk)
+        dispatch_email('contact_receipt', msg.pk)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):

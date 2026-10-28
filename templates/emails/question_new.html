@@ -1,0 +1,8 @@
+<c-email.layout preheader="{{ student_name }} a posé une question : {{ question.title }}">
+  <c-email.heading>Nouvelle question d'un étudiant</c-email.heading>
+  <c-email.paragraph>
+    <strong>{{ student_name }}</strong> a posé une question dans la formation <strong>{{ course.title }}</strong>{% if lesson %} (leçon « {{ lesson.title }} »){% endif %}.
+  </c-email.paragraph>
+  <c-email.quote label="{{ question.title }}">{{ question.content|linebreaksbr }}</c-email.quote>
+  <c-email.button href="{{ cta_url }}">Répondre à la question</c-email.button>
+</c-email.layout>

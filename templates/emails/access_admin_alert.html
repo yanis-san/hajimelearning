@@ -1,0 +1,13 @@
+<c-email.layout preheader="Une preuve de paiement attend votre validation.">
+  <c-email.heading>Nouveau paiement à valider</c-email.heading>
+  <c-email.paragraph>
+    <strong>{{ student_name }}</strong> vient d'envoyer une preuve de paiement pour <strong>{{ course.title }}</strong>.
+  </c-email.paragraph>
+  <c-email.details>
+    <c-email.detail label="Étudiant">{{ student_name }} ({{ student_email }})</c-email.detail>
+    <c-email.detail label="Formation">{{ course.title }}</c-email.detail>
+    <c-email.detail label="Montant attendu">{{ amount }} DA</c-email.detail>
+    {% if coupon_code %}<c-email.detail label="Code promo">{{ coupon_code }}</c-email.detail>{% endif %}
+  </c-email.details>
+  <c-email.button href="{{ cta_url }}">Examiner la demande</c-email.button>
+</c-email.layout>

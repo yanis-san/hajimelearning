@@ -102,5 +102,4 @@ def free_course():
 @pytest.fixture(autouse=True)
 def mock_pdf_generation(monkeypatch):
     """Bypass la génération de PDF (WeasyPrint) pour éviter les crashs GTK sous Windows/Tests."""
-    monkeypatch.setattr('access.tasks.send_access_confirmation_email.delay', lambda req: None)
     monkeypatch.setattr('courses.tasks.generate_certificate_pdf.delay', lambda comp: None)

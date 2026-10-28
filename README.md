@@ -78,6 +78,6 @@ puis `SNAP_DIR=/tmp/apres SNAP_COMPARE=/tmp/avant pytest tests/snapshots.py` apr
 ## Production (cPanel)
 
 Variables d'environnement : voir l'en-tête de `config/settings/prod.py`
-(`DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, `DB_*`, `SITE_URL`, `EMAIL_*`).
+(`DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, `DB_*`, **`SITE_URL`** (https, obligatoire), `EMAIL_*`).
 Après chaque déploiement : `python manage.py migrate && python manage.py collectstatic --noinput`.
 Les fichiers de cours payants et les certificats sont stockés hors de `media/` (`protected_media/`).

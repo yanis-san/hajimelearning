@@ -1,0 +1,12 @@
+<c-email.layout preheader="Votre demande d'espace instructeur n'a pas pu être acceptée.">
+  <c-email.heading>Votre demande n'a pas pu être acceptée</c-email.heading>
+  <c-email.paragraph>Bonjour {{ first_name }},</c-email.paragraph>
+  <c-email.paragraph>
+    Nous n'avons pas pu accepter votre demande pour l'offre <strong>{{ plan.name }}</strong>.
+  </c-email.paragraph>
+  {% if admin_note %}
+    <c-email.quote label="Motif indiqué">{{ admin_note|linebreaksbr }}</c-email.quote>
+  {% endif %}
+  <c-email.paragraph>Vous pouvez consulter les offres et déposer une nouvelle demande à tout moment.</c-email.paragraph>
+  <c-email.button href="{{ cta_url }}">Voir les offres</c-email.button>
+</c-email.layout>

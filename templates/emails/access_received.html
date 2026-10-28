@@ -1,0 +1,14 @@
+<c-email.layout preheader="Nous vérifions votre paiement et vous prévenons dès que l'accès est ouvert.">
+  <c-email.heading>Preuve de paiement bien reçue</c-email.heading>
+  <c-email.paragraph>Bonjour {{ first_name }},</c-email.paragraph>
+  <c-email.paragraph>
+    Nous avons bien reçu votre preuve de paiement pour la formation <strong>{{ course.title }}</strong>.
+    Nous la vérifions et vous prévenons par e-mail dès que votre accès est ouvert.
+  </c-email.paragraph>
+  <c-email.details>
+    <c-email.detail label="Formation">{{ course.title }}</c-email.detail>
+    <c-email.detail label="Montant">{{ amount }} DA</c-email.detail>
+    {% if coupon_code %}<c-email.detail label="Code promo">{{ coupon_code }}</c-email.detail>{% endif %}
+  </c-email.details>
+  <c-email.button href="{{ cta_url }}">Voir la formation</c-email.button>
+</c-email.layout>

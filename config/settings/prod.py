@@ -12,6 +12,7 @@ from .base import *
 #    1. DJANGO_SETTINGS_MODULE = config.settings.prod  <-- CRITIQUE
 #    2. DJANGO_SECRET_KEY      = (Générez une longue chaîne aléatoire)
 #    3. DJANGO_ALLOWED_HOSTS   = mondomaine.com www.mondomaine.com
+#    3b. SITE_URL              = https://mondomaine.com   <-- liens des e-mails (obligatoire)
 #
 #    [Base de données MySQL cPanel] :
 #    4. DB_NAME     = (Nom de la base cPanel)
@@ -41,6 +42,10 @@ if not SECRET_KEY:
     raise ValueError("❌ ERREUR PROD : Variable 'DJANGO_SECRET_KEY' manquante !")
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost').split(' ')
+
+# URL publique : les boutons et liens des e-mails sont absolus, une valeur par défaut serait fausse en production
+if not os.environ.get('SITE_URL', '').startswith('https://'):
+    raise ValueError("❌ ERREUR PROD : variable 'SITE_URL' manquante ou sans https:// (ex. https://hajimelearning.com)")
 
 # --- BASE DE DONNÉES (MySQL via PyMySQL) ---
 # En production, on impose MySQL.

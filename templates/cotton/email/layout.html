@@ -1,0 +1,46 @@
+{# Structure commune des e-mails : bandeau de marque, carte de contenu, pied de page. Styles en ligne (clients de messagerie). #}
+{% load static %}
+<c-vars preheader="" />
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ subject }}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f3f4f6;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#f3f4f6;">{{ preheader }}</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6;">
+    <tr>
+      <td align="center" style="padding:24px 12px;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background-color:#ffffff;border:2px solid #111827;border-radius:14px;overflow:hidden;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+          <tr>
+            <td style="background-color:#e6003a;padding:18px 28px;">
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding-right:12px;"><img src="{{ site_url }}{% static 'img/hanko_round.png' %}" width="40" height="40" alt="" style="display:block;border-radius:50%;background-color:#ffffff;"></td>
+                  <td style="font-size:20px;font-weight:800;color:#ffffff;letter-spacing:-0.3px;">{{ site_name }}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 28px 8px 28px;color:#111827;font-size:16px;line-height:1.6;">
+              {{ slot }}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:8px 28px 28px 28px;">
+              <p style="margin:0;padding-top:20px;border-top:1px solid #e5e7eb;font-size:12px;line-height:1.6;color:#6b7280;">
+                Une question ? Écrivez-nous à <a href="mailto:{{ support_email }}" style="color:#b30030;">{{ support_email }}</a>
+                ou rendez-vous sur <a href="{{ site_url }}" style="color:#b30030;">{{ site_url }}</a>.<br>
+                © {% now "Y" %} {{ site_name }}
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

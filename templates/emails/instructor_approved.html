@@ -1,0 +1,9 @@
+<c-email.layout preheader="Votre espace instructeur est activé.">
+  <c-email.heading>Bienvenue dans l'espace instructeur</c-email.heading>
+  <c-email.paragraph>Bonjour {{ first_name }},</c-email.paragraph>
+  <c-email.paragraph>
+    Votre demande a été acceptée : l'offre <strong>{{ plan.name }}</strong> est active. Vous pouvez créer vos formations,
+    organiser vos modules et leçons et répondre aux questions de vos étudiants.
+  </c-email.paragraph>
+  <c-email.button href="{{ cta_url }}">Ouvrir mon espace instructeur</c-email.button>
+</c-email.layout>

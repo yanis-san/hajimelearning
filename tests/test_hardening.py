@@ -215,6 +215,9 @@ class TestTemplateComponents:
 
         offenders = []
         for path in Path('templates').rglob('*.html'):
+            # Exception documentée : les e-mails exigent des styles en ligne (clients de messagerie)
+            if 'emails' in path.parts or 'email' in path.parts:
+                continue
             text = path.read_text(encoding='utf-8')
             if '<style' in text or ' style="' in text or ' onclick="' in text:
                 offenders.append(str(path))

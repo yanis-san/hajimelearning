@@ -1,0 +1,9 @@
+<c-email.layout preheader="{{ author_name }} a répondu : {{ question.title }}">
+  <c-email.heading>Nouvelle réponse</c-email.heading>
+  <c-email.paragraph>Bonjour {{ first_name }},</c-email.paragraph>
+  <c-email.paragraph>
+    <strong>{{ author_name }}</strong> a répondu à la question « {{ question.title }} » dans la formation <strong>{{ course.title }}</strong>.
+  </c-email.paragraph>
+  <c-email.quote label="Réponse">{{ response.content|linebreaksbr }}</c-email.quote>
+  <c-email.button href="{{ cta_url }}">Voir la discussion</c-email.button>
+</c-email.layout>

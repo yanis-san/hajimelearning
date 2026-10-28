@@ -1,0 +1,11 @@
+<c-email.layout preheader="{{ message.first_name }} {{ message.last_name }} vous a écrit depuis le formulaire de contact.">
+  <c-email.heading>Nouveau message de contact</c-email.heading>
+  <c-email.details>
+    <c-email.detail label="De">{{ message.first_name }} {{ message.last_name }}</c-email.detail>
+    <c-email.detail label="E-mail">{{ message.email }}</c-email.detail>
+    <c-email.detail label="Motif">{{ reason }}</c-email.detail>
+    {% if message.user_id %}<c-email.detail label="Compte">Utilisateur connecté</c-email.detail>{% endif %}
+  </c-email.details>
+  <c-email.quote label="Message">{{ message.message|linebreaksbr }}</c-email.quote>
+  <c-email.button href="{{ cta_url }}">Répondre à {{ message.first_name }}</c-email.button>
+</c-email.layout>
