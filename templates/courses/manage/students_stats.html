@@ -8,8 +8,8 @@
 
   {# ── Résumé rapide ── #}
   <div class="grid grid-cols-3 gap-4 mb-6">
-    <div class="bg-orange-50 border border-orange-100 rounded-xl p-4 text-center">
-      <div class="text-2xl font-black text-orange-500">{{ student_stats|length }}</div>
+    <div class="bg-primary/5 border border-primary/20 rounded-xl p-4 text-center">
+      <div class="text-2xl font-black text-primary">{{ student_stats|length }}</div>
       <div class="text-xs text-gray-500 mt-1">Inscrits</div>
     </div>
     <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
@@ -48,12 +48,12 @@
         {# Barre progression #}
         <div class="hidden sm:block w-40 shrink-0">
           <div class="flex justify-between mb-1">
-            <span class="text-xs font-semibold {% if stat.percent == 100 %}text-green-600{% else %}text-orange-500{% endif %}">
+            <span class="text-xs font-semibold {% if stat.percent == 100 %}text-green-600{% else %}text-primary{% endif %}">
               {{ stat.percent }}%
             </span>
             <span class="text-xs text-gray-400">{{ stat.completed }}/{{ total_lessons }}</span>
           </div>
-          <progress class="meter {% if stat.percent == 100 %}meter-green{% elif stat.percent < 20 %}meter-redsoft{% else %}meter-orange{% endif %}"
+          <progress class="meter {% if stat.percent == 100 %}meter-green{% elif stat.percent < 20 %}meter-redsoft{% else %}meter-primary{% endif %}"
                     value="{{ stat.percent }}" max="100">{{ stat.percent }}%</progress>
         </div>
 
@@ -77,10 +77,10 @@
           {# Progression mobile #}
           <div class="sm:hidden">
             <div class="flex justify-between mb-1">
-              <span class="text-xs font-semibold {% if stat.percent == 100 %}text-green-600{% else %}text-orange-500{% endif %}">{{ stat.percent }}%</span>
+              <span class="text-xs font-semibold {% if stat.percent == 100 %}text-green-600{% else %}text-primary{% endif %}">{{ stat.percent }}%</span>
               <span class="text-xs text-gray-400">{{ stat.completed }}/{{ total_lessons }} leçons</span>
             </div>
-            <progress class="meter {% if stat.percent == 100 %}meter-green{% else %}meter-orange{% endif %}"
+            <progress class="meter {% if stat.percent == 100 %}meter-green{% else %}meter-primary{% endif %}"
                       value="{{ stat.percent }}" max="100">{{ stat.percent }}%</progress>
           </div>
 
@@ -116,19 +116,19 @@
                 {% for qblock in ld.quiz_blocks %}
                   {% with result=stat.quiz_results|dict_get:qblock.id %}
                   <div class="ml-7 flex items-center gap-2 text-xs border-t border-gray-50 pt-1.5">
-                    <svg class="w-3.5 h-3.5 text-orange-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="w-3.5 h-3.5 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                     </svg>
                     <span class="text-gray-500">{{ qblock.quiz_title|default:"Quiz" }}</span>
                     <span class="mx-1 text-gray-300">·</span>
                     {% if result %}
                       <span class="font-semibold
-                        {% if result.percent >= 80 %}text-green-600{% elif result.percent >= 50 %}text-orange-500{% else %}text-red-500{% endif %}">
+                        {% if result.percent >= 80 %}text-green-600{% elif result.percent >= 50 %}text-primary{% else %}text-red-500{% endif %}">
                         {{ result.score }}/{{ result.total }} — {{ result.percent }}%
                       </span>
                       {% if result.percent == 100 %}<span>🏆</span>
                       {% elif result.percent >= 80 %}<span class="text-green-500">✓</span>
-                      {% elif result.percent >= 50 %}<span class="text-orange-400">~</span>
+                      {% elif result.percent >= 50 %}<span class="text-primary">~</span>
                       {% else %}<span class="text-red-400">✗</span>
                       {% endif %}
                     {% else %}

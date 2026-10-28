@@ -19,7 +19,7 @@
     <div class="flex items-center gap-3 shrink-0">
       {% if is_manager == 'true' %}
         <span @click.stop="window.location.href='{% url 'manage_module_lessons' module.course.slug module.id %}';"
-              class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 transition cursor-pointer"
+              class="btn btn-outline btn-xs hidden sm:inline-flex"
               title="Gérer les leçons de ce module">
           ⚙️ Gérer le module
         </span>
@@ -61,7 +61,7 @@
             <div class="flex items-center gap-2.5 shrink-0">
               {% if is_manager == 'true' %}
                 <span @click.prevent.stop="window.location.href='{% url 'manage_lesson_content' module.course.slug lesson.slug %}';"
-                      class="px-2.5 py-1 text-xs font-bold rounded-lg bg-gray-900 text-white hover:bg-primary transition shadow-sm cursor-pointer"
+                      class="btn btn-secondary btn-xs"
                       title="Modifier le contenu de cette leçon (Builder)">
                   ✏️ Builder
                 </span>

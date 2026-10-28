@@ -22,11 +22,9 @@
               Mes Cours
             </a>
             {% if user.is_staff or user.instructor_profile.is_active %}
-              <a href="{% url 'manage_course_list' %}"
-                 class="text-sm font-bold text-gray-900 hover:text-white border-2 border-gray-900 bg-yellow-400 hover:bg-primary shadow-[2px_2px_0_0_#111827] hover:-translate-y-0.5 rounded-xl px-3 py-1.5 transition-all"
-                 title="Gérer les formations, modules et leçons">
-                🎓 Gérer mes cours
-              </a>
+              <c-ui.btn href="{% url 'manage_course_list' %}" title="Gérer les formations, modules et leçons" variant="accent" size="sm">
+        🎓 Gérer mes cours
+       </c-ui.btn>
             {% endif %}
             {% if user.instructor_profile.is_active %}
               <a href="{% url 'instructor_dashboard' %}"
@@ -77,10 +75,9 @@
              class="text-sm font-semibold text-gray-700 hover:text-gray-900 px-3 py-1.5 transition-all hidden sm:block">
             Se connecter
           </a>
-          <a href="{% url 'account_signup' %}" 
-             class="text-sm font-bold text-white bg-primary border-2 border-primary hover:bg-white hover:text-primary rounded-xl px-4 py-2 transition-all">
-             S'inscrire
-          </a>
+          <c-ui.btn href="{% url 'account_signup' %}" variant="primary" size="sm">
+       S'inscrire
+     </c-ui.btn>
         {% endif %}
 
         {# ── Hamburger mobile ── #}
@@ -122,10 +119,9 @@
           Mes Cours
         </a>
         {% if user.is_staff or user.instructor_profile.is_active %}
-          <a href="{% url 'manage_course_list' %}"
-             class="block text-sm font-bold text-gray-900 bg-yellow-100 hover:bg-yellow-200 border border-yellow-300 rounded-xl px-4 py-3 transition-all">
-            🎓 Gérer mes cours (Studio)
-          </a>
+          <c-ui.btn href="{% url 'manage_course_list' %}" variant="accent" size="sm" block="true">
+      🎓 Gérer mes cours (Studio)
+     </c-ui.btn>
         {% endif %}
         {% if user.instructor_profile.is_active %}
           <a href="{% url 'instructor_dashboard' %}"
@@ -158,10 +154,9 @@
            class="block text-sm font-bold text-gray-800 hover:bg-gray-50 rounded-xl px-4 py-3 transition-all">
           Se connecter
         </a>
-        <a href="{% url 'account_signup' %}"
-           class="block text-sm font-bold text-primary bg-primary/10 hover:bg-primary hover:text-white rounded-xl px-4 py-3 transition-all text-center mt-2">
+        <c-ui.btn href="{% url 'account_signup' %}" variant="primary" size="sm" block="true" class="mt-2">
           S'inscrire
-        </a>
+        </c-ui.btn>
       {% endif %}
     </div>
   </div>

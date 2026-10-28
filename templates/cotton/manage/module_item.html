@@ -39,12 +39,12 @@
               class="flex items-center gap-2">
           {% csrf_token %}
           <input type="text" name="title" value="{{ module.title }}"
-                 class="flex-grow px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
+                 class="flex-grow px-3 py-2 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent"
                  x-ref="editInput"
                  x-on:keydown.escape="editing = false">
           <label class="flex items-center gap-1.5 text-sm text-gray-600">
             <input type="checkbox" name="is_published" {% if module.is_published %}checked{% endif %}
-                   class="rounded border-gray-300 text-orange-500 focus:ring-orange-400">
+                   class="rounded border-gray-300 text-primary focus:ring-primary/40">
             Publié
           </label>
           <c-ui.btn variant="primary" size="sm" type="submit">
@@ -64,7 +64,7 @@
         📖 Leçons
       </c-ui.btn>
       <button x-on:click="editing = true; $nextTick(() => $refs.editInput.focus())"
-              class="p-1.5 rounded-lg text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition cursor-pointer"
+              class="p-1.5 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/5 transition cursor-pointer"
               title="Renommer">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>

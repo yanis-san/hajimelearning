@@ -10,7 +10,7 @@ htmx.onLoad((content) => {
     el._sortable = new Sortable(el, {
       animation: 150,
       handle: '.handle',
-      ghostClass: 'bg-orange-50',
+      ghostClass: 'bg-primary/5',
       onEnd: () => htmx.trigger(el, 'end'),
     });
   });

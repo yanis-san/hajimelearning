@@ -21,7 +21,7 @@ class ContentBlockForm(forms.ModelForm):
         for field in self.fields:
             self.fields[field].widget.attrs.update(
                 {
-                    'class': 'w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition'
+                    'class': 'w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition'
                 }
             )
         self.fields['title'].widget.attrs.update({'placeholder': 'Titre du bloc'})
@@ -29,14 +29,14 @@ class ContentBlockForm(forms.ModelForm):
             {
                 'rows': 12,
                 'placeholder': 'Votre texte (Markdown)...',
-                'class': 'w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition font-mono text-sm resize-y',
+                'class': 'w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition font-mono text-sm resize-y',
             }
         )
         self.fields['video_id'].widget.attrs.update({'placeholder': 'Ex: dQw4w9WgXcQ'})
         self.fields['quiz_title'].widget.attrs.update({'placeholder': 'Ex: Test de connaissances'})
         self.fields['file_content'].widget.attrs.update(
             {
-                'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100'
+                'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/5 file:text-primary-dark hover:file:bg-primary/10'
             }
         )
 

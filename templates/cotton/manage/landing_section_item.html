@@ -64,7 +64,7 @@
         {% endif %}
       {% elif section.section_type == 'hero' %}
         {% if section.subtitle %}<p class="text-gray-500 italic truncate">{{ section.subtitle }}</p>{% endif %}
-        {% if section.cta_text %}<span class="inline-block mt-1 text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">{{ section.cta_text }}</span>{% endif %}
+        {% if section.cta_text %}<span class="inline-block mt-1 text-xs bg-primary/10 text-primary-dark px-2 py-0.5 rounded-full">{{ section.cta_text }}</span>{% endif %}
         {% if section.image %}
           <img src="{{ section.image.url }}" alt="" class="w-32 h-20 object-cover rounded-lg border border-gray-200 mt-1">
         {% endif %}

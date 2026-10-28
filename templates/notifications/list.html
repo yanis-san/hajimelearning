@@ -5,40 +5,29 @@
 
   <c-ui.page-header title="Notifications">
     {% if notifications %}
-      <button type="button"
-              hx-post="{% url 'mark_all_read' %}"
-              hx-target="#notification-list"
-              hx-swap="innerHTML"
-              hx-vals='{"type": "{{ current_type|default:'' }}"}'
-              class="text-sm font-black text-white uppercase bg-primary border-2 border-dark px-4 py-2 shadow-[2px_2px_0_0_#09090B] hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#09090B] active:translate-y-0 active:shadow-none transition-all cursor-pointer">
-        Tout marquer comme lu
-      </button>
+      <c-ui.btn type="button" hx-post="{% url 'mark_all_read' %}" hx-target="#notification-list" hx-swap="innerHTML" hx-vals='{"type": "{{ current_type|default:'' }}"}' variant="primary" size="sm">
+    Tout marquer comme lu
+   </c-ui.btn>
     {% endif %}
   </c-ui.page-header>
 
   {# ── Filtres ── #}
   {% if is_instructor %}
     <div class="flex flex-wrap items-center gap-3 mb-8">
-      <a href="{% url 'my_notifications' %}"
-         class="px-4 py-2 text-sm font-bold border-2 rounded-xl transition-all hover:-translate-y-0.5 
-                {% if not current_type %}bg-gray-900 border-gray-900 text-white shadow-[2px_2px_0_0_#111827]{% else %}bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-[2px_2px_0_0_#111827]{% endif %}">
+      <c-ui.btn href="{% url 'my_notifications' %}" size="sm" variant="{% if not current_type %}secondary{% else %}outline{% endif %}">
         Toutes
-      </a>
-      <a href="{% url 'my_notifications' %}?type=student"
-         class="px-4 py-2 text-sm font-bold border-2 rounded-xl transition-all hover:-translate-y-0.5 
-                {% if current_type == 'student' %}bg-gray-900 border-gray-900 text-white shadow-[2px_2px_0_0_#111827]{% else %}bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-[2px_2px_0_0_#111827]{% endif %}">
+      </c-ui.btn>
+      <c-ui.btn href="{% url 'my_notifications' %}?type=student" size="sm" variant="{% if current_type == 'student' %}secondary{% else %}outline{% endif %}">
         Mes apprentissages
-      </a>
-      <a href="{% url 'my_notifications' %}?type=instructor"
-         class="flex items-center gap-2 px-4 py-2 text-sm font-bold border-2 rounded-xl transition-all hover:-translate-y-0.5 
-                {% if current_type == 'instructor' %}bg-gray-900 border-gray-900 text-white shadow-[2px_2px_0_0_#111827]{% else %}bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-[2px_2px_0_0_#111827]{% endif %}">
+      </c-ui.btn>
+      <c-ui.btn href="{% url 'my_notifications' %}?type=instructor" size="sm" variant="{% if current_type == 'instructor' %}secondary{% else %}outline{% endif %}">
         Côté formateur
         {% if navbar_instructor_unread_count > 0 and current_type != 'instructor' %}
           <span class="inline-flex items-center justify-center min-w-[1.2rem] h-5 px-1 text-xs font-bold text-white bg-primary rounded-full border-2 border-white shadow-sm">
             {{ navbar_instructor_unread_count }}
           </span>
         {% endif %}
-      </a>
+      </c-ui.btn>
     </div>
   {% endif %}
 

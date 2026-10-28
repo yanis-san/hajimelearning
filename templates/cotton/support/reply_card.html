@@ -1,7 +1,7 @@
 <c-vars response="" />
 
 <div class="bg-white rounded-xl p-5 border shadow-sm
-            {% if response.is_instructor %}border-orange-200{% else %}border-gray-200{% endif %}">
+            {% if response.is_instructor %}border-primary/30{% else %}border-gray-200{% endif %}">
 
   {# Author header #}
   <div class="flex items-center justify-between mb-3">
@@ -9,7 +9,7 @@
       <c-ui.avatar :user="response.author" size="sm" />
       <div class="flex items-center gap-2">
         {% if response.is_instructor %}
-          <span class="text-sm font-semibold text-orange-600 flex items-center gap-1">🎓 Sensei / Équipe</span>
+          <span class="text-sm font-semibold text-primary flex items-center gap-1">🎓 Sensei / Équipe</span>
         {% elif response.author == response.question.student %}
           <span class="text-sm font-medium text-gray-800">{{ response.author.first_name|default:response.author.email }}</span>
           <span class="text-[11px] bg-gray-100 text-gray-600 font-semibold px-2 py-0.5 rounded-md">Auteur</span>

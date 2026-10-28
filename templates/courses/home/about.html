@@ -27,12 +27,10 @@
                     <div class="absolute -bottom-2 -right-2 w-10 h-3 bg-white border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
                     
                     <!-- Sound Toggle Button -->
-                    <button @click="toggleMute()"
-                            class="absolute bottom-6 right-6 z-30 bg-primary border-2 border-gray-900 rounded-xl p-3 text-white shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#111827] transition-all cursor-pointer group/btn"
-                            aria-label="Activer/Désactiver le son">
-                        <svg x-show="isMuted" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
-                        <svg x-show="!isMuted" x-cloak class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
-                    </button>
+                    <c-ui.btn @click="toggleMute()" aria-label="Activer/Désactiver le son" variant="primary" size="md" icon="true" class="absolute bottom-6 right-6 z-30 group/btn">
+            <svg x-show="isMuted" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+            <svg x-show="!isMuted" x-cloak class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+          </c-ui.btn>
                 </div>
             </div>
 

@@ -6,7 +6,7 @@
 <div class="max-w-lg mx-auto px-4 py-12 lg:py-20">
 
   <a href="{% url 'instructor_plans' %}"
-     class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-orange-600 transition mb-6">
+     class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary transition mb-6">
     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
     </svg>
@@ -58,7 +58,7 @@
         </label>
         <div class="relative">
           <input type="file" name="payment_proof" accept="image/*" required
-                 class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-orange-50 file:text-orange-600 hover:file:bg-orange-100 file:cursor-pointer cursor-pointer">
+                 class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-primary/5 file:text-primary hover:file:bg-primary/10 file:cursor-pointer cursor-pointer">
         </div>
         <p class="text-xs text-gray-400 mt-1.5">JPG, PNG — Max 5 Mo</p>
         {% if form.payment_proof.errors %}
@@ -66,7 +66,7 @@
         {% endif %}
       </div>
 
-      <c-ui.btn type="submit" variant="primary" size="lg" class="w-full justify-center">
+      <c-ui.btn type="submit" variant="primary" size="lg" block="true">
         {% if is_upgrade %}Envoyer ma demande d'upgrade{% else %}Envoyer ma demande{% endif %}
       </c-ui.btn>
     </form>

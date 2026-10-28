@@ -1,32 +1,14 @@
-<c-vars variant="primary" href="" type="button" size="md" disabled="false" class="" />
+{# Bouton ou lien-bouton. Convention de couleurs : voir static/css/app/buttons.css #}
+<c-vars variant="primary" href="" type="button" size="md" disabled="false" block="false" icon="false" class="" />
 
 {% if href %}
 <a href="{{ href }}"
-   class="inline-flex items-center justify-center font-bold transition-all duration-200 cursor-pointer border-2 border-gray-900 rounded-xl manga-drawn
-          {% if size == 'sm' %}px-3 py-1.5 text-sm shadow-[2px_2px_0_0_#111827] hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5
-          {% elif size == 'lg' %}px-8 py-3 text-lg shadow-[4px_4px_0_0_#111827] hover:shadow-[6px_6px_0_0_#111827] hover:-translate-y-1
-          {% else %}px-5 py-2.5 text-base shadow-[3px_3px_0_0_#111827] hover:shadow-[4px_4px_0_0_#111827] hover:-translate-y-1{% endif %}
-          {% if variant == 'primary' %}bg-primary text-white hover:bg-white hover:text-gray-900
-          {% elif variant == 'secondary' %}bg-gray-900 text-white hover:bg-primary hover:border-gray-900
-          {% elif variant == 'outline' %}bg-white text-gray-900 hover:bg-gray-50
-          {% elif variant == 'danger' %}bg-red-500 text-white border-red-700 shadow-[3px_3px_0_0_#7f1d1d] hover:bg-red-600
-          {% elif variant == 'ghost' %}border-transparent shadow-none hover:border-gray-200 hover:bg-gray-50 hover:shadow-sm{% endif %}
-          {% if disabled == 'true' %}opacity-50 cursor-not-allowed pointer-events-none{% endif %}
-          {{ class }}"
+   class="btn btn-{{ variant }} btn-{{ size }}{% if block == 'true' %} btn-block{% endif %}{% if icon == 'true' %} btn-icon{% endif %} manga-drawn {{ class }}"
+   {% if disabled == 'true' %}aria-disabled="true"{% endif %}
    {{ attrs }}>{{ slot }}</a>
 {% else %}
 <button type="{{ type }}"
+        class="btn btn-{{ variant }} btn-{{ size }}{% if block == 'true' %} btn-block{% endif %}{% if icon == 'true' %} btn-icon{% endif %} manga-drawn {{ class }}"
         {% if disabled == 'true' %}disabled{% endif %}
-        class="inline-flex items-center justify-center font-bold transition-all duration-200 cursor-pointer border-2 border-gray-900 rounded-xl manga-drawn
-               {% if size == 'sm' %}px-3 py-1.5 text-sm shadow-[2px_2px_0_0_#111827] hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5
-               {% elif size == 'lg' %}px-8 py-3 text-lg shadow-[4px_4px_0_0_#111827] hover:shadow-[6px_6px_0_0_#111827] hover:-translate-y-1
-               {% else %}px-5 py-2.5 text-base shadow-[3px_3px_0_0_#111827] hover:shadow-[4px_4px_0_0_#111827] hover:-translate-y-1{% endif %}
-               {% if variant == 'primary' %}bg-primary text-white hover:bg-white hover:text-gray-900
-               {% elif variant == 'secondary' %}bg-gray-900 text-white hover:bg-primary hover:border-gray-900
-               {% elif variant == 'outline' %}bg-white text-gray-900 hover:bg-gray-50
-               {% elif variant == 'danger' %}bg-red-500 text-white border-red-700 shadow-[3px_3px_0_0_#7f1d1d] hover:bg-red-600
-               {% elif variant == 'ghost' %}border-transparent shadow-none hover:border-gray-200 hover:bg-gray-50 hover:shadow-sm{% endif %}
-               {% if disabled == 'true' %}opacity-50 cursor-not-allowed{% endif %}
-               {{ class }}"
         {{ attrs }}>{{ slot }}</button>
 {% endif %}

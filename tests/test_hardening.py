@@ -255,3 +255,23 @@ class TestMarkdownSanitization:
 
         assert '<img' not in str(faq_items('### <img src=x onerror=1>\nreponse')[0][0])
         assert '<img' not in str(testimonial_items('### ★★★★★ | <img src=x onerror=1>\ntexte')[0]['name'])
+
+
+class TestDesignConvention:
+    def test_no_leftover_orange_palette(self):
+        from pathlib import Path
+
+        offenders = [str(p) for p in Path('templates').rglob('*.html') if '-orange-' in p.read_text(encoding='utf-8')]
+        assert not offenders, f"Couleur d'interaction = primary, plus d'orange : {offenders}"
+
+    def test_buttons_use_the_shared_component(self):
+        from pathlib import Path
+
+        offenders = []
+        for path in Path('templates').rglob('*.html'):
+            if path.name == 'btn.html':
+                continue
+            for line in path.read_text(encoding='utf-8').splitlines():
+                if 'shadow-[' in line and 'hover:-translate-y' in line and ('<a ' in line or '<button' in line):
+                    offenders.append(f'{path}: {line.strip()[:80]}')
+        assert not offenders, offenders

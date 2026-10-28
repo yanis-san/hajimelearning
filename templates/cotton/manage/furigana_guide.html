@@ -53,7 +53,7 @@
       <div class="p-6 overflow-y-auto space-y-6">
 
         {# Intro note #}
-        <div class="p-4 bg-orange-50 border-2 border-orange-200 rounded-xl text-xs text-orange-950 flex items-start gap-3">
+        <div class="p-4 bg-primary/5 border-2 border-primary/30 rounded-xl text-xs text-primary-dark flex items-start gap-3">
           <span class="text-xl shrink-0">💡</span>
           <div>
             <span class="font-bold">Comment ça marche ?</span> Vous n'avez pas besoin d'écrire de balises HTML. Écrivez simplement vos kanjis et prononciations entre accolades ou chevrons, la plateforme s'occupe de la typographie et de la disposition exacte au-dessus des caractères.
@@ -78,12 +78,9 @@
                 <span class="text-base text-gray-900 font-medium"><ruby>日本語<rt>にほんご</rt></ruby></span>
               </div>
             </div>
-            <button type="button"
-                    x-on:click="copyText('{日本語|にほんご}', 1)"
-                    class="px-3.5 py-2 text-xs font-bold rounded-lg border-2 border-gray-900 transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-[2px_2px_0_0_#111827] active:translate-y-0.5"
-                    :class="copiedIndex === 1 ? 'bg-green-500 text-white border-green-600 shadow-none' : 'bg-white text-gray-900 hover:bg-gray-100'">
+            <c-ui.btn x-on:click="copyText('{日本語|にほんご}', 1)" x-bind:class="copiedIndex === 1 && 'bg-green-500 text-white border-green-600'" variant="outline" size="xs" class="shrink-0">
               <span x-text="copiedIndex === 1 ? '✓ Copié !' : '📋 Copier'"></span>
-            </button>
+            </c-ui.btn>
           </div>
 
           {# Modèle 2 #}
@@ -100,12 +97,9 @@
                 <span class="text-base text-gray-900 font-medium"><ruby>日<rt>に</rt></ruby><ruby>本<rt>ほん</rt></ruby><ruby>語<rt>ご</rt></ruby></span>
               </div>
             </div>
-            <button type="button"
-                    x-on:click="copyText('{日本語|に|ほん|ご}', 2)"
-                    class="px-3.5 py-2 text-xs font-bold rounded-lg border-2 border-gray-900 transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-[2px_2px_0_0_#111827] active:translate-y-0.5"
-                    :class="copiedIndex === 2 ? 'bg-green-500 text-white border-green-600 shadow-none' : 'bg-white text-gray-900 hover:bg-gray-100'">
+            <c-ui.btn x-on:click="copyText('{日本語|に|ほん|ご}', 2)" x-bind:class="copiedIndex === 2 && 'bg-green-500 text-white border-green-600'" variant="outline" size="xs" class="shrink-0">
               <span x-text="copiedIndex === 2 ? '✓ Copié !' : '📋 Copier'"></span>
-            </button>
+            </c-ui.btn>
           </div>
 
           {# Modèle 3 #}
@@ -122,12 +116,9 @@
                 <span class="text-base text-gray-900 font-medium"><ruby>食<rt>た</rt></ruby>べる</span>
               </div>
             </div>
-            <button type="button"
-                    x-on:click="copyText('{食|た}べる', 3)"
-                    class="px-3.5 py-2 text-xs font-bold rounded-lg border-2 border-gray-900 transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-[2px_2px_0_0_#111827] active:translate-y-0.5"
-                    :class="copiedIndex === 3 ? 'bg-green-500 text-white border-green-600 shadow-none' : 'bg-white text-gray-900 hover:bg-gray-100'">
+            <c-ui.btn x-on:click="copyText('{食|た}べる', 3)" x-bind:class="copiedIndex === 3 && 'bg-green-500 text-white border-green-600'" variant="outline" size="xs" class="shrink-0">
               <span x-text="copiedIndex === 3 ? '✓ Copié !' : '📋 Copier'"></span>
-            </button>
+            </c-ui.btn>
           </div>
 
           {# Modèle 4 #}
@@ -144,12 +135,9 @@
                 <span class="text-base text-gray-900 font-medium"><ruby>漢字<rt>かんじ</rt></ruby></span>
               </div>
             </div>
-            <button type="button"
-                    x-on:click="copyText('漢字《かんじ》', 4)"
-                    class="px-3.5 py-2 text-xs font-bold rounded-lg border-2 border-gray-900 transition flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-[2px_2px_0_0_#111827] active:translate-y-0.5"
-                    :class="copiedIndex === 4 ? 'bg-green-500 text-white border-green-600 shadow-none' : 'bg-white text-gray-900 hover:bg-gray-100'">
+            <c-ui.btn x-on:click="copyText('漢字《かんじ》', 4)" x-bind:class="copiedIndex === 4 && 'bg-green-500 text-white border-green-600'" variant="outline" size="xs" class="shrink-0">
               <span x-text="copiedIndex === 4 ? '✓ Copié !' : '📋 Copier'"></span>
-            </button>
+            </c-ui.btn>
           </div>
         </div>
 
@@ -160,12 +148,9 @@
           <div class="bg-gray-900 text-white rounded-xl p-4 space-y-3 font-mono text-xs">
             <div class="flex items-center justify-between pb-2 border-b border-gray-800">
               <span class="text-gray-400 font-sans text-xs">Phrase d'apprentissage</span>
-              <button type="button"
-                      x-on:click="copyText('{私|わたし}は{日本語|にほんご}を{勉強|べんきょう}しています。', 5)"
-                      class="text-xs px-2.5 py-1 rounded bg-gray-800 hover:bg-primary text-white transition flex items-center gap-1 cursor-pointer"
-                      :class="copiedIndex === 5 && 'bg-green-600'">
+              <c-ui.btn x-on:click="copyText('{私|わたし}は{日本語|にほんご}を{勉強|べんきょう}しています。', 5)" x-bind:class="copiedIndex === 5 && 'bg-green-600'" variant="secondary" size="xs">
                 <span x-text="copiedIndex === 5 ? '✓ Copié' : '📋 Copier'"></span>
-              </button>
+              </c-ui.btn>
             </div>
             <p class="text-gray-200 select-all">{私|わたし}は{日本語|にほんご}を{勉強|べんきょう}しています。</p>
             <p class="text-sm font-sans text-white border-t border-gray-800/80 pt-2"><ruby>私<rt>わたし</rt></ruby>は<ruby>日本語<rt>にほんご</rt></ruby>を<ruby>勉強<rt>べんきょう</rt></ruby>しています。</p>
@@ -174,12 +159,9 @@
           <div class="bg-gray-900 text-white rounded-xl p-4 space-y-3 font-mono text-xs">
             <div class="flex items-center justify-between pb-2 border-b border-gray-800">
               <span class="text-gray-400 font-sans text-xs">Salutation & météo</span>
-              <button type="button"
-                      x-on:click="copyText('{今日|きょう}は{良|い}い{天気|てんき}ですね。', 6)"
-                      class="text-xs px-2.5 py-1 rounded bg-gray-800 hover:bg-primary text-white transition flex items-center gap-1 cursor-pointer"
-                      :class="copiedIndex === 6 && 'bg-green-600'">
+              <c-ui.btn x-on:click="copyText('{今日|きょう}は{良|い}い{天気|てんき}ですね。', 6)" x-bind:class="copiedIndex === 6 && 'bg-green-600'" variant="secondary" size="xs">
                 <span x-text="copiedIndex === 6 ? '✓ Copié' : '📋 Copier'"></span>
-              </button>
+              </c-ui.btn>
             </div>
             <p class="text-gray-200 select-all">{今日|きょう}は{良|い}い{天気|てんき}ですね。</p>
             <p class="text-sm font-sans text-white border-t border-gray-800/80 pt-2"><ruby>今日<rt>きょう</rt></ruby>は<ruby>良<rt>い</rt></ruby>い<ruby>天気<rt>てんき</rt></ruby>ですね。</p>
@@ -200,11 +182,9 @@
 
       {# ── Footer ── #}
       <div class="px-6 py-3 bg-gray-50 border-t-2 border-gray-200 flex justify-end shrink-0">
-        <button type="button"
-                x-on:click="open = false"
-                class="px-4 py-2 text-xs font-bold bg-gray-900 text-white rounded-lg hover:bg-primary transition cursor-pointer">
+        <c-ui.btn x-on:click="open = false" variant="secondary" size="xs">
           Fermer
-        </button>
+        </c-ui.btn>
       </div>
 
     </div>

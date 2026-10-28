@@ -36,16 +36,16 @@
           
           {% if progress_percent == 100 %}
           <div class="pt-4 border-t-2 border-gray-900 border-dashed">
-            <a href="{% url 'download_certificate' course.slug %}" class="block w-full text-center bg-gray-900 text-white font-bold rounded-xl px-4 py-3 border-2 border-gray-900 shadow-[2px_2px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_#111827] transition-all">
-              🎓 Télécharger mon certificat
-            </a>
+            <c-ui.btn href="{% url 'download_certificate' course.slug %}" variant="secondary" size="md" block="true">
+       🎓 Télécharger mon certificat
+      </c-ui.btn>
           </div>
           {% else %}
           <div class="pt-4 border-t-2 border-gray-900 border-dashed">
             {% if course.user_progress.resume_lesson %}
-              <a href="{% url 'lesson_detail' course.slug course.user_progress.resume_lesson.slug %}" class="block w-full text-center bg-primary text-white font-bold rounded-xl px-4 py-3 border-2 border-gray-900 shadow-[2px_2px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_#111827] transition-all">
-                {% if progress_percent > 0 %}Continuer{% else %}Commencer{% endif %}
-              </a>
+              <c-ui.btn href="{% url 'lesson_detail' course.slug course.user_progress.resume_lesson.slug %}" variant="primary" size="md" block="true">
+        {% if progress_percent > 0 %}Continuer{% else %}Commencer{% endif %}
+       </c-ui.btn>
             {% endif %}
           </div>
           {% endif %}

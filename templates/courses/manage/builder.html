@@ -79,13 +79,9 @@
 
     <div class="h-5 w-px bg-gray-200 hidden sm:block mx-1"></div>
 
-    <button type="button"
-            x-data
-            x-on:click="$dispatch('open-furigana-guide')"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border-2 border-gray-900 bg-yellow-300 hover:bg-yellow-400 text-gray-900 shadow-[2px_2px_0_0_#111827] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition cursor-pointer"
-            title="Consulter le guide et copier des modèles furigana">
-      <span>💡 Guide Furigana</span>
-    </button>
+    <c-ui.btn type="button" x-data x-on:click="$dispatch('open-furigana-guide')" title="Consulter le guide et copier des modèles furigana" variant="accent" size="xs">
+   <span>💡 Guide Furigana</span>
+  </c-ui.btn>
   </div>
 
   {# ── Statut autosave Google Docs ── #}

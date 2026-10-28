@@ -19,7 +19,7 @@
   {# Contenu cliquable #}
   <div class="flex-1 min-w-0">
     <a href="{% url 'mark_read_and_redirect' notif.id %}" class="group">
-      <p class="text-sm font-medium text-gray-800 group-hover:text-orange-600 transition-colors truncate">
+      <p class="text-sm font-medium text-gray-800 group-hover:text-primary transition-colors truncate">
         {{ notif.title|default:"Notification" }}
       </p>
       <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ notif.message }}</p>

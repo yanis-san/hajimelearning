@@ -5,7 +5,7 @@
 
 {# ══ HERO SECTION ══ #}
 {% if section.section_type == 'hero' %}
-<div class="relative overflow-hidden rounded-2xl {% if bg == 'dark' %}bg-gray-900{% elif bg == 'orange' %}bg-orange-500{% elif bg == 'gray' %}bg-gray-100{% else %}bg-gray-900{% endif %} mb-8 {{ section.css_class }}">
+<div class="relative overflow-hidden rounded-2xl {% if bg == 'dark' %}bg-gray-900{% elif bg == 'orange' %}bg-primary{% elif bg == 'gray' %}bg-gray-100{% else %}bg-gray-900{% endif %} mb-8 {{ section.css_class }}">
 
   {# Image de fond #}
   {% if section.image %}
@@ -25,16 +25,12 @@
       </p>
     {% endif %}
     {% if section.cta_text %}
-      <a href="{{ section.cta_url|default:'#' }}"
-         class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-base font-semibold
-                {% if bg == 'orange' %}bg-white text-orange-600 hover:bg-gray-50
-                {% else %}bg-orange-500 text-white hover:bg-orange-600{% endif %}
-                shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+      <c-ui.btn href="{{ section.cta_url|default:'#' }}" variant="{% if bg == 'orange' %}outline{% else %}primary{% endif %}" size="lg">
         {{ section.cta_text }}
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
         </svg>
-      </a>
+      </c-ui.btn>
     {% endif %}
   </div>
 
@@ -42,7 +38,7 @@
 
 {# ══ TEXT + IMAGE SECTION ══ #}
 {% elif section.section_type == 'text_image' %}
-<div class="{% if bg == 'white' %}bg-white{% elif bg == 'gray' %}bg-gray-50{% elif bg == 'green' %}bg-green-50 border border-green-100{% elif bg == 'orange' %}bg-orange-50 border border-orange-100{% endif %} {% if bg != 'none' %}rounded-xl p-6 md:p-10{% endif %} mb-8 {{ section.css_class }}">
+<div class="{% if bg == 'white' %}bg-white{% elif bg == 'gray' %}bg-gray-50{% elif bg == 'green' %}bg-green-50 border border-green-100{% elif bg == 'orange' %}bg-primary/5 border border-primary/20{% endif %} {% if bg != 'none' %}rounded-xl p-6 md:p-10{% endif %} mb-8 {{ section.css_class }}">
 
   <div class="flex flex-col {% if section.image_position == 'left' %}md:flex-row-reverse{% else %}md:flex-row{% endif %} items-center gap-8 md:gap-12">
 
@@ -58,10 +54,9 @@
       {% endif %}
       {% if section.cta_text %}
         <div class="mt-6">
-          <a href="{{ section.cta_url|default:'#' }}"
-             class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold bg-orange-500 text-white hover:bg-orange-600 shadow-sm transition">
+          <c-ui.btn href="{{ section.cta_url|default:'#' }}" variant="primary" size="md">
             {{ section.cta_text }}
-          </a>
+          </c-ui.btn>
         </div>
       {% endif %}
     </div>
@@ -80,7 +75,7 @@
 
 {# ══ FAQ SECTION ══ #}
 {% elif section.section_type == 'faq' %}
-<div class="{% if bg == 'white' %}bg-white{% elif bg == 'gray' %}bg-gray-50{% elif bg == 'green' %}bg-green-50 border border-green-100{% elif bg == 'orange' %}bg-orange-50 border border-orange-100{% endif %} {% if bg != 'none' %}rounded-xl p-6 md:p-10{% endif %} mb-8 {{ section.css_class }}">
+<div class="{% if bg == 'white' %}bg-white{% elif bg == 'gray' %}bg-gray-50{% elif bg == 'green' %}bg-green-50 border border-green-100{% elif bg == 'orange' %}bg-primary/5 border border-primary/20{% endif %} {% if bg != 'none' %}rounded-xl p-6 md:p-10{% endif %} mb-8 {{ section.css_class }}">
 
   {% if section.title %}
     <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">{{ section.title }}</h3>
@@ -90,8 +85,8 @@
     {% for question, answer in section.body|faq_items %}
       <div x-data="{ open: false }" class="py-4">
         <button x-on:click="open = !open"
-                class="w-full flex items-center justify-between text-left cursor-pointer group focus:outline-none focus:ring-2 focus:ring-orange-400 rounded-lg px-1 -ml-1">
-          <span class="text-base font-medium text-gray-800 group-hover:text-orange-600 transition pr-4">
+                class="w-full flex items-center justify-between text-left cursor-pointer group focus:outline-none focus:ring-2 focus:ring-primary/40 rounded-lg px-1 -ml-1">
+          <span class="text-base font-medium text-gray-800 group-hover:text-primary transition pr-4">
             {{ question }}
           </span>
           <svg class="w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200"
@@ -116,7 +111,7 @@
 
 {# ══ TESTIMONIALS SECTION ══ #}
 {% if section.section_type == 'testimonials' %}
-<div class="{% if bg == 'white' %}bg-white{% elif bg == 'gray' %}bg-gray-50{% elif bg == 'green' %}bg-green-50 border border-green-100{% elif bg == 'orange' %}bg-orange-50 border border-orange-100{% endif %} {% if bg != 'none' %}rounded-xl p-6 md:p-10{% endif %} mb-8 {{ section.css_class }}">
+<div class="{% if bg == 'white' %}bg-white{% elif bg == 'gray' %}bg-gray-50{% elif bg == 'green' %}bg-green-50 border border-green-100{% elif bg == 'orange' %}bg-primary/5 border border-primary/20{% endif %} {% if bg != 'none' %}rounded-xl p-6 md:p-10{% endif %} mb-8 {{ section.css_class }}">
 
   {% if section.title %}
     <h3 class="text-2xl font-bold text-gray-900 mb-8 text-center">{{ section.title }}</h3>
@@ -126,14 +121,14 @@
     {% for item in section.body|testimonial_items %}
       <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
         {# Stars #}
-        <div class="text-orange-400 text-sm mb-3 tracking-wider">{{ item.stars }}</div>
+        <div class="text-primary text-sm mb-3 tracking-wider">{{ item.stars }}</div>
         {# Quote #}
         <div class="prose prose-sm max-w-none text-gray-600 mb-4">
           {{ item.text_html }}
         </div>
         {# Author #}
         <div class="flex items-center gap-3 pt-3 border-t border-gray-100">
-          <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-xs font-bold shrink-0">
+          <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold shrink-0">
             {{ item.name|first }}
           </div>
           <span class="text-sm font-medium text-gray-800">{{ item.name }}</span>
@@ -145,7 +140,7 @@
 </div>
 
 {% else %}
-<div class="{% if bg == 'white' %}bg-white{% elif bg == 'gray' %}bg-gray-50{% elif bg == 'green' %}bg-green-50 border border-green-100{% elif bg == 'orange' %}bg-orange-50 border border-orange-100{% endif %} {% if bg != 'none' %}rounded-xl p-6 mb-8{% else %}mb-8{% endif %} {{ section.css_class }}">
+<div class="{% if bg == 'white' %}bg-white{% elif bg == 'gray' %}bg-gray-50{% elif bg == 'green' %}bg-green-50 border border-green-100{% elif bg == 'orange' %}bg-primary/5 border border-primary/20{% endif %} {% if bg != 'none' %}rounded-xl p-6 mb-8{% else %}mb-8{% endif %} {{ section.css_class }}">
 
   {# ── TEXTE ── #}
   {% if section.section_type == 'text' %}
@@ -185,15 +180,15 @@
   {# ── POINTS FORTS ── #}
   {% elif section.section_type == 'features' %}
     {% if section.title %}
-      <h3 class="text-lg font-bold {% if bg == 'green' %}text-green-900{% elif bg == 'orange' %}text-orange-900{% else %}text-gray-900{% endif %} mb-3 flex items-center gap-2">
-        <svg class="w-5 h-5 {% if bg == 'green' %}text-green-600{% elif bg == 'orange' %}text-orange-600{% else %}text-gray-600{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <h3 class="text-lg font-bold {% if bg == 'green' %}text-green-900{% elif bg == 'orange' %}text-primary-dark{% else %}text-gray-900{% endif %} mb-3 flex items-center gap-2">
+        <svg class="w-5 h-5 {% if bg == 'green' %}text-green-600{% elif bg == 'orange' %}text-primary{% else %}text-gray-600{% endif %}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
         {{ section.title }}
       </h3>
     {% endif %}
     {% if section.body %}
-      <div class="prose prose-sm max-w-none {% if bg == 'green' %}prose-green text-green-800{% elif bg == 'orange' %}prose-orange text-orange-800{% else %}text-gray-700{% endif %}">
+      <div class="prose prose-sm max-w-none {% if bg == 'green' %}prose-green text-green-800{% elif bg == 'orange' %}prose-orange text-primary-dark{% else %}text-gray-700{% endif %}">
         {{ section.body|md }}
       </div>
     {% endif %}

@@ -16,36 +16,25 @@
           {% endif %}
         </div>
 
-        <button type="button"
-                x-on:click="openBar = !openBar"
-                class="md:hidden inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-800 hover:bg-gray-700 text-yellow-300 text-xs font-bold border border-gray-700 shrink-0 cursor-pointer transition active:scale-95"
-                title="Afficher ou masquer les outils de gestion">
-          <span x-text="openBar ? 'Réduire ▴' : '🛠️ Outils ▾'"></span>
-        </button>
+        <c-ui.btn type="button" x-on:click="openBar = !openBar" title="Afficher ou masquer les outils de gestion" variant="toolbar" size="xs" class="md:hidden">
+     <span x-text="openBar ? 'Réduire ▴' : '🛠️ Outils ▾'"></span>
+    </c-ui.btn>
       </div>
 
       <div :class="openBar ? 'flex' : 'hidden md:flex'"
            class="items-center gap-2 flex-wrap text-xs sm:text-sm font-bold pt-2 md:pt-0 border-t border-gray-800 md:border-t-0">
-        <a href="{% url 'manage_course_edit' course.slug %}"
-           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-white transition border border-gray-700 hover:border-gray-500 shadow-sm"
-           title="Modifier titre, description, prix, tags, visuels">
-          ⚙️ Paramètres & Prix
-        </a>
-        <a href="{% url 'manage_course_modules' course.slug %}"
-           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-dark text-white transition shadow-sm"
-           title="Gérer les modules, ajouter et réorganiser les leçons">
+        <c-ui.btn href="{% url 'manage_course_edit' course.slug %}" title="Modifier titre, description, prix, tags, visuels" variant="toolbar" size="sm">
+     ⚙️ Paramètres & Prix
+    </c-ui.btn>
+        <c-ui.btn href="{% url 'manage_course_modules' course.slug %}" title="Gérer les modules, ajouter et réorganiser les leçons" variant="primary" size="xs">
           📦 Modules & Leçons
-        </a>
-        <a href="{% url 'manage_course_landing' course.slug %}"
-           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-white transition border border-gray-700 hover:border-gray-500 shadow-sm"
-           title="Personnaliser les blocs de la page de vente">
-          🎨 Page Vitrine
-        </a>
-        <a href="{% url 'manage_course_students' course.slug %}"
-           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-white transition border border-gray-700 hover:border-gray-500 shadow-sm"
-           title="Voir les inscrits et leurs progressions">
-          👥 Étudiants
-        </a>
+        </c-ui.btn>
+        <c-ui.btn href="{% url 'manage_course_landing' course.slug %}" title="Personnaliser les blocs de la page de vente" variant="toolbar" size="sm">
+     🎨 Page Vitrine
+    </c-ui.btn>
+        <c-ui.btn href="{% url 'manage_course_students' course.slug %}" title="Voir les inscrits et leurs progressions" variant="toolbar" size="sm">
+     👥 Étudiants
+    </c-ui.btn>
         <button type="button"
                 x-on:click="$dispatch('open-furigana-guide')"
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-yellow-400 hover:bg-yellow-300 text-gray-950 transition font-extrabold shadow-sm cursor-pointer"
@@ -54,15 +43,13 @@
         </button>
         <div class="h-4 w-px bg-gray-700 hidden lg:block mx-1"></div>
         {% if preview_landing %}
-          <a href="{% url 'course_detail' course.slug %}"
-             class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 text-xs transition border border-transparent hover:border-gray-700">
-            👁️ Vue Inscrit
-          </a>
+          <c-ui.btn href="{% url 'course_detail' course.slug %}" variant="toolbar" size="xs">
+      👁️ Vue Inscrit
+     </c-ui.btn>
         {% else %}
-          <a href="{% url 'course_detail' course.slug %}?view=landing"
-             class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 text-xs transition border border-transparent hover:border-gray-700">
-            👁️ Aperçu Vitrine
-          </a>
+          <c-ui.btn href="{% url 'course_detail' course.slug %}?view=landing" variant="toolbar" size="xs">
+      👁️ Aperçu Vitrine
+     </c-ui.btn>
         {% endif %}
       </div>
     </div>

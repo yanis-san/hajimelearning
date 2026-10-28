@@ -10,7 +10,7 @@
 
         {# Breadcrumb #}
         <nav class="flex items-center gap-2 text-sm text-gray-400 mb-6">
-          <a href="{% url 'course_list' %}" class="hover:text-orange-600 transition">Catalogue</a>
+          <a href="{% url 'course_list' %}" class="hover:text-primary transition">Catalogue</a>
           <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           <span class="text-gray-700 font-medium truncate">{{ course.title }}</span>
         </nav>
@@ -73,14 +73,14 @@
 
           {# Pré-requis #}
           {% if course.prerequisites %}
-            <div class="bg-orange-50 border border-orange-100 rounded-xl p-6 mb-8">
-              <h3 class="text-lg font-bold text-orange-900 mb-3 flex items-center gap-2">
-                <svg class="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="bg-primary/5 border border-primary/20 rounded-xl p-6 mb-8">
+              <h3 class="text-lg font-bold text-primary-dark mb-3 flex items-center gap-2">
+                <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 Pré-requis
               </h3>
-              <div class="prose prose-sm prose-orange max-w-none text-orange-800">
+              <div class="prose prose-sm prose-orange max-w-none text-primary-dark">
                 {{ course.prerequisites|md }}
               </div>
             </div>
@@ -102,8 +102,8 @@
             {% elif course.thumbnail %}
               <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="w-full h-full object-cover">
             {% else %}
-              <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-100 to-orange-50">
-                <svg class="w-16 h-16 text-orange-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
+                <svg class="w-16 h-16 text-primary/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                 </svg>
               </div>

@@ -15,12 +15,9 @@
 
             <div class="flex items-center gap-2">
               {# Bouton Furigana #}
-              <button type="button"
-                      x-on:click="$dispatch('open-furigana-guide')"
-                      class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-lg border-2 border-gray-900 bg-yellow-300 hover:bg-yellow-400 text-gray-900 shadow-[2px_2px_0_0_#111827] hover:-translate-y-0.5 transition cursor-pointer"
-                      title="Consulter le guide et copier des modèles furigana">
-                <span>💡 Guide Furigana</span>
-              </button>
+              <c-ui.btn type="button" x-on:click="$dispatch('open-furigana-guide')" title="Consulter le guide et copier des modèles furigana" variant="accent" size="xs">
+        <span>💡 Guide Furigana</span>
+       </c-ui.btn>
 
               {# Switcher de mode d'édition #}
               <div class="flex rounded-xl bg-gray-100 p-1 border border-gray-200">

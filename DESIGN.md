@@ -219,17 +219,23 @@ The system uses a consistent softly-rounded corner language. Corners are never s
 ## Components
 
 ### Buttons
-Confident and quiet. The button is the system's most disciplined component — five variants, three sizes, one radius.
+Source de vérité : `static/css/app/buttons.css`, utilisé via `<c-ui.btn variant="…" size="…" />`. Ne jamais recréer un bouton avec des classes Tailwind.
 
-- **Shape:** Softly rounded edges (12px / `rounded-xl`)
-- **Primary:** Tangerine fill, white text (`bg-orange-500 text-white`), light shadow at rest, deeper shadow on hover. The only button that uses color.
-- **Hover / Focus:** Darkens to tangerine-deep (`bg-orange-600`), gains `shadow-md`. Focus ring is `ring-2 ring-orange-400 ring-offset-2`.
-- **Secondary:** Ink fill, white text (`bg-gray-900 text-white`). For strong non-primary actions.
-- **Outline:** White fill, mist border, slate text. For tertiary or paired actions.
-- **Ghost:** Transparent fill, smoke text. For inline or contextual actions (e.g. dismiss).
-- **Danger:** Red fill, white text. For destructive actions only.
-- **Sizes:** `sm` (px-3 py-1.5 text-xs), `md` (px-4 py-2.5 text-sm), `lg` (px-6 py-3 text-base).
-- **Disabled:** 50% opacity, `cursor-not-allowed`, `pointer-events-none`.
+**Règle d'or : une variante = une teinte. Au survol on assombrit la même teinte ; on ne change jamais de couleur** (pas de jaune→rouge, noir→rose, rose→blanc).
+
+- **Forme :** bordure encre 2px, `rounded-xl` (bords « manga »), ombre dure décalée.
+- **Survol :** le bouton monte de 2px et son ombre grandit ; au clic il s'enfonce. Focus clavier : contour rose de la marque.
+- **primary :** rose/rouge de la marque (`#FF003C` → `#CC0030`), texte blanc. L'action principale, une par zone.
+- **secondary :** encre (`#111827` → `#374151`), texte blanc. Action secondaire forte.
+- **outline :** fond blanc (→ `gray-100`). Action neutre.
+- **accent :** jaune (`yellow-300` → `yellow-400`). Outils de gestion/builder, réservé au staff et aux instructeurs.
+- **danger :** contour et texte rouges sur fond blanc (→ `red-50`). Actions destructives.
+- **ghost :** sans cadre, fond gris clair au survol. Actions discrètes.
+- **inverse :** transparent à contour blanc (→ fond blanc, texte encre). Sur fond sombre ou coloré.
+- **toolbar :** barres d'outils sombres (gestion de cours).
+- **Tailles :** `xs`, `sm`, `md` (défaut), `lg` ; options `block="true"` (pleine largeur) et `icon="true"` (carré).
+- **Désactivé :** opacité 50 %, `cursor-not-allowed`.
+- **Couleur d'interaction :** liens, focus, onglets actifs et survols utilisent `primary` / `primary-dark` (plus aucun orange).
 
 ### Badges
 - **Style:** Pill-shaped (`rounded-full`), tinted background + darker text per variant.

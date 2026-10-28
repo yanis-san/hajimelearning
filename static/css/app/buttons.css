@@ -1,0 +1,171 @@
+/*
+ * Système de boutons (composant <c-ui.btn />).
+ *
+ * Convention (à respecter pour tout nouveau bouton) :
+ *  - une variante = une teinte ; au survol on assombrit la MÊME teinte, on ne change jamais de couleur ;
+ *  - le survol soulève le bouton (-2px) et agrandit son ombre dure ; le clic l'enfonce ;
+ *  - primary   : action principale de la page (rose/rouge de la marque), 1 par zone ;
+ *  - secondary : action secondaire forte (encre noire) ;
+ *  - outline   : action neutre (blanc) ;
+ *  - accent    : outils de gestion / builder (jaune), réservé au staff et aux instructeurs ;
+ *  - danger    : action destructive (rouge, contour) ;
+ *  - ghost     : action discrète sans cadre ;
+ *  - inverse   : bouton transparent à contour blanc, sur fond sombre ou coloré ;
+ *  - toolbar   : boutons des barres d'outils sombres (gestion de cours).
+ */
+
+.btn {
+  --btn-bg: #fff;
+  --btn-bg-hover: #f3f4f6;
+  --btn-fg: #111827;
+  --btn-fg-hover: var(--btn-fg);
+  --btn-border: #111827;
+  --btn-border-hover: var(--btn-border);
+  --btn-shadow-color: #111827;
+  --btn-offset: 3px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  color: var(--btn-fg);
+  background-color: var(--btn-bg);
+  border: 2px solid var(--btn-border);
+  border-radius: 0.75rem;
+  box-shadow: var(--btn-offset) var(--btn-offset) 0 0 var(--btn-shadow-color);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.btn:hover {
+  color: var(--btn-fg-hover);
+  background-color: var(--btn-bg-hover);
+  border-color: var(--btn-border-hover);
+  transform: translateY(-2px);
+  box-shadow: calc(var(--btn-offset) + 1px) calc(var(--btn-offset) + 1px) 0 0 var(--btn-shadow-color);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.btn:focus-visible {
+  outline: 3px solid #ff003c;
+  outline-offset: 2px;
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Variantes ── */
+.btn-primary {
+  --btn-bg: #ff003c;
+  --btn-bg-hover: #cc0030;
+  --btn-fg: #fff;
+}
+
+.btn-secondary {
+  --btn-bg: #111827;
+  --btn-bg-hover: #374151;
+  --btn-fg: #fff;
+}
+
+.btn-outline {
+  --btn-bg: #fff;
+  --btn-bg-hover: #f3f4f6;
+}
+
+.btn-accent {
+  --btn-bg: #fde047;
+  --btn-bg-hover: #facc15;
+}
+
+.btn-danger {
+  --btn-bg: #fff;
+  --btn-bg-hover: #fef2f2;
+  --btn-fg: #b91c1c;
+  --btn-border: #dc2626;
+  --btn-border-hover: #b91c1c;
+  --btn-shadow-color: #dc2626;
+}
+
+.btn-ghost {
+  --btn-bg: transparent;
+  --btn-bg-hover: #f3f4f6;
+  --btn-border: transparent;
+  --btn-border-hover: #e5e7eb;
+  box-shadow: none;
+}
+
+.btn-ghost:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+.btn-inverse {
+  --btn-bg: transparent;
+  --btn-bg-hover: #fff;
+  --btn-fg: #fff;
+  --btn-fg-hover: #111827;
+  --btn-border: #fff;
+  --btn-shadow-color: transparent;
+}
+
+.btn-toolbar {
+  --btn-bg: #1f2937;
+  --btn-bg-hover: #374151;
+  --btn-fg: #f3f4f6;
+  --btn-fg-hover: #fff;
+  --btn-border: #374151;
+  --btn-border-hover: #6b7280;
+  --btn-shadow-color: transparent;
+  gap: 0.375rem;
+  border-width: 1px;
+  border-radius: 0.5rem;
+}
+
+.btn-toolbar:hover {
+  transform: none;
+}
+
+/* ── Tailles ── */
+.btn-xs {
+  --btn-offset: 2px;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.btn-sm {
+  --btn-offset: 2px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.btn-lg {
+  --btn-offset: 4px;
+  padding: 0.75rem 2rem;
+  font-size: 1.125rem;
+}
+
+.btn-block {
+  display: flex;
+  width: 100%;
+}
+
+.btn-icon {
+  padding: 0.625rem;
+}

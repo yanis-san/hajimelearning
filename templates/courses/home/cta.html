@@ -11,12 +11,12 @@
             Créez votre compte gratuitement. Accédez aux formations en quelques secondes et rejoignez les élèves.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <a href="{% url 'account_signup' %}" class="w-full sm:w-auto bg-white text-gray-900 font-bold rounded-xl px-8 py-3.5 border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#111827] active:translate-y-0.5 transition-all text-center">
-                Créer mon compte
-            </a>
-            <a href="{% url 'contact' %}" class="w-full sm:w-auto bg-transparent text-white font-bold rounded-xl px-8 py-3.5 border-2 border-white hover:bg-white hover:text-gray-900 transition-all text-center">
-                Nous contacter
-            </a>
+            <c-ui.btn href="{% url 'account_signup' %}" variant="outline" size="lg" class="w-full sm:w-auto">
+        Créer mon compte
+      </c-ui.btn>
+            <c-ui.btn href="{% url 'contact' %}" variant="inverse" size="lg" class="w-full sm:w-auto">
+        Nous contacter
+      </c-ui.btn>
         </div>
     </div>
 </section>

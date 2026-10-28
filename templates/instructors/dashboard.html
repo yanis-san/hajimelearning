@@ -12,7 +12,7 @@
       <h1 class="text-2xl font-bold text-gray-900">Espace Instructeur</h1>
       <p class="text-sm text-gray-500 mt-1">
         Offre <strong>{{ profile.plan.name }}</strong> — {{ profile.revenue_percent }}% de revenus
-        <a href="{% url 'instructor_plans' %}" class="text-orange-500 hover:text-orange-700 font-medium ml-2 text-xs transition">
+        <a href="{% url 'instructor_plans' %}" class="text-primary hover:text-primary-dark font-medium ml-2 text-xs transition">
           Changer d'offre →
         </a>
       </p>
@@ -37,7 +37,7 @@
       </div>
       <p class="text-2xl font-bold text-gray-900">{{ my_courses|length }}</p>
       {% if profile.max_courses > 0 %}
-        <progress class="meter mt-2 {% if profile.courses_remaining == 0 %}meter-red{% else %}meter-orange{% endif %}"
+        <progress class="meter mt-2 {% if profile.courses_remaining == 0 %}meter-red{% else %}meter-ink{% endif %}"
                   value="{% widthratio my_courses|length profile.max_courses 100 %}" max="100"></progress>
         <p class="text-xs text-gray-400 mt-1">
           {% if profile.courses_remaining == 0 %}
@@ -136,7 +136,7 @@
               <span class="text-xs font-semibold text-gray-800">{{ course.modules_count }}</span>
               {% if profile.max_modules_per_course > 0 %}
                 <span class="text-xs text-gray-400">/ {{ profile.max_modules_per_course }}</span>
-                <progress class="meter meter-xs w-16 {% if course.modules_count >= profile.max_modules_per_course %}meter-red{% else %}meter-amber{% endif %}"
+                <progress class="meter meter-xs w-16 {% if course.modules_count >= profile.max_modules_per_course %}meter-red{% else %}meter-ink{% endif %}"
                           value="{% widthratio course.modules_count profile.max_modules_per_course 100 %}" max="100"></progress>
               {% else %}
                 <span class="text-xs text-gray-400">/ ∞</span>
@@ -149,7 +149,7 @@
               <span class="text-xs font-semibold text-gray-800">{{ course.lessons_count }}</span>
               {% if profile.max_lessons_per_course > 0 %}
                 <span class="text-xs text-gray-400">/ {{ profile.max_lessons_per_course }}</span>
-                <progress class="meter meter-xs w-16 {% if course.lessons_count >= profile.max_lessons_per_course %}meter-red{% else %}meter-amber{% endif %}"
+                <progress class="meter meter-xs w-16 {% if course.lessons_count >= profile.max_lessons_per_course %}meter-red{% else %}meter-ink{% endif %}"
                           value="{% widthratio course.lessons_count profile.max_lessons_per_course 100 %}" max="100"></progress>
               {% else %}
                 <span class="text-xs text-gray-400">/ ∞</span>

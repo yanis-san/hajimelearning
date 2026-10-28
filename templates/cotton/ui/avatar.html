@@ -1,7 +1,7 @@
 <c-vars user="" size="md" href="" />
 
 {% if href %}
-<a href="{{ href }}" class="block rounded-full shrink-0 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 transition" {{ attrs }}>
+<a href="{{ href }}" class="block rounded-full shrink-0 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 transition" {{ attrs }}>
 {% endif %}
 
   {% if user.avatar %}
@@ -13,7 +13,7 @@
                 {% elif size == 'xl' %}w-24 h-24
                 {% else %}w-8 h-8{% endif %}">
   {% else %}
-    <div class="rounded-full bg-orange-500 text-white flex items-center justify-center font-semibold select-none shrink-0
+    <div class="rounded-full bg-primary text-white flex items-center justify-center font-semibold select-none shrink-0
                 {% if size == 'sm' %}w-6 h-6 text-xs
                 {% elif size == 'lg' %}w-16 h-16 text-xl
                 {% elif size == 'xl' %}w-24 h-24 text-3xl

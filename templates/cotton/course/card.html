@@ -51,26 +51,22 @@
 
     {# CTA principal #}
     {% if is_completed == 'true' %}
-      <a href="{% url 'download_certificate' course.slug %}"
-         class="w-full text-center px-3 py-2 text-xs font-bold uppercase tracking-widest bg-gray-900 text-white border-2 border-gray-900 rounded-lg shadow-sm hover:translate-y-0.5 hover:shadow-none hover:bg-black transition-all manga-drawn-alt">
-        🎓 Certificat
-      </a>
-      <a href="{{ course.get_absolute_url }}"
-         class="w-full text-center px-3 py-2 text-xs font-bold uppercase tracking-widest bg-white text-gray-900 border-2 border-gray-900 rounded-lg shadow-sm hover:translate-y-0.5 hover:shadow-none hover:bg-gray-50 transition-all manga-drawn-alt">
-        Revoir
-      </a>
+      <c-ui.btn href="{% url 'download_certificate' course.slug %}" variant="secondary" size="sm" block="true" class="uppercase tracking-widest">
+    🎓 Certificat
+   </c-ui.btn>
+      <c-ui.btn href="{{ course.get_absolute_url }}" variant="outline" size="sm" block="true" class="uppercase tracking-widest">
+    Revoir
+   </c-ui.btn>
     {% else %}
-      <a href="{{ course.get_absolute_url }}"
-         class="w-full text-center px-3 py-2 text-xs font-bold uppercase tracking-widest bg-primary text-white border-2 border-gray-900 rounded-lg shadow-sm hover:translate-y-0.5 hover:shadow-none hover:bg-gray-900 transition-all manga-drawn-alt">
-        {% if show_progress == 'true' and progress|add:"0" > 0 %}Continuer{% elif show_progress == 'true' %}Commencer{% else %}Voir le cours{% endif %}
-      </a>
+      <c-ui.btn href="{{ course.get_absolute_url }}" variant="primary" size="sm" block="true" class="uppercase tracking-widest">
+    {% if show_progress == 'true' and progress|add:"0" > 0 %}Continuer{% elif show_progress == 'true' %}Commencer{% else %}Voir le cours{% endif %}
+   </c-ui.btn>
     {% endif %}
 
     {% if user.is_staff or course.instructor_id == user.id %}
-      <a href="{% url 'manage_course_edit' course.slug %}"
-         class="w-full text-center px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider bg-yellow-400 text-gray-900 border-2 border-gray-900 rounded-lg shadow-sm hover:translate-y-0.5 hover:shadow-none hover:bg-yellow-300 transition-all manga-drawn-alt">
-        ⚙️ Gérer ce cours
-      </a>
+      <c-ui.btn href="{% url 'manage_course_edit' course.slug %}" variant="accent" size="xs" block="true" class="uppercase tracking-wider">
+    ⚙️ Gérer ce cours
+   </c-ui.btn>
     {% endif %}
   </div>
 

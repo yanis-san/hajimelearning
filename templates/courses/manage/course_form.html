@@ -95,16 +95,14 @@
     <!-- ── BARRE D'ACTIONS INFERIEURE ── -->
     <div class="flex flex-wrap items-center justify-between gap-4 mt-10 pt-6 border-t-2 border-gray-900">
       <div class="flex flex-wrap items-center gap-3">
-        <button type="submit"
-                class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-black uppercase tracking-wider text-xs shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 active:translate-y-0 active:shadow-none transition cursor-pointer">
+        <c-ui.btn type="submit" variant="primary" size="md" class="uppercase tracking-wider">
           <span>💾</span>
           <span>{% if is_edit %}Enregistrer les modifications{% else %}Créer la formation{% endif %}</span>
-        </button>
+        </c-ui.btn>
 
-        <a href="{% url 'manage_course_list' %}"
-           class="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl border-2 border-gray-900 bg-white hover:bg-gray-100 text-gray-900 font-bold text-xs shadow-[2px_2px_0_0_#111827] transition">
-          Retour à la liste
-        </a>
+        <c-ui.btn href="{% url 'manage_course_list' %}" variant="outline" size="sm">
+     Retour à la liste
+    </c-ui.btn>
       </div>
 
       {% if is_edit %}

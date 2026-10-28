@@ -20,7 +20,7 @@
       <form method="POST" action="{% url 'account_confirm_email' confirmation.key %}">
         {% csrf_token %}
         {{ redirect_field }}
-        <c-ui.btn type="submit" class="w-full justify-center">
+        <c-ui.btn type="submit" block="true">
           Confirmer mon adresse e-mail
         </c-ui.btn>
       </form>
@@ -36,7 +36,7 @@
     <p class="text-sm text-gray-600 mb-4">
       Vous pouvez demander un nouveau lien depuis votre espace.
     </p>
-    <c-ui.btn href="{% url 'account_login' %}" class="w-full justify-center" variant="outline">
+    <c-ui.btn href="{% url 'account_login' %}" block="true" variant="outline">
       Retour à la connexion
     </c-ui.btn>
   {% endif %}

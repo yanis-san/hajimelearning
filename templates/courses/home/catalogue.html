@@ -69,9 +69,9 @@
                 <div class="text-6xl mb-6">🚧</div>
                 <h3 class="text-2xl font-bold text-gray-900 mb-4">Aucune formation disponible</h3>
                 <p class="text-gray-600 font-medium mb-8">Les premières formations arrivent bientôt. Revenez très vite !</p>
-                <a href="{% url 'account_signup' %}" class="inline-block bg-primary text-white font-bold rounded-xl px-8 py-3.5 border-2 border-primary shadow-[4px_4px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_#111827] transition-all">
-                    M'avertir à l'ouverture
-                </a>
+                <c-ui.btn href="{% url 'account_signup' %}" variant="primary" size="lg">
+          M'avertir à l'ouverture
+        </c-ui.btn>
             </div>
             {% endif %}
         </div>

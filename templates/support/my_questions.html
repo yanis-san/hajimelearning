@@ -17,12 +17,12 @@
     </div>
     <div class="flex items-center gap-2">
       {% if total_open > 0 %}
-        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-50 text-orange-700 text-sm font-medium">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/5 text-primary-dark text-sm font-medium">
           ⏳ {{ total_open }} question{{ total_open|pluralize }} en attente
         </span>
       {% endif %}
       <a href="{% url 'user_dashboard' %}"
-         class="text-sm text-gray-500 hover:text-orange-600 transition">
+         class="text-sm text-gray-500 hover:text-primary transition">
         ← Dashboard
       </a>
     </div>
@@ -38,11 +38,11 @@
       {% for cd in courses_data %}
       <button type="button"
               x-on:click="activeCourse = '{{ cd.course.slug }}'; filter = 'all'"
-              :class="activeCourse === '{{ cd.course.slug }}' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'text-gray-600 hover:bg-gray-50 border-transparent'"
+              :class="activeCourse === '{{ cd.course.slug }}' ? 'bg-primary/5 text-primary-dark border-primary/30' : 'text-gray-600 hover:bg-gray-50 border-transparent'"
               class="w-full text-left flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-sm transition cursor-pointer">
         <span class="truncate font-medium">{{ cd.course.title }}</span>
         <span class="shrink-0 text-xs px-1.5 py-0.5 rounded-full
-          {% if cd.open_count > 0 %}bg-orange-100 text-orange-600{% else %}bg-gray-100 text-gray-400{% endif %}">
+          {% if cd.open_count > 0 %}bg-primary/10 text-primary{% else %}bg-gray-100 text-gray-400{% endif %}">
           {{ cd.total }}
         </span>
       </button>
@@ -65,7 +65,7 @@
             </p>
           </div>
           <a href="{% url 'course_detail' cd.course.slug %}"
-             class="text-xs text-orange-600 hover:text-orange-700 transition">
+             class="text-xs text-primary hover:text-primary-dark transition">
             Voir le cours →
           </a>
         </div>
