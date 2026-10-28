@@ -2,15 +2,15 @@
 (function () {
   const variants = {
     lesson: {
-      empty: '<p class="text-gray-400 italic text-sm">L\'aperçu apparaîtra ici…</p>',
+      empty: '<p class="text-gray-500 italic text-sm">L\'aperçu apparaîtra ici…</p>',
       prose: 'prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-a:text-primary prose-strong:text-gray-800 prose-table:text-sm',
     },
     course: {
-      empty: '<p class="text-gray-400 italic">Aucun contenu rédigé pour le moment…</p>',
+      empty: '<p class="text-gray-500 italic">Aucun contenu rédigé pour le moment…</p>',
       prose: 'prose prose-sm max-w-none prose-headings:text-gray-900 prose-headings:font-bold prose-p:text-gray-700 prose-a:text-primary prose-strong:text-gray-900 prose-ul:list-disc prose-ul:pl-5',
     },
     landing: {
-      empty: '<p class="text-gray-400 italic text-sm">L\'aperçu apparaîtra ici…</p>',
+      empty: '<p class="text-gray-500 italic text-sm">L\'aperçu apparaîtra ici…</p>',
       prose: 'prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-a:text-primary prose-strong:text-gray-800',
     },
   };

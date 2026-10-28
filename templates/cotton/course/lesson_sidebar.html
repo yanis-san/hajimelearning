@@ -3,7 +3,7 @@
 
 {# ── Bouton toggle mobile ── #}
 <button x-on:click="sidebarOpen = !sidebarOpen"
-        class="lg:hidden fixed bottom-6 left-6 z-40 flex items-center justify-center w-14 h-14 bg-primary text-white border-2 border-gray-900 rounded-full shadow-[4px_4px_0_0_#111827] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_#111827] transition-all cursor-pointer focus:outline-none">
+        class="lg:hidden fixed bottom-6 left-6 z-40 flex items-center justify-center w-14 h-14 bg-primary text-white border-2 border-gray-900 rounded-full shadow-brutal-md hover:-translate-y-1 hover:shadow-brutal-lg transition-all cursor-pointer focus:outline-none">
   <svg x-show="!sidebarOpen" x-cloak class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
   </svg>
@@ -56,7 +56,7 @@
     <div class="space-y-4">
       {% for module in course.modules.all %}
         <div x-data="{ moduleOpen: {% if module == current_lesson.module %}true{% else %}false{% endif %} }"
-             class="border-2 border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-[3px_3px_0_0_#111827] transition-shadow duration-200 overflow-hidden manga-drawn-alt">
+             class="border-2 border-gray-200 rounded-xl bg-white shadow-sm hover:shadow-brutal transition-shadow duration-200 overflow-hidden manga-drawn-alt">
 
           {# Header module #}
           <button x-on:click="moduleOpen = !moduleOpen"
@@ -67,7 +67,7 @@
                 <span class="text-yellow-500 text-xs font-normal ml-1">(Brouillon)</span>
               {% endif %}
             </span>
-            <svg class="w-5 h-5 shrink-0 transition-transform duration-200 text-gray-400 group-hover:text-gray-900"
+            <svg class="w-5 h-5 shrink-0 transition-transform duration-200 text-gray-500 group-hover:text-gray-900"
                  :class="moduleOpen && 'rotate-180'"
                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -80,7 +80,7 @@
               <li>
                 <a href="{% url 'lesson_detail' course.slug l.slug %}"
                    class="flex items-center gap-3 px-4 py-3 text-sm transition
-                          {% if l == current_lesson %}bg-primary/10 text-primary font-bold{% else %}bg-white text-gray-700 hover:bg-gray-50 font-medium{% endif %}">
+                          {% if l == current_lesson %}bg-primary/10 text-primary-dark font-bold{% else %}bg-white text-gray-700 hover:bg-gray-50 font-medium{% endif %}">
 
                   {# Icône statut #}
                   {% if l.id in completed_ids %}
@@ -91,7 +91,7 @@
                       </svg>
                     </span>
                   {% elif not l.is_free and has_access != 'true' %}
-                    <span class="flex items-center justify-center w-6 h-6 border-2 border-gray-300 rounded-full bg-gray-50 text-gray-400 shrink-0">
+                    <span class="flex items-center justify-center w-6 h-6 border-2 border-gray-300 rounded-full bg-gray-50 text-gray-500 shrink-0">
                       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                       </svg>
@@ -105,7 +105,7 @@
 
                   <span class="truncate flex-1">{{ l.title|furigana }}</span>
                   {% if l.duration_minutes %}
-                    <span class="text-xs text-gray-400 shrink-0">{{ l.duration_minutes }} min</span>
+                    <span class="text-xs text-gray-500 shrink-0">{{ l.duration_minutes }} min</span>
                   {% endif %}
                   {% if is_manager == 'true' and not l.is_published %}
                     <span class="text-yellow-500 text-xs">(Brouillon)</span>

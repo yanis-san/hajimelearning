@@ -59,7 +59,7 @@
 }
 
 .btn:focus-visible {
-  outline: 3px solid #ff003c;
+  outline: 3px solid #e6003a;
   outline-offset: 2px;
 }
 
@@ -72,8 +72,8 @@
 
 /* ── Variantes ── */
 .btn-primary {
-  --btn-bg: #ff003c;
-  --btn-bg-hover: #cc0030;
+  --btn-bg: #e6003a;
+  --btn-bg-hover: #b30030;
   --btn-fg: #fff;
 }
 

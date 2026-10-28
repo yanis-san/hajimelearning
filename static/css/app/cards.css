@@ -1,0 +1,18 @@
+/*
+ * Carte « manga » (composant <c-ui.card />) : fond blanc, contour net, ombre dure.
+ * padding : none | sm | md (défaut) | lg ; border : ink (défaut) | soft.
+ */
+.card {
+  background-color: #fff;
+  border: 2px solid #111827;
+  border-radius: 1rem;
+  box-shadow: 4px 4px 0 0 #111827;
+}
+
+.card-soft {
+  border-color: #e5e7eb;
+}
+
+.card-pad-sm { padding: 1rem; }
+.card-pad-md { padding: 1.5rem; }
+.card-pad-lg { padding: 2rem; }

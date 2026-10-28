@@ -60,7 +60,7 @@
           <input type="file" name="payment_proof" accept="image/*" required
                  class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-primary/5 file:text-primary hover:file:bg-primary/10 file:cursor-pointer cursor-pointer">
         </div>
-        <p class="text-xs text-gray-400 mt-1.5">JPG, PNG — Max 5 Mo</p>
+        <p class="text-xs text-gray-500 mt-1.5">JPG, PNG — Max 5 Mo</p>
         {% if form.payment_proof.errors %}
           <p class="text-xs text-red-500 mt-1">{{ form.payment_proof.errors.0 }}</p>
         {% endif %}

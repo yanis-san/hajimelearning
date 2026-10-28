@@ -424,3 +424,41 @@ class TestBuilderAutosaveContract:
             reverse('add_block', args=[lesson.id, 'text']), {'video_id': 'x' * 500}, headers={'X-Autosave': 'true'}
         )
         assert response.status_code == 422 and ContentBlock.objects.count() == 0
+
+
+class TestAccessibilityContrast:
+    @staticmethod
+    def _luminance(hex_color):
+        channels = [int(hex_color.lstrip('#')[i : i + 2], 16) / 255 for i in (0, 2, 4)]
+        linear = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in channels]
+        return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+
+    def _ratio(self, first, second):
+        high, low = sorted((self._luminance(first), self._luminance(second)), reverse=True)
+        return (high + 0.05) / (low + 0.05)
+
+    def _theme_color(self, name):
+        import re
+        from pathlib import Path
+
+        css = Path('theme/static_src/src/styles.css').read_text(encoding='utf-8')
+        return re.search(rf'--color-{name}:\s*(#[0-9A-Fa-f]{{6}})', css).group(1)
+
+    def test_brand_colors_meet_wcag_aa_on_white(self):
+        assert (
+            self._ratio(self._theme_color('primary'), '#FFFFFF') >= 4.5
+        )  # texte blanc sur fond rose, texte rose sur blanc
+        assert self._ratio(self._theme_color('primary-dark'), '#FFFFFF') >= 4.5
+
+    def test_no_low_contrast_gray_text_on_light_backgrounds(self):
+        from pathlib import Path
+
+        dark_contexts = {'footer.html', 'furigana_guide.html', 'promo.html'}
+        offenders = [
+            str(path)
+            for path in Path('templates').rglob('*.html')
+            if path.name not in dark_contexts
+            and 'manager_bar' not in path.name
+            and 'text-gray-400' in path.read_text(encoding='utf-8')
+        ]
+        assert not offenders, f'text-gray-400 (2.5:1) illisible sur fond clair, utiliser gray-500 : {offenders}'

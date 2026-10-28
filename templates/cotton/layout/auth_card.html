@@ -14,7 +14,7 @@
 
     {# Carte #}
     <div class="relative group">
-        <div class="relative bg-white border-2 border-gray-200 rounded-2xl shadow-[4px_4px_0_0_#111827] px-8 py-10 z-10 transition-transform duration-300 manga-drawn">
+        <c-ui.card border="soft" padding="None" padding="none" drawn="true" class="relative px-8 py-10 z-10 transition-transform duration-300">
 
           {% if title %}
             <div class="mb-8 border-b-2 border-gray-100 pb-4">
@@ -27,7 +27,7 @@
 
           {{ slot }}
 
-        </div>
+        </c-ui.card>
     </div>
 
   </div>

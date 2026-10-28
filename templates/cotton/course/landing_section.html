@@ -89,7 +89,7 @@
           <span class="text-base font-medium text-gray-800 group-hover:text-primary transition pr-4">
             {{ question }}
           </span>
-          <svg class="w-5 h-5 text-gray-400 shrink-0 transition-transform duration-200"
+          <svg class="w-5 h-5 text-gray-500 shrink-0 transition-transform duration-200"
                :class="open && 'rotate-180'"
                fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -128,7 +128,7 @@
         </div>
         {# Author #}
         <div class="flex items-center gap-3 pt-3 border-t border-gray-100">
-          <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold shrink-0">
+          <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary-dark text-xs font-bold shrink-0">
             {{ item.name|first }}
           </div>
           <span class="text-sm font-medium text-gray-800">{{ item.name }}</span>

@@ -225,7 +225,7 @@ Source de vérité : `static/css/app/buttons.css`, utilisé via `<c-ui.btn varia
 
 - **Forme :** bordure encre 2px, `rounded-xl` (bords « manga »), ombre dure décalée.
 - **Survol :** le bouton monte de 2px et son ombre grandit ; au clic il s'enfonce. Focus clavier : contour rose de la marque.
-- **primary :** rose/rouge de la marque (`#FF003C` → `#CC0030`), texte blanc. L'action principale, une par zone.
+- **primary :** rose/rouge de la marque (`#E6003A` → `#B30030`), texte blanc. L'action principale, une par zone.
 - **secondary :** encre (`#111827` → `#374151`), texte blanc. Action secondaire forte.
 - **outline :** fond blanc (→ `gray-100`). Action neutre.
 - **accent :** jaune (`yellow-300` → `yellow-400`). Outils de gestion/builder, réservé au staff et aux instructeurs.

@@ -84,11 +84,11 @@
                       x-on:input="document.getElementById('id_text_content').value = $refs.splitEditor.value; renderLessonBlockMarkdown($refs.splitEditor.value, 'md-live-preview'); markDirty()"
                       rows="16"
                       placeholder="Votre texte (Markdown)..."
-                      class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition font-mono text-sm resize-y"></textarea>
+                      class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition font-mono text-sm resize-y"></textarea>
           </div>
           <div id="md-live-preview"
                class="border border-gray-200 rounded-xl p-4 bg-gray-50 overflow-y-auto max-h-[28rem]">
-            <p class="text-gray-400 italic text-sm">L'aperçu apparaîtra ici…</p>
+            <p class="text-gray-500 italic text-sm">L'aperçu apparaîtra ici…</p>
           </div>
         </div>
 
@@ -96,7 +96,7 @@
         <div x-show="tab === 'preview'" x-transition>
           <div id="md-full-preview"
                class="border border-gray-200 rounded-xl p-6 bg-gray-50 min-h-[12rem] overflow-y-auto">
-            <p class="text-gray-400 italic text-sm">L'aperçu apparaîtra ici…</p>
+            <p class="text-gray-500 italic text-sm">L'aperçu apparaîtra ici…</p>
           </div>
         </div>
       </div>
@@ -118,7 +118,7 @@
         <div class="space-y-1">
           <label for="id_title" class="block text-sm font-medium text-gray-700">Titre de l'audio</label>
           {{ form.title }}
-          <p class="text-xs text-gray-400">Optionnel</p>
+          <p class="text-xs text-gray-500">Optionnel</p>
         </div>
         <div class="space-y-1">
           <label for="id_file_content" class="block text-sm font-medium text-gray-700">
@@ -129,7 +129,7 @@
         <div class="space-y-1">
           <label for="id_text_content" class="block text-sm font-medium text-gray-700">Consigne</label>
           <textarea name="text_content" rows="2"
-                    class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition resize-y">{{ form.text_content.value|default:'' }}</textarea>
+                    class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition resize-y">{{ form.text_content.value|default:'' }}</textarea>
         </div>
         <div class="bg-yellow-50 p-3 rounded-xl border border-yellow-200">
           <label class="block text-sm font-medium text-yellow-800 mb-1">Fichier Correction</label>

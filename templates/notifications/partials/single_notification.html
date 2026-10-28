@@ -30,11 +30,11 @@
             hx-target="#notif-item-{{ notif.id }}"
             hx-swap="outerHTML"
             class="mt-1.5 text-xs font-bold cursor-pointer transition-colors
-                   {% if not notif.is_read %}text-primary hover:brightness-95{% else %}text-gray-400 hover:text-gray-600{% endif %}">
+                   {% if not notif.is_read %}text-primary hover:brightness-95{% else %}text-gray-500 hover:text-gray-600{% endif %}">
       {% if not notif.is_read %}Marquer comme lu{% else %}Marquer comme non lu{% endif %}
     </button>
   </div>
 
   {# Date #}
-  <span class="shrink-0 text-xs text-gray-400 whitespace-nowrap mt-1">{{ notif.created_at|timesince }}</span>
+  <span class="shrink-0 text-xs text-gray-500 whitespace-nowrap mt-1">{{ notif.created_at|timesince }}</span>
 </div>

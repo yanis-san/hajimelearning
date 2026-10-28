@@ -29,8 +29,8 @@
                   hx-indicator="#catalogue-grid"
                   class="px-4 py-2 text-sm font-bold rounded-xl border-2 transition-all cursor-pointer manga-drawn"
                   :class="active === ''
-                    ? 'bg-gray-900 border-gray-900 text-white shadow-[3px_3px_0_0_#111827] -translate-y-0.5'
-                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5'">
+                    ? 'bg-gray-900 border-gray-900 text-white shadow-brutal -translate-y-0.5'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-brutal hover:-translate-y-0.5'">
             Toutes
           </button>
 
@@ -45,8 +45,8 @@
                     hx-indicator="#catalogue-grid"
                     class="px-4 py-2 text-sm font-bold rounded-xl border-2 transition-all cursor-pointer manga-drawn"
                     :class="active === '{{ cat.slug }}'
-                      ? 'bg-gray-900 border-gray-900 text-white shadow-[3px_3px_0_0_#111827] -translate-y-0.5'
-                      : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5'">
+                      ? 'bg-gray-900 border-gray-900 text-white shadow-brutal -translate-y-0.5'
+                      : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-brutal hover:-translate-y-0.5'">
               {{ cat.name }}
             </button>
           {% endfor %}
@@ -59,7 +59,7 @@
 
         {# Recherche #}
         <div class="relative flex-1 max-w-md">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
           <input
@@ -78,7 +78,7 @@
 
         {# Boutons de tri #}
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-xs text-gray-400 mr-1">Trier par :</span>
+          <span class="text-xs text-gray-500 mr-1">Trier par :</span>
 
           <button type="button"
                   @click="sort = sortNext(sort, 'created_at', '-created_at')"
@@ -88,8 +88,8 @@
                   hx-include="[name='q'], [name='category']"
                   class="px-3 py-1.5 text-xs font-bold rounded-xl border-2 transition-all cursor-pointer manga-drawn-alt"
                   :class="(sort === '-created_at' || sort === 'created_at')
-                    ? 'bg-gray-900 border-gray-900 text-white shadow-[2px_2px_0_0_#111827]'
-                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-[2px_2px_0_0_#111827]'">
+                    ? 'bg-gray-900 border-gray-900 text-white shadow-brutal-sm'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-brutal-sm'">
             Récent
             <span x-text="sort === '-created_at' ? '↓' : sort === 'created_at' ? '↑' : ''"></span>
           </button>
@@ -102,8 +102,8 @@
                   hx-include="[name='q'], [name='category']"
                   class="px-3 py-1.5 text-xs font-bold rounded-xl border-2 transition-all cursor-pointer manga-drawn-alt"
                   :class="(sort === 'title' || sort === '-title')
-                    ? 'bg-gray-900 border-gray-900 text-white shadow-[2px_2px_0_0_#111827]'
-                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-[2px_2px_0_0_#111827]'">
+                    ? 'bg-gray-900 border-gray-900 text-white shadow-brutal-sm'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-brutal-sm'">
             Titre
             <span x-text="sort === 'title' ? '↑' : sort === '-title' ? '↓' : ''"></span>
           </button>
@@ -116,8 +116,8 @@
                   hx-include="[name='q'], [name='category']"
                   class="px-3 py-1.5 text-xs font-bold rounded-xl border-2 transition-all cursor-pointer manga-drawn-alt"
                   :class="(sort === 'price' || sort === '-price')
-                    ? 'bg-gray-900 border-gray-900 text-white shadow-[2px_2px_0_0_#111827]'
-                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-[2px_2px_0_0_#111827]'">
+                    ? 'bg-gray-900 border-gray-900 text-white shadow-brutal-sm'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-900 hover:shadow-brutal-sm'">
             Prix
             <span x-text="sort === 'price' ? '↑' : sort === '-price' ? '↓' : ''"></span>
           </button>

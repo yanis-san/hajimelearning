@@ -54,7 +54,7 @@
               <span class="inline-flex items-center gap-1 text-xs font-medium text-primary-dark bg-primary/5 px-2 py-0.5 rounded-full">⏳ Ouvert</span>
             {% endif %}
             {% if question.lesson %}
-              <span class="text-xs text-gray-400">{{ question.lesson.title }}</span>
+              <span class="text-xs text-gray-500">{{ question.lesson.title }}</span>
             {% endif %}
           </div>
           <p class="text-sm font-semibold text-gray-800 group-hover:text-primary-dark transition truncate">{{ question.title }}</p>
@@ -65,7 +65,7 @@
             <c-ui.avatar :user="question.student" size="xs" />
             <span>{{ question.student.get_full_name|default:question.student.email }}</span>
           </div>
-          <p class="text-xs text-gray-400 mt-1">{{ question.updated_at|timesince }} ago</p>
+          <p class="text-xs text-gray-500 mt-1">{{ question.updated_at|timesince }} ago</p>
         </div>
       </div>
     </a>
@@ -75,7 +75,7 @@
       <p class="text-sm font-medium text-gray-700">
         {% if status_filter == 'resolved' %}Aucune question résolue{% else %}Aucune question en attente{% endif %}
       </p>
-      <p class="text-xs text-gray-400 mt-1">Les questions de vos étudiants apparaîtront ici.</p>
+      <p class="text-xs text-gray-500 mt-1">Les questions de vos étudiants apparaîtront ici.</p>
     </div>
     {% endfor %}
   </div>

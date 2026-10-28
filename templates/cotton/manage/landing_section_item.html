@@ -6,7 +6,7 @@
   <input type="hidden" name="section_order" value="{{ section.id }}">
 
   {# Drag handle #}
-  <div class="handle cursor-move flex flex-col items-center justify-center p-2 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition text-gray-400 hover:text-gray-600 mt-1 select-none"
+  <div class="handle cursor-move flex flex-col items-center justify-center p-2 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition text-gray-500 hover:text-gray-600 mt-1 select-none"
        title="Glisser pour déplacer">
     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
@@ -41,11 +41,11 @@
       {% endif %}
 
       {% if not section.is_visible %}
-        <span class="text-xs text-gray-400 italic">masquée</span>
+        <span class="text-xs text-gray-500 italic">masquée</span>
       {% endif %}
 
       {% if section.background != 'none' %}
-        <span class="text-xs text-gray-400">fond : {{ section.get_background_display }}</span>
+        <span class="text-xs text-gray-500">fond : {{ section.get_background_display }}</span>
       {% endif %}
     </div>
 
@@ -60,7 +60,7 @@
         {% if section.image %}
           <img src="{{ section.image.url }}" alt="" class="w-32 h-20 object-cover rounded-lg border border-gray-200">
         {% else %}
-          <span class="text-gray-400 italic">Aucune image</span>
+          <span class="text-gray-500 italic">Aucune image</span>
         {% endif %}
       {% elif section.section_type == 'hero' %}
         {% if section.subtitle %}<p class="text-gray-500 italic truncate">{{ section.subtitle }}</p>{% endif %}
@@ -74,12 +74,12 @@
             <img src="{{ section.image.url }}" alt="" class="w-20 h-14 object-cover rounded-lg border border-gray-200">
           {% endif %}
           <p class="line-clamp-2 flex-1">{{ section.body|striptags|truncatechars:80 }}</p>
-          <span class="text-xs text-gray-400">Image {{ section.get_image_position_display }}</span>
+          <span class="text-xs text-gray-500">Image {{ section.get_image_position_display }}</span>
         </div>
       {% endif %}
 
       {% if section.css_class %}
-        <p class="text-xs text-gray-400 mt-1">CSS : <code class="bg-gray-50 px-1 rounded">{{ section.css_class }}</code></p>
+        <p class="text-xs text-gray-500 mt-1">CSS : <code class="bg-gray-50 px-1 rounded">{{ section.css_class }}</code></p>
       {% endif %}
     </div>
 

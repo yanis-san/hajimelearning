@@ -4,7 +4,7 @@
       <div x-show="tab === 'seo'" x-cloak class="space-y-6">
 
         {# Carte 1 : Meta Description & Google SERP Preview #}
-        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-6">
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-brutal-md p-6 sm:p-7 space-y-6">
           <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
             <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
               <span>🔍</span> Optimisation Google & Référencement (SEO)
@@ -20,7 +20,7 @@
                 Meta Description (Google Snippet)
               </label>
               <div class="text-xs font-mono font-bold"
-                   :class="metaDescLength > 160 ? 'text-red-600' : (metaDescLength >= 120 ? 'text-emerald-600' : 'text-gray-400')">
+                   :class="metaDescLength > 160 ? 'text-red-600' : (metaDescLength >= 120 ? 'text-emerald-600' : 'text-gray-500')">
                 <span x-text="metaDescLength">0</span> / 160 caractères
               </div>
             </div>
@@ -45,7 +45,7 @@
               <div class="flex items-center gap-2 text-xs text-gray-600 mb-1">
                 <span class="w-4 h-4 rounded-full bg-primary text-white font-black text-[9px] flex items-center justify-center">H</span>
                 <span class="font-medium text-gray-700">Hajime Learning</span>
-                <span class="text-gray-400">› course › <span x-text="courseSlug || '{{ course.slug|default:'mon-cours' }}'"></span></span>
+                <span class="text-gray-500">› course › <span x-text="courseSlug || '{{ course.slug|default:'mon-cours' }}'"></span></span>
               </div>
               <h3 class="text-base text-blue-700 font-medium hover:underline cursor-pointer truncate leading-snug">
                 <span x-text="courseTitle || '{{ course.title|default:'Titre de la formation' }}'"></span> — Hajime Learning
@@ -58,7 +58,7 @@
         </div>
 
         {# Carte 2 : Mots-clés (Keywords) #}
-        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-4">
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-brutal-md p-6 sm:p-7 space-y-4">
           <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
             <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
               <span>🏷️</span> Mots-clés ciblés (Meta Keywords)

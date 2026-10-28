@@ -15,7 +15,7 @@
     </div>
 
     {# Meta #}
-    <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-400">
+    <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-500">
       {% if question.lesson %}
         <span>📄 {{ question.lesson.title }}</span>
       {% endif %}
@@ -34,7 +34,7 @@
 
     {# Auteur (si pas la question de l'utilisateur) #}
     {% if question.student != current_user %}
-      <span class="text-xs text-gray-400">
+      <span class="text-xs text-gray-500">
         {{ question.student.get_full_name|default:question.student.email }}
       </span>
     {% endif %}

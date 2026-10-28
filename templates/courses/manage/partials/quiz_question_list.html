@@ -1,5 +1,5 @@
 {% for q in block.questions.all %}
     <c-manage.quiz-question-item :q="q" :block="block" index="{{ forloop.counter }}" />
 {% empty %}
-    <p class="text-gray-400 text-xs italic py-2">Aucune question dans ce quiz.</p>
+    <p class="text-gray-500 text-xs italic py-2">Aucune question dans ce quiz.</p>
 {% endfor %}

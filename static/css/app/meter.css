@@ -2,7 +2,7 @@
 
 /* ── Barre de progression (<progress>) ── */
 .meter {
-  --meter-color: #ff003c;
+  --meter-color: #e6003a;
   appearance: none;
   display: block;
   width: 100%;
@@ -35,7 +35,7 @@
 .meter-red { --meter-color: #ef4444; }
 .meter-redsoft { --meter-color: #f87171; }
 .meter-blue { --meter-color: #3b82f6; }
-.meter-primary { --meter-color: #ff003c; }
+.meter-primary { --meter-color: #e6003a; }
 .meter-ink { --meter-color: #111827; }
 
 /* Variante « jauge dessinée » (cartes cours) : bordure noire, bord droit marqué */

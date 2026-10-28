@@ -5,10 +5,19 @@
 @source "../../../**/templates/**/*.html";
 
 @theme {
-  --color-primary: #FF003C; /* Persona Manga Red */
-  --color-primary-dark: #CC0030;
+  --color-primary: #E6003A; /* Rouge manga, contraste 4.75:1 avec le blanc (WCAG AA) */
+  --color-primary-dark: #B30030; /* survols et texte rouge sur fond clair (7.3:1) */
   --color-secondary: #00E5FF; /* Electric Cyan */
   --color-dark: #09090B; /* Deep contrast black */
+  --color-ink: #111827; /* Encre : contours et ombres dures du style manga */
+
+  /* Ombres dures « manga » : décalage net, sans flou */
+  --shadow-soft: 2px 2px 0 0 rgb(17 24 39 / 0.08);
+  --shadow-brutal-sm: 2px 2px 0 0 var(--color-ink);
+  --shadow-brutal: 3px 3px 0 0 var(--color-ink);
+  --shadow-brutal-md: 4px 4px 0 0 var(--color-ink);
+  --shadow-brutal-lg: 6px 6px 0 0 var(--color-ink);
+  --shadow-brutal-xl: 8px 8px 0 0 var(--color-ink);
 
   --animate-sakura-fall: sakura-fall linear infinite;
   --animate-sakura-sway: sakura-sway ease-in-out infinite;

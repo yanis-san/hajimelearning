@@ -29,7 +29,7 @@
     {# ── OPTION A : Paiement par virement ── #}
     <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
       <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-        <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary text-sm font-bold">A</span>
+        <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary-dark text-sm font-bold">A</span>
         Payer par Virement
       </h2>
 
@@ -44,7 +44,7 @@
                  hx-post="{% url 'validate_coupon' course.id %}"
                  hx-target="#price-result"
                  hx-trigger="keyup delay:500ms changed"
-                 class="w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition text-sm">
+                 class="w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition text-sm">
         </div>
 
         {# Price display (HTMX target) #}

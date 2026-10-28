@@ -1,0 +1,4 @@
+{# Carte manga. Styles : static/css/app/cards.css #}
+<c-vars padding="md" border="ink" drawn="false" class="" />
+
+<div class="card{% if border == 'soft' %} card-soft{% endif %}{% if padding != 'none' %} card-pad-{{ padding }}{% endif %}{% if drawn == 'true' %} manga-drawn{% endif %} {{ class }}" {{ attrs }}>{{ slot }}</div>

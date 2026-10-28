@@ -14,7 +14,7 @@
 
   {# ── Toolbar : palette de sections ── #}
   <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 sticky top-20 z-10 flex flex-wrap gap-3 justify-center items-center">
-    <span class="text-sm font-medium text-gray-400">Ajouter :</span>
+    <span class="text-sm font-medium text-gray-500">Ajouter :</span>
 
     <c-ui.btn variant="ghost" size="sm"
               hx-get="{% url 'add_landing_section' course.slug 'hero' %}"
@@ -98,7 +98,7 @@
                 hx-on::after-request="document.getElementById('empty-state')?.remove()">
         📦 Démarrer avec un modèle
       </c-ui.btn>
-      <p class="text-xs text-gray-400 mt-4">
+      <p class="text-xs text-gray-500 mt-4">
         💡 Sans sections, la page affiche automatiquement la description et les arguments du formulaire principal.
       </p>
     </div>

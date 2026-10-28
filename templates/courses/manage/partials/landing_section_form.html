@@ -62,16 +62,16 @@
           <label for="id_body" class="block text-sm font-medium text-gray-700">
             {% if section_type == 'faq' %}
               Questions & Réponses
-              <span class="text-xs text-gray-400">(Séparez chaque Q/R avec ### Question)</span>
+              <span class="text-xs text-gray-500">(Séparez chaque Q/R avec ### Question)</span>
             {% elif section_type == 'testimonials' %}
               Témoignages
-              <span class="text-xs text-gray-400">(Format : ### ★★★★★ | Nom\nTémoignage)</span>
+              <span class="text-xs text-gray-500">(Format : ### ★★★★★ | Nom\nTémoignage)</span>
             {% elif section_type == 'text_image' %}
               Contenu texte
             {% else %}
               Contenu Markdown
               {% if section_type == 'features' %}
-                <span class="text-xs text-gray-400">(utilisez des listes à puces : - Point 1)</span>
+                <span class="text-xs text-gray-500">(utilisez des listes à puces : - Point 1)</span>
               {% endif %}
             {% endif %}
           </label>
@@ -122,7 +122,7 @@
       <div class="mb-4">
         <label for="id_video_id" class="block text-sm font-medium text-gray-700 mb-1">ID de la vidéo YouTube</label>
         {{ form.video_id }}
-        <p class="text-xs text-gray-400 mt-1">L'identifiant après watch?v= (ex: dQw4w9WgXcQ)</p>
+        <p class="text-xs text-gray-500 mt-1">L'identifiant après watch?v= (ex: dQw4w9WgXcQ)</p>
       </div>
     {% endif %}
 

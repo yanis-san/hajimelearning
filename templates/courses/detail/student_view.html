@@ -4,14 +4,14 @@
     {# ══════════════════════════════════════════════════════ #}
 
     {# Breadcrumb #}
-    <nav class="flex items-center gap-2 text-sm text-gray-400 mb-8 font-bold tracking-widest uppercase">
+    <nav class="flex items-center gap-2 text-sm text-gray-500 mb-8 font-bold tracking-widest uppercase">
       <a href="{% url 'user_dashboard' %}" class="hover:text-dark transition-colors">Mes cours</a>
       <svg class="w-4 h-4 text-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
       <span class="text-dark truncate">{{ course.title }}</span>
     </nav>
 
     {# Carte de progression #}
-    <div class="bg-white border-2 border-gray-900 rounded-2xl p-6 lg:p-10 shadow-[4px_4px_0_0_#111827] mb-12 relative overflow-hidden manga-drawn">
+    <div class="bg-white border-2 border-gray-900 rounded-2xl p-6 lg:p-10 shadow-brutal-md mb-12 relative overflow-hidden manga-drawn">
       <div class="absolute -right-8 -top-8 w-32 h-32 bg-[radial-gradient(circle,rgba(255,0,60,0.1)_2px,transparent_2px)] bg-[size:10px_10px] pointer-events-none transform rotate-12"></div>
       
       <!-- Manga tape -->
@@ -22,7 +22,7 @@
       <h1 class="text-3xl lg:text-5xl font-extrabold text-gray-900 mb-4 pr-20 tracking-tight drop-shadow-sm">{{ course.title }}</h1>
       <p class="text-gray-600 mb-8 max-w-2xl font-medium text-lg">{{ course.short_description }}</p>
 
-      <div class="max-w-md p-5 border-2 border-gray-900 rounded-xl bg-gray-50 shadow-[3px_3px_0_0_#111827] relative overflow-hidden manga-drawn-alt">
+      <div class="max-w-md p-5 border-2 border-gray-900 rounded-xl bg-gray-50 shadow-brutal relative overflow-hidden manga-drawn-alt">
         <div class="absolute inset-0 bg-[radial-gradient(circle,rgba(0,0,0,0.03)_2px,transparent_2px)] bg-[size:8px_8px] pointer-events-none"></div>
         <div class="relative z-10">
           <div class="flex justify-between items-end mb-3">

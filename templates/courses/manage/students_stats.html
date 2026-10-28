@@ -42,7 +42,7 @@
               {{ stat.user.email }}
             {% endif %}
           </p>
-          <p class="text-xs text-gray-400 truncate">{{ stat.user.email }}</p>
+          <p class="text-xs text-gray-500 truncate">{{ stat.user.email }}</p>
         </div>
 
         {# Barre progression #}
@@ -51,19 +51,19 @@
             <span class="text-xs font-semibold {% if stat.percent == 100 %}text-green-600{% else %}text-primary{% endif %}">
               {{ stat.percent }}%
             </span>
-            <span class="text-xs text-gray-400">{{ stat.completed }}/{{ total_lessons }}</span>
+            <span class="text-xs text-gray-500">{{ stat.completed }}/{{ total_lessons }}</span>
           </div>
           <progress class="meter {% if stat.percent == 100 %}meter-green{% elif stat.percent < 20 %}meter-redsoft{% else %}meter-primary{% endif %}"
                     value="{{ stat.percent }}" max="100">{{ stat.percent }}%</progress>
         </div>
 
         {# Dernière activité #}
-        <div class="hidden lg:block text-xs text-gray-400 shrink-0 w-28 text-right">
+        <div class="hidden lg:block text-xs text-gray-500 shrink-0 w-28 text-right">
           {% if stat.last_active %}{{ stat.last_active|timesince }}{% else %}Jamais{% endif %}
         </div>
 
         {# Chevron #}
-        <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200"
+        <svg class="w-4 h-4 text-gray-500 shrink-0 transition-transform duration-200"
              :class="open && 'rotate-180'"
              fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -78,7 +78,7 @@
           <div class="sm:hidden">
             <div class="flex justify-between mb-1">
               <span class="text-xs font-semibold {% if stat.percent == 100 %}text-green-600{% else %}text-primary{% endif %}">{{ stat.percent }}%</span>
-              <span class="text-xs text-gray-400">{{ stat.completed }}/{{ total_lessons }} leçons</span>
+              <span class="text-xs text-gray-500">{{ stat.completed }}/{{ total_lessons }} leçons</span>
             </div>
             <progress class="meter {% if stat.percent == 100 %}meter-green{% else %}meter-primary{% endif %}"
                       value="{{ stat.percent }}" max="100">{{ stat.percent }}%</progress>
@@ -107,8 +107,8 @@
                   {% else %}
                     <span class="flex items-center justify-center w-5 h-5 rounded-full bg-gray-100 shrink-0 border border-gray-200">
                     </span>
-                    <span class="text-sm text-gray-400">{{ ld.lesson.title }}</span>
-                    <span class="ml-auto text-xs text-gray-400">—</span>
+                    <span class="text-sm text-gray-500">{{ ld.lesson.title }}</span>
+                    <span class="ml-auto text-xs text-gray-500">—</span>
                   {% endif %}
                 </div>
 
@@ -132,7 +132,7 @@
                       {% else %}<span class="text-red-400">✗</span>
                       {% endif %}
                     {% else %}
-                      <span class="italic text-gray-400">Non tenté</span>
+                      <span class="italic text-gray-500">Non tenté</span>
                     {% endif %}
                   </div>
                   {% endwith %}

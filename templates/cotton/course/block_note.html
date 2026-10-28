@@ -5,7 +5,7 @@
 
   <div class="flex items-center gap-3">
     <button type="button" x-on:click="open = !open"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold border-2 border-gray-900 rounded-lg shadow-[2px_2px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_#111827] active:translate-y-0 active:shadow-none transition cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold border-2 border-gray-900 rounded-lg shadow-brutal-sm hover:-translate-y-0.5 hover:shadow-brutal active:translate-y-0 active:shadow-none transition cursor-pointer"
             :class="saved ? 'bg-yellow-100 text-gray-900 hover:bg-yellow-200' : 'bg-white text-gray-600 hover:text-gray-900'">
       <span>📝</span>
       <span x-text="open ? 'Fermer' : (saved ? 'Ma note' : 'Ajouter une note')"></span>
@@ -14,7 +14,7 @@
   </div>
 
   <form x-ref="form" x-show="open" x-collapse x-cloak x-on:submit.prevent="save()"
-        class="mt-2 bg-yellow-50 border-2 border-gray-900 rounded-xl p-3 shadow-[3px_3px_0_0_#111827]">
+        class="mt-2 bg-yellow-50 border-2 border-gray-900 rounded-xl p-3 shadow-brutal">
     <textarea name="note_content" rows="4"
               x-on:keydown.ctrl.enter.prevent="save()"
               placeholder="Ma note perso sur ce bloc (visible uniquement par moi)…"
@@ -23,7 +23,7 @@
       <c-ui.btn type="submit" x-bind:disabled="saving" variant="secondary" size="xs">
         <span x-text="saving ? 'Enregistrement…' : '💾 Enregistrer'"></span>
       </c-ui.btn>
-      <span class="text-[11px] text-gray-400 hidden sm:inline">Ctrl + Entrée</span>
+      <span class="text-[11px] text-gray-500 hidden sm:inline">Ctrl + Entrée</span>
       <span x-show="status === 'error'" x-transition class="text-xs font-bold text-red-600">Erreur, réessayez</span>
     </div>
   </form>

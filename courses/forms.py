@@ -21,7 +21,7 @@ class ContentBlockForm(forms.ModelForm):
         for field in self.fields:
             self.fields[field].widget.attrs.update(
                 {
-                    'class': 'w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition'
+                    'class': 'w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition'
                 }
             )
         self.fields['title'].widget.attrs.update({'placeholder': 'Titre du bloc'})
@@ -29,7 +29,7 @@ class ContentBlockForm(forms.ModelForm):
             {
                 'rows': 12,
                 'placeholder': 'Votre texte (Markdown)...',
-                'class': 'w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition font-mono text-sm resize-y',
+                'class': 'w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition font-mono text-sm resize-y',
             }
         )
         self.fields['video_id'].widget.attrs.update({'placeholder': 'Ex: dQw4w9WgXcQ'})
@@ -67,12 +67,12 @@ class QuizQuestionForm(forms.ModelForm):
 
 TAILWIND_INPUT = (
     'w-full px-4 py-2.5 border-2 border-gray-300 rounded-xl bg-stone-50/80 text-gray-900 '
-    'placeholder-gray-400 focus:bg-white focus:outline-none focus:border-gray-900 '
+    'placeholder-gray-500 focus:bg-white focus:outline-none focus:border-gray-900 '
     'focus:ring-2 focus:ring-gray-900/10 transition-all text-sm font-medium shadow-2xs hover:border-gray-400'
 )
 TAILWIND_TEXTAREA = (
     'w-full px-4 py-3 border-2 border-gray-300 rounded-xl bg-stone-50/80 text-gray-900 '
-    'placeholder-gray-400 focus:bg-white focus:outline-none focus:border-gray-900 '
+    'placeholder-gray-500 focus:bg-white focus:outline-none focus:border-gray-900 '
     'focus:ring-2 focus:ring-gray-900/10 transition-all text-sm resize-y shadow-2xs hover:border-gray-400'
 )
 TAILWIND_CHECKBOX = (
