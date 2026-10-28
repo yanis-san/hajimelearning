@@ -32,7 +32,7 @@
         <c-form.field :field="form.cta_url" label="Lien du bouton" variant="plain" />
       </div>
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Image de fond</label>
+        <c-form.label>Image de fond</c-form.label>
         {% if section and section.image %}
           <div class="mb-2">
             <img src="{{ section.image.url }}" alt="" class="w-40 h-24 rounded-lg object-cover border border-gray-200">
@@ -46,7 +46,7 @@
     {% if section_type == 'text' or section_type == 'features' or section_type == 'faq' or section_type == 'text_image' or section_type == 'testimonials' %}
       <div class="mb-4">
         <div class="flex items-center justify-between mb-1">
-          <label for="id_body" class="block text-sm font-medium text-gray-700">
+          <c-form.label for="id_body">
             {% if section_type == 'faq' %}
               Questions & Réponses
               <span class="text-xs text-gray-500">(Séparez chaque Q/R avec ### Question)</span>
@@ -61,7 +61,7 @@
                 <span class="text-xs text-gray-500">(utilisez des listes à puces : - Point 1)</span>
               {% endif %}
             {% endif %}
-          </label>
+          </c-form.label>
           <div class="flex rounded-lg bg-gray-100 p-0.5">
             <button type="button"
                     x-on:click="tab = 'edit'"
@@ -107,7 +107,7 @@
 
     {% if section_type == 'video' %}
       <div class="mb-4">
-        <label for="id_video_id" class="block text-sm font-medium text-gray-700 mb-1">ID de la vidéo YouTube</label>
+        <c-form.label for="id_video_id">ID de la vidéo YouTube</c-form.label>
         {{ form.video_id }}
         <p class="text-xs text-gray-500 mt-1">L'identifiant après watch?v= (ex: dQw4w9WgXcQ)</p>
       </div>
@@ -115,7 +115,7 @@
 
     {% if section_type == 'image' or section_type == 'text_image' %}
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+        <c-form.label>Image</c-form.label>
         {% if section and section.image %}
           <div class="mb-2">
             <img src="{{ section.image.url }}" alt="" class="w-40 h-24 rounded-lg object-cover border border-gray-200">

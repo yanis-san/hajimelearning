@@ -8,9 +8,7 @@ Seules les leçons PUBLIÉES (dans des modules publiés) comptent.
 
 from dataclasses import dataclass, field
 
-from django.db.models import Prefetch
-
-from .models import ContentBlock, CourseActivity, Lesson, StudentProgress
+from .models import CourseActivity, Lesson, StudentProgress
 
 
 def published_lessons(course, include_drafts=False):
@@ -19,15 +17,6 @@ def published_lessons(course, include_drafts=False):
     if not include_drafts:
         qs = qs.filter(is_published=True, module__is_published=True)
     return list(qs.select_related('module').order_by('module__order', 'module__id', 'order', 'id'))
-
-
-def lessons_prefetch(include_drafts=False):
-    """Prefetch des leçons d'un module + types de blocs (icônes du sommaire)."""
-    qs = Lesson.objects.all()
-    if not include_drafts:
-        qs = qs.filter(is_published=True)
-    qs = qs.prefetch_related(Prefetch('blocks', queryset=ContentBlock.objects.only('id', 'lesson_id', 'type', 'order')))
-    return Prefetch('lessons', queryset=qs)
 
 
 @dataclass

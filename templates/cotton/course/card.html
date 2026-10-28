@@ -73,7 +73,7 @@
   {# Barre de progression toujours visible en bas (dashboard) #}
   {% if show_progress == 'true' %}
     <div class="absolute inset-x-0 bottom-0 h-2 bg-white border-t-2 border-gray-900">
-      <progress class="meter meter-manga meter-primary" value="{{ progress }}" max="100">{{ progress }}%</progress>
+      <c-ui.progress-bar percent="{{ progress }}" color="primary" manga="true" />
     </div>
   {% endif %}
 

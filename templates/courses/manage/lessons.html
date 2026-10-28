@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<c-layout.course_builder :course="course" active_tab="modules">
+<c-layout.course-builder :course="course" active_tab="modules">
 
   {# ── Add lesson form ── #}
   <c-ui.card variant="soft" padding="sm" class="mb-8">
@@ -23,10 +23,7 @@
       <div class="w-48">
         {{ form.slug }}
       </div>
-      <label class="flex items-center gap-1.5 text-sm text-gray-600">
-        {{ form.is_free }}
-        Gratuit
-      </label>
+      <c-form.check :field="form.is_free">Gratuit</c-form.check>
       <c-ui.btn variant="primary" type="submit">
         ➕ Ajouter une leçon
       </c-ui.btn>
@@ -46,5 +43,5 @@
   <div id="reorder-msg"></div>
 
 
-</c-layout.course_builder>
+</c-layout.course-builder>
 {% endblock %}

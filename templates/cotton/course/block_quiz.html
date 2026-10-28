@@ -32,9 +32,7 @@
   <c-ui.card variant="soft" padding="none" class="overflow-hidden" x-show="['playing', 'time_up', 'feedback'].includes(state)" x-cloak>
 
     {# Barre de temps #}
-    <progress class="meter meter-blue rounded-none"
-              :class="timePercent < 20 ? 'meter-red' : 'meter-blue'"
-              :value="timePercent" max="100"></progress>
+    <c-ui.progress-bar percent="100" color="blue" class="rounded-none" x-bind:value="timePercent" x-bind:class="timePercent < 20 ? 'meter-red' : 'meter-blue'" />
 
     <div class="p-6">
       {# Indicateur question + timer #}

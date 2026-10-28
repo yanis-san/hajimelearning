@@ -1,8 +1,11 @@
-<c-vars percent="0" color="primary" size="" show_label="true" />
+{# Barre de progression (<progress>). `show_label="true"` ajoute le pourcentage ; `manga="true"` : jauge dessinée des cartes. Styles : meter.css #}
+<c-vars percent="0" color="primary" size="" show_label="false" manga="false" class="" />
 
-<div class="flex items-center gap-3" {{ attrs }}>
-  <progress class="meter meter-{{ color }}{% if size %} meter-{{ size }}{% endif %} flex-1" value="{{ percent }}" max="100">{{ percent }}%</progress>
-  {% if show_label == 'true' %}
+{% if show_label == 'true' %}
+  <div class="flex items-center gap-3 {{ class }}">
+    <progress class="meter meter-{{ color }}{% if size %} meter-{{ size }}{% endif %} flex-1" value="{{ percent }}" max="100" {{ attrs }}>{{ percent }}%</progress>
     <span class="text-xs font-medium text-gray-500 w-9 text-right shrink-0">{{ percent }}%</span>
-  {% endif %}
-</div>
+  </div>
+{% else %}
+  <progress class="meter meter-{{ color }}{% if size %} meter-{{ size }}{% endif %}{% if manga == 'true' %} meter-manga{% endif %} {{ class }}" value="{{ percent }}" max="100" {{ attrs }}>{{ percent }}%</progress>
+{% endif %}

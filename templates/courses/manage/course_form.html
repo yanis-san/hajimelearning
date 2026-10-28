@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<c-layout.course_builder :course="course" active_tab="infos" :is_edit="is_edit">
+<c-layout.course-builder :course="course" active_tab="infos" :is_edit="is_edit">
 
   <form method="post" enctype="multipart/form-data" class="max-w-4xl" novalidate
         x-data="courseForm"
@@ -116,5 +116,5 @@
     </div>
 
   </form>
-</c-layout.course_builder>
+</c-layout.course-builder>
 {% endblock %}

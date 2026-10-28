@@ -1,8 +1,12 @@
-{# Case à cocher avec libellé en ligne. `checked` : "true" pour cocher. #}
-<c-vars name="" checked="false" />
+{# Case à cocher avec libellé en ligne : soit un champ Django (`field`), soit une case HTML (`name`, `checked="true"`). #}
+<c-vars name="" checked="false" field="" />
 
-<label class="flex items-center gap-1.5 text-sm text-gray-600" {{ attrs }}>
-  <input type="checkbox" name="{{ name }}" {% if checked == 'true' %}checked{% endif %}
-         class="rounded border-gray-300 text-primary focus:ring-primary/40">
+<label class="flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer" {{ attrs }}>
+  {% if field %}
+    {{ field }}
+  {% else %}
+    <input type="checkbox" name="{{ name }}" {% if checked == 'true' %}checked{% endif %}
+           class="rounded border-gray-300 text-primary focus:ring-primary/40">
+  {% endif %}
   {{ slot }}
 </label>

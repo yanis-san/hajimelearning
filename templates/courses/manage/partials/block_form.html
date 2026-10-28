@@ -41,9 +41,9 @@
       <div class="space-y-3">
         <div class="flex items-center justify-between flex-wrap gap-2">
           <div class="flex items-center gap-2">
-            <label class="block text-sm font-medium text-gray-700">
+            <c-form.label>
               Contenu Texte <span class="text-red-500">*</span>
-            </label>
+            </c-form.label>
             <c-ui.btn type="button" x-on:click="$dispatch('open-furigana-guide')" title="Ouvrir le guide et copier des modèles furigana" variant="accent" size="xs">
        💡 Modèles Furigana
       </c-ui.btn>
@@ -108,18 +108,18 @@
     {% if block_type == 'audio' or block.type == 'audio' %}
       <div class="space-y-4">
         <div class="space-y-1">
-          <label for="id_title" class="block text-sm font-medium text-gray-700">Titre de l'audio</label>
+          <c-form.label for="id_title">Titre de l'audio</c-form.label>
           {{ form.title }}
           <p class="text-xs text-gray-500">Optionnel</p>
         </div>
         <c-form.field :field="form.file_content" label="Fichier MP3" variant="plain" required="true" class="space-y-1" />
         <div class="space-y-1">
-          <label for="id_text_content" class="block text-sm font-medium text-gray-700">Consigne</label>
+          <c-form.label for="id_text_content">Consigne</c-form.label>
           <textarea name="text_content" rows="2"
                     class="w-full px-4 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition resize-y">{{ form.text_content.value|default:'' }}</textarea>
         </div>
         <div class="bg-yellow-50 p-3 rounded-xl border border-yellow-200">
-          <label class="block text-sm font-medium text-yellow-800 mb-1">Fichier Correction</label>
+          <c-form.label tone="warning">Fichier Correction</c-form.label>
           {{ form.related_file }}
           <p class="text-xs text-yellow-600 mt-1">Optionnel</p>
         </div>
@@ -137,9 +137,9 @@
     {# ── Quiz ── #}
     {% if block_type == 'quiz' or block.type == 'quiz' %}
       <div class="bg-green-50 p-4 rounded-xl border border-green-200">
-        <label for="id_quiz_title" class="block text-sm font-medium text-green-800 mb-1">
+        <c-form.label for="id_quiz_title" tone="success">
           Nom du Quiz <span class="text-red-500">*</span>
-        </label>
+        </c-form.label>
         {{ form.quiz_title }}
       </div>
     {% endif %}

@@ -1,0 +1,8 @@
+{# Libellé de champ. variant : caps | plain | compact ; tone : default | warning | success (panneaux colorés). #}
+<c-vars for="" variant="plain" tone="default" />
+
+<label {% if for %}for="{{ for }}"{% endif %}
+       class="{% if variant == 'caps' %}block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between
+              {% elif variant == 'compact' %}block text-xs font-medium mb-1 {% if tone == 'warning' %}text-yellow-800{% elif tone == 'success' %}text-green-700{% else %}text-gray-600{% endif %}
+              {% else %}block text-sm font-medium mb-1 {% if tone == 'warning' %}text-yellow-800{% elif tone == 'success' %}text-green-800{% else %}text-gray-700{% endif %}{% endif %}"
+       {{ attrs }}>{{ slot }}</label>

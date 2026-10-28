@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<c-layout.course_builder :course="course" active_tab="modules">
+<c-layout.course-builder :course="course" active_tab="modules">
 
   {# ── Add module form ── #}
   <c-ui.card variant="soft" padding="sm" class="mb-8">
@@ -39,5 +39,5 @@
   <div id="reorder-msg"></div>
 
 
-</c-layout.course_builder>
+</c-layout.course-builder>
 {% endblock %}

@@ -499,3 +499,36 @@ class TestComponentUsage:
             if 'block text-xs font-black uppercase tracking-wider text-gray-800' in path.read_text(encoding='utf-8')
         ]
         assert not offenders, f'Utiliser <c-form.field> : {offenders}'
+
+    def test_no_raw_label_or_progress_outside_components(self):
+        offenders = [
+            str(path)
+            for path in self._templates()
+            if '<label' in path.read_text(encoding='utf-8') or '<progress' in path.read_text(encoding='utf-8')
+        ]
+        assert not offenders, f'Utiliser <c-form.label> / <c-ui.progress-bar> : {offenders}'
+
+    def test_component_tags_use_kebab_case(self):
+        import re
+        from pathlib import Path
+
+        offenders = [
+            str(path)
+            for path in Path('templates').rglob('*.html')
+            if re.search(r'</?c-[a-z.-]*_', path.read_text(encoding='utf-8'))
+        ]
+        assert not offenders, f'Balises <c-…> en kebab-case uniquement : {offenders}'
+
+    def test_every_component_is_used(self):
+        import re
+        from pathlib import Path
+
+        corpus = ''.join(p.read_text(encoding='utf-8') for p in Path('templates').rglob('*.html'))
+        unused = []
+        for path in Path('templates/cotton').rglob('*.html'):
+            tag = 'c-' + path.relative_to('templates/cotton').with_suffix('').as_posix().replace('/', '.').replace(
+                '_', '-'
+            )
+            if not re.search(rf'<{re.escape(tag)}[\s/>]', corpus):
+                unused.append(tag)
+        assert not unused, f'Composants inutilisés (à supprimer) : {unused}'

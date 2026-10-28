@@ -2,7 +2,7 @@
 {% load md %}
 
 {% block content %}
-<c-layout.course_builder :course="course" active_tab="students">
+<c-layout.course-builder :course="course" active_tab="students">
 
   {% if student_stats %}
 
@@ -52,8 +52,7 @@
             </span>
             <span class="text-xs text-gray-500">{{ stat.completed }}/{{ total_lessons }}</span>
           </div>
-          <progress class="meter {% if stat.percent == 100 %}meter-green{% elif stat.percent < 20 %}meter-redsoft{% else %}meter-primary{% endif %}"
-                    value="{{ stat.percent }}" max="100">{{ stat.percent }}%</progress>
+          <c-ui.progress-bar percent="{{ stat.percent }}" color="{% if stat.percent == 100 %}green{% elif stat.percent < 20 %}redsoft{% else %}primary{% endif %}" />
         </div>
 
         {# Dernière activité #}
@@ -79,8 +78,7 @@
               <span class="text-xs font-semibold {% if stat.percent == 100 %}text-green-600{% else %}text-primary{% endif %}">{{ stat.percent }}%</span>
               <span class="text-xs text-gray-500">{{ stat.completed }}/{{ total_lessons }} leçons</span>
             </div>
-            <progress class="meter {% if stat.percent == 100 %}meter-green{% else %}meter-primary{% endif %}"
-                      value="{{ stat.percent }}" max="100">{{ stat.percent }}%</progress>
+            <c-ui.progress-bar percent="{{ stat.percent }}" color="{% if stat.percent == 100 %}green{% else %}primary{% endif %}" />
           </div>
 
           {# Modules + leçons + quiz #}
@@ -162,5 +160,5 @@
                    message="Aucun étudiant inscrit pour le moment." />
   {% endif %}
 
-</c-layout.course_builder>
+</c-layout.course-builder>
 {% endblock %}

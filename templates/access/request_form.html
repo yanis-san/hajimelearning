@@ -36,21 +36,10 @@
       <form method="POST" enctype="multipart/form-data" class="space-y-5">
         {% csrf_token %}
 
-        {# Code promo #}
-        <div class="bg-gray-50 rounded-xl p-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Avez-vous un code promo ?</label>
-          <input type="text" name="promo_code"
-                 placeholder="Ex: PROMO20"
-                 hx-post="{% url 'validate_coupon' course.id %}"
-                 hx-target="#price-result"
-                 hx-trigger="keyup delay:500ms changed"
-                 class="w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition text-sm">
-        </div>
-
-        {# Price display (HTMX target) #}
-        <div id="price-result">
+        {# Code promo + aperçu du prix (cible HTMX) #}
+        <c-form.coupon-field :course="course">
           {% include 'access/partials/price_display.html' %}
-        </div>
+        </c-form.coupon-field>
 
         <div class="border-t border-gray-200"></div>
 
@@ -63,7 +52,7 @@
 
         {# Upload proof #}
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Envoyer la preuve (Photo)</label>
+          <c-form.label>Envoyer la preuve (Photo)</c-form.label>
           {{ proof_form.payment_proof }}
         </div>
 
@@ -84,7 +73,7 @@
       <form method="POST" class="space-y-4">
         {% csrf_token %}
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">{{ code_form.code.label }}</label>
+          <c-form.label>{{ code_form.code.label }}</c-form.label>
           {{ code_form.code }}
         </div>
         <c-ui.btn variant="secondary" type="submit" name="submit_code" block="true">

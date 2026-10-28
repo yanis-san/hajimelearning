@@ -2,9 +2,9 @@
 
 <div class="space-y-1">
   {% if label %}
-    <label for="{{ name }}" class="block text-sm font-bold text-gray-700">
+    <c-form.label for="{{ name }}">
       {{ label }}{% if required == 'true' %}<span class="text-primary ml-1">*</span>{% endif %}
-    </label>
+    </c-form.label>
   {% endif %}
 
   {% if type == 'password' %}

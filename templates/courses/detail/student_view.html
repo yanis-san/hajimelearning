@@ -31,7 +31,7 @@
           </div>
           <!-- progress bar is hard to stylize via c-ui if it's not neo-brutalist inside, let's wrap it in a brutalist frame -->
           <div class="border-2 border-gray-900 rounded-full overflow-hidden bg-white h-4 shadow-inner mb-5">
-            <progress class="meter meter-manga meter-primary" value="{{ progress_percent }}" max="100">{{ progress_percent }}%</progress>
+            <c-ui.progress-bar percent="{{ progress_percent }}" manga="true" />
           </div>
           
           {% if progress_percent == 100 %}

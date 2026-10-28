@@ -69,9 +69,9 @@
 
       {# Ce que vous apprendrez #}
       <div>
-        <label for="{{ form.what_you_will_learn.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+        <c-form.label for="{{ form.what_you_will_learn.id_for_label }}">
           Ce que vous apprendrez
-        </label>
+        </c-form.label>
         {{ form.what_you_will_learn }}
         <p class="mt-1 text-xs text-gray-500">Un point par ligne</p>
         {% if form.what_you_will_learn.errors %}
@@ -84,9 +84,9 @@
 
       {# Vidéo de présentation #}
       <div>
-        <label for="{{ form.trailer_video_id.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+        <c-form.label for="{{ form.trailer_video_id.id_for_label }}">
           ID vidéo YouTube (trailer)
-        </label>
+        </c-form.label>
         {{ form.trailer_video_id }}
         <p class="mt-1 text-xs text-gray-500">L'identifiant YouTube de la vidéo de présentation</p>
         {% if form.trailer_video_id.errors %}
@@ -115,9 +115,9 @@
 
       {# Image carte #}
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <c-form.label>
           🃏 Image carte <span class="text-xs text-gray-500">(catalogue, accueil)</span>
-        </label>
+        </c-form.label>
         {% if is_edit and course.thumbnail %}
           <div class="mb-3">
             <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}"
@@ -132,9 +132,9 @@
 
       {# Image vitrine #}
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">
+        <c-form.label>
           🖼️ Image vitrine <span class="text-xs text-gray-500">(page de vente — sidebar)</span>
-        </label>
+        </c-form.label>
         {% if is_edit and course.cover_image %}
           <div class="mb-3">
             <img src="{{ course.cover_image.url }}" alt="{{ course.title }}"
@@ -149,10 +149,7 @@
 
       {# Publication #}
       <div class="flex items-start gap-3">
-        <label class="inline-flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-          {{ form.is_published }}
-          Publier la formation
-        </label>
+        <c-form.check :field="form.is_published">Publier la formation</c-form.check>
       </div>
       <p class="text-xs text-gray-500 -mt-3">
         En brouillon, la formation n'est visible que par vous. Publiez-la quand elle est prête.

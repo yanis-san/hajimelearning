@@ -3,7 +3,7 @@
 
 <div class="bg-stone-50/70 border-2 border-dashed border-gray-300 rounded-2xl p-5 space-y-3" {{ attrs }}>
   <div class="flex items-center justify-between">
-    <label class="block text-xs font-black uppercase tracking-wider text-gray-800">{{ icon }} {{ label }}</label>
+    <c-form.label variant="compact">{{ icon }} {{ label }}</c-form.label>
   </div>
 
   {% if current %}
