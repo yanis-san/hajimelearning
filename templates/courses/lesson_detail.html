@@ -30,7 +30,7 @@
      </svg>
     </c-ui.btn>
 
-        <h1 class="flex-1 text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight italic truncate">{{ lesson.title|furigana }}</h1>
+        <c-ui.title class="flex-1 lg:text-3xl font-extrabold tracking-tight italic truncate">{{ lesson.title|furigana }}</c-ui.title>
 
         <c-ui.btn x-on:click="allExpanded = !allExpanded; $dispatch(allExpanded ? 'expand-all-blocks' : 'collapse-all-blocks')" title="Déplier/Replier tous les blocs" variant="outline" size="sm" class="hidden sm:flex whitespace-nowrap">
      <svg class="w-4 h-4 transition-transform duration-200" :class="!allExpanded && '-rotate-90'"

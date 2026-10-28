@@ -453,7 +453,7 @@ class TestAccessibilityContrast:
     def test_no_low_contrast_gray_text_on_light_backgrounds(self):
         from pathlib import Path
 
-        dark_contexts = {'footer.html', 'furigana_guide.html', 'promo.html'}
+        dark_contexts = {'footer.html', 'footer_link.html', 'social_link.html', 'furigana_guide.html', 'promo.html'}
         offenders = [
             str(path)
             for path in Path('templates').rglob('*.html')
@@ -462,3 +462,40 @@ class TestAccessibilityContrast:
             and 'text-gray-400' in path.read_text(encoding='utf-8')
         ]
         assert not offenders, f'text-gray-400 (2.5:1) illisible sur fond clair, utiliser gray-500 : {offenders}'
+
+
+class TestComponentUsage:
+    """Les composants Cotton sont l'unique source de style : on interdit de recréer leur balisage à la main."""
+
+    @staticmethod
+    def _templates():
+        from pathlib import Path
+
+        return [p for p in Path('templates').rglob('*.html') if 'cotton' not in p.parts]
+
+    def test_pages_do_not_hand_roll_cards(self):
+        offenders = [
+            str(path)
+            for path in self._templates()
+            if 'bg-white border-2 border-gray-900' in path.read_text(encoding='utf-8')
+            and 'shadow-brutal' in path.read_text(encoding='utf-8')
+            and 'rounded-2xl' in path.read_text(encoding='utf-8')
+            and path.name not in {'404.html', '500.html'}
+        ]
+        assert not offenders, f'Utiliser <c-ui.card> : {offenders}'
+
+    def test_page_titles_use_the_title_component(self):
+        offenders = [
+            str(path)
+            for path in self._templates()
+            if '<h1' in path.read_text(encoding='utf-8') and 'courses/home/hero.html' not in path.as_posix()
+        ]
+        assert not offenders, f'Utiliser <c-ui.title> (échelle unique) : {offenders}'
+
+    def test_form_labels_use_form_field(self):
+        offenders = [
+            str(path)
+            for path in self._templates()
+            if 'block text-xs font-black uppercase tracking-wider text-gray-800' in path.read_text(encoding='utf-8')
+        ]
+        assert not offenders, f'Utiliser <c-form.field> : {offenders}'

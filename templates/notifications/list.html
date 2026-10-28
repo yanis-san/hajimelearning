@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto py-10 px-4">
+<c-layout.container size="2xl" class="py-10">
 
   <c-ui.page-header title="Notifications">
     {% if notifications %}
@@ -36,5 +36,5 @@
     {% include "notifications/partials/notification_list.html" %}
   </div>
 
-</div>
+</c-layout.container>
 {% endblock %}

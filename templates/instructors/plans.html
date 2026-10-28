@@ -3,13 +3,13 @@
 {% block title %}Devenir Instructeur — Hajime Learning{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+<c-layout.container size="6xl" class="py-12 lg:py-20">
 
   {# ── En-tête ── #}
   <div class="text-center max-w-2xl mx-auto mb-14">
-    <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+    <c-ui.title size="lg" class="mb-4">
       Partagez votre expertise
-    </h1>
+    </c-ui.title>
     <p class="text-lg text-gray-500 leading-relaxed">
       Créez vos formations, touchez des milliers d'étudiants et générez des revenus.
       Choisissez l'offre qui vous correspond.
@@ -100,5 +100,5 @@
     </div>
   </div>
 
-</div>
+</c-layout.container>
 {% endblock %}

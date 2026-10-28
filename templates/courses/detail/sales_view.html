@@ -15,7 +15,7 @@
           <span class="text-gray-700 font-medium truncate">{{ course.title }}</span>
         </nav>
 
-        <h1 class="text-3xl lg:text-4xl font-extrabold text-gray-900 mb-4">{{ course.title }}</h1>
+        <c-ui.title size="lg" class="mb-4">{{ course.title }}</c-ui.title>
         <p class="text-lg text-gray-500 mb-8 max-w-2xl">{{ course.short_description }}</p>
 
         {# ── Lien admin rapide vers le builder ── #}
@@ -96,7 +96,7 @@
           {# Image vitrine (cover_image prioritaire, thumbnail en fallback) #}
           <div class="h-48 bg-gray-100 w-full relative">
             <!-- Manga tape -->
-            <div class="absolute -top-2 -left-2 w-10 h-3 bg-primary border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
+            <c-ui.tape />
             {% if course.cover_image %}
               <img src="{{ course.cover_image.url }}" alt="{{ course.title }}" class="w-full h-full object-cover">
             {% elif course.thumbnail %}
@@ -154,11 +154,7 @@
 
     {# Programme de la formation #}
     <div class="mt-16 max-w-4xl mx-auto">
-      <div class="drop-shadow-sm inline-block mb-2">
-          <div class="inline-block bg-gray-900 text-white px-3 py-1 rounded-lg manga-tape transform -rotate-1 shadow-brutal-sm">
-              <span class="font-bold tracking-widest uppercase text-xs">Curriculum</span>
-          </div>
-      </div>
+      <c-ui.kicker class="mb-2">Curriculum</c-ui.kicker>
       <h2 class="text-2xl font-extrabold text-gray-900 mb-5">Programme de la formation</h2>
 
       <div class="space-y-3">

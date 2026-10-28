@@ -1,0 +1,8 @@
+{# Lien du pied de page. `bare="true"` : sans <li> (liens légaux en ligne). #}
+<c-vars href="" bare="false" />
+
+{% if bare == 'true' %}
+  <a href="{{ href }}" class="hover:text-gray-200 transition-colors" {{ attrs }}>{{ slot }}</a>
+{% else %}
+  <li><a href="{{ href }}" class="text-gray-400 hover:text-white font-normal inline-flex items-center gap-1.5 transition-colors" {{ attrs }}>{{ slot }}</a></li>
+{% endif %}

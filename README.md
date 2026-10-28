@@ -50,6 +50,29 @@ Priorité à Tailwind, Alpine.js et HTMX, sous forme de composants Cotton.
 - `static/js/builder/` : scripts du builder (éditeur de blocs, aperçu Markdown, SortableJS).
 - `static/js/vendor/` : bibliothèques tierces minifiées (Alpine, HTMX, marked, SortableJS).
 
+## Composants Cotton (`templates/cotton/`)
+
+Règle : **jamais de balisage de carte, bouton, badge, titre ou champ écrit à la main dans une page** —
+on utilise le composant (des tests le vérifient). Les styles « maison » vivent dans `static/css/app/*.css`
+(couche `components`, donc surchargeables par les utilitaires Tailwind).
+
+| Composant | Rôle | Styles |
+| --- | --- | --- |
+| `<c-ui.btn variant size block icon>` | Boutons et liens-boutons (primary, secondary, outline, accent, danger, ghost, inverse, toolbar) | `buttons.css` |
+| `<c-ui.card variant padding drawn>` | Cartes (brutal, soft, flat, muted) | `cards.css` |
+| `<c-ui.card-header icon title>` | En-tête de carte (titre + badge/action à droite) | — |
+| `<c-ui.badge variant tone>` | Badges (tons solid, soft, dark) | `badges.css` |
+| `<c-ui.title size as>` | Échelle de titres (lg, md, sm) | `typography.css` |
+| `<c-ui.link>`, `<c-ui.kicker>`, `<c-ui.tape>`, `<c-ui.marquee>` | Lien de marque, sur-titre ruban, adhésif décoratif, bandeau défilant | — |
+| `<c-ui.progress-bar>`, `<c-ui.alert>`, `<c-ui.avatar>`, `<c-ui.empty-state>`, `<c-ui.page-header>` | Éléments d'interface divers | `meter.css` |
+| `<c-form.field :field label hint aside variant>` | Libellé + champ Django + erreur/aide ; `error`, `hint`, `check`, `checkbox-card`, `upload`, `input`, `select`, `textarea` | — |
+| `<c-layout.container size>` | Conteneur de page centré | — |
+| `<c-layout.navbar>`, `footer`, `nav-link`, `footer-link`, `social-link`, `auth-card`, `auth-switch`… | Structure du site | — |
+| `<c-course.block-frame icon tone>` | Cadre repliable commun aux blocs de leçon (texte, vidéo, audio, fichier, Anki, quiz) | — |
+
+Outil de non-régression visuelle : `SNAP_DIR=/tmp/avant pytest tests/snapshots.py` avant un refactor,
+puis `SNAP_DIR=/tmp/apres SNAP_COMPARE=/tmp/avant pytest tests/snapshots.py` après (voir l'en-tête du fichier).
+
 ## Production (cPanel)
 
 Variables d'environnement : voir l'en-tête de `config/settings/prod.py`

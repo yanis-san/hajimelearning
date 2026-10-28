@@ -6,46 +6,22 @@
 
     {# Question + Duration #}
     <div class="flex gap-4 mb-3">
-      <div class="flex-grow space-y-1">
-        <label for="id_question_text" class="block text-xs font-medium text-gray-700">La Question</label>
-        {{ form.question_text }}
-      </div>
-      <div class="w-24 space-y-1">
-        <label for="id_duration" class="block text-xs font-medium text-gray-700">⏱️ Sec</label>
-        {{ form.duration }}
-      </div>
+      <c-form.field :field="form.question_text" label="La Question" variant="compact" class="flex-grow" />
+      <c-form.field :field="form.duration" label="⏱️ Sec" variant="compact" class="w-24" />
     </div>
 
     {# Choices grid #}
     <div class="grid grid-cols-2 gap-2 mb-3">
-      <div class="space-y-1">
-        <label class="block text-xs text-gray-500">Choix A</label>
-        {{ form.choice_a }}
-      </div>
-      <div class="space-y-1">
-        <label class="block text-xs text-gray-500">Choix B</label>
-        {{ form.choice_b }}
-      </div>
-      <div class="space-y-1">
-        <label class="block text-xs text-gray-500">Choix C</label>
-        {{ form.choice_c }}
-      </div>
-      <div class="space-y-1">
-        <label class="block text-xs text-gray-500">Choix D</label>
-        {{ form.choice_d }}
-      </div>
+      <c-form.field :field="form.choice_a" label="Choix A" variant="compact" />
+      <c-form.field :field="form.choice_b" label="Choix B" variant="compact" />
+      <c-form.field :field="form.choice_c" label="Choix C" variant="compact" />
+      <c-form.field :field="form.choice_d" label="Choix D" variant="compact" />
     </div>
 
     {# Correct answer + explanation #}
     <div class="grid grid-cols-2 gap-4 mb-3 bg-gray-50 p-3 rounded-xl">
-      <div class="space-y-1">
-        <label for="id_correct_answer" class="block text-xs font-medium text-green-700">Bonne Réponse</label>
-        {{ form.correct_answer }}
-      </div>
-      <div class="space-y-1">
-        <label for="id_explanation" class="block text-xs text-gray-500">Explication (si erreur)</label>
-        {{ form.explanation }}
-      </div>
+      <c-form.field :field="form.correct_answer" label="Bonne Réponse" variant="compact" />
+      <c-form.field :field="form.explanation" label="Explication (si erreur)" variant="compact" />
     </div>
 
     {# Actions #}

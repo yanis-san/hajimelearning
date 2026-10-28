@@ -1,5 +1,5 @@
 {# Cadre repliable commun à tous les blocs de leçon. Le corps du bloc est le slot par défaut ; le titre est le slot « title ». #}
-<c-vars icon="" tone="yellow" />
+<c-vars icon="" tone="yellow" title="" footer="" />
 
 <div x-data="collapsibleBlock"
      class="border border-gray-300 rounded-2xl bg-white shadow-soft overflow-hidden manga-drawn" {{ attrs }}>
@@ -32,5 +32,10 @@
 
   <div x-show="open" x-collapse>
     {{ slot }}
+    {% if footer %}
+      <div class="px-6 pb-6 pt-0">
+        <div class="pt-4 border-t border-gray-100">{{ footer }}</div>
+      </div>
+    {% endif %}
   </div>
 </div>

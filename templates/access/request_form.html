@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-4 py-10">
+<c-layout.container size="5xl" class="py-10">
 
   {# ── Back + Title ── #}
   <a href="{% url 'course_detail' course.slug %}"
@@ -94,5 +94,5 @@
     </c-ui.card>
 
   </div>
-</div>
+</c-layout.container>
 {% endblock %}

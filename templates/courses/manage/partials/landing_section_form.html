@@ -22,26 +22,14 @@
     {% csrf_token %}
 
     {# ── Titre (optionnel, tous les types) ── #}
-    <div class="mb-4">
-      <label for="id_title" class="block text-sm font-medium text-gray-700 mb-1">Titre (optionnel)</label>
-      {{ form.title }}
-    </div>
+    <c-form.field :field="form.title" label="Titre (optionnel)" variant="plain" class="mb-4" />
 
     {# ── Hero : sous-titre + CTA ── #}
     {% if section_type == 'hero' %}
-      <div class="mb-4">
-        <label for="id_subtitle" class="block text-sm font-medium text-gray-700 mb-1">Sous-titre / Accroche</label>
-        {{ form.subtitle }}
-      </div>
+      <c-form.field :field="form.subtitle" label="Sous-titre / Accroche" variant="plain" class="mb-4" />
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label for="id_cta_text" class="block text-sm font-medium text-gray-700 mb-1">Texte du bouton CTA</label>
-          {{ form.cta_text }}
-        </div>
-        <div>
-          <label for="id_cta_url" class="block text-sm font-medium text-gray-700 mb-1">Lien du bouton</label>
-          {{ form.cta_url }}
-        </div>
+        <c-form.field :field="form.cta_text" label="Texte du bouton CTA" variant="plain" />
+        <c-form.field :field="form.cta_url" label="Lien du bouton" variant="plain" />
       </div>
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700 mb-1">Image de fond</label>
@@ -138,22 +126,13 @@
     {% endif %}
 
     {% if section_type == 'text_image' %}
-      <div class="mb-4">
-        <label for="id_image_position" class="block text-sm font-medium text-gray-700 mb-1">Position de l'image</label>
-        {{ form.image_position }}
-      </div>
+      <c-form.field :field="form.image_position" label="Position de l'image" variant="plain" class="mb-4" />
     {% endif %}
 
     {# ── Options de style ── #}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-      <div>
-        <label for="id_background" class="block text-sm font-medium text-gray-700 mb-1">Fond</label>
-        {{ form.background }}
-      </div>
-      <div>
-        <label for="id_css_class" class="block text-sm font-medium text-gray-700 mb-1">Classes Tailwind</label>
-        {{ form.css_class }}
-      </div>
+      <c-form.field :field="form.background" label="Fond" variant="plain" />
+      <c-form.field :field="form.css_class" label="Classes Tailwind" variant="plain" />
     </div>
 
     {# ── Actions ── #}

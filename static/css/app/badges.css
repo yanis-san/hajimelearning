@@ -53,3 +53,13 @@
 .badge-soft.badge-yellow { --badge-bg: #fef3c7; --badge-fg: #92400e; --badge-border: #fde68a; }
 .badge-soft.badge-orange { --badge-bg: #ffedd5; --badge-fg: #9a3412; --badge-border: #fed7aa; }
 .badge-soft.badge-purple { --badge-bg: #f3e8ff; --badge-fg: #6b21a8; --badge-border: #e9d5ff; }
+
+/* Ton « dark » : pastille discrète sur fond sombre (pied de page) */
+.badge-dark {
+  --badge-bg: #111827;
+  --badge-fg: #d1d5db;
+  --badge-border: #1f2937;
+  padding: 0.25rem 0.625rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+}

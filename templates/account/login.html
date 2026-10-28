@@ -25,9 +25,7 @@
     <div>
       <div class="flex items-center justify-between mb-1">
         <span class="text-sm font-medium text-gray-700">Mot de passe</span>
-        <a href="{% url 'account_reset_password' %}" class="text-xs text-primary hover:text-primary-dark font-medium transition">
-          Mot de passe oublié ?
-        </a>
+        <c-ui.link href="{% url 'account_reset_password' %}" class="text-xs">Mot de passe oublié ?</c-ui.link>
       </div>
       <c-form.input
         name="password"
@@ -45,10 +43,7 @@
     </div>
   </form>
 
-  <p class="mt-6 text-center text-sm text-gray-500 border-t border-gray-100 pt-6">
-    Pas encore de compte ?
-    <a href="{% url 'account_signup' %}" class="text-primary hover:text-primary-dark font-medium ml-1">S'inscrire</a>
-  </p>
+  <c-layout.auth-switch text="Pas encore de compte ?" href="{% url 'account_signup' %}" label="S'inscrire" />
 
 </c-layout.auth-card>
 {% endblock %}

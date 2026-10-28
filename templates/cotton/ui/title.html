@@ -1,0 +1,6 @@
+{# Titre. `as` : h1 (défaut) | h2 | h3 ; `size` : lg | md (défaut) | sm. Échelle : static/css/app/typography.css #}
+<c-vars as="h1" size="md" class="" />
+
+{% if as == 'h2' %}<h2 class="title title-{{ size }} {{ class }}" {{ attrs }}>{{ slot }}</h2>
+{% elif as == 'h3' %}<h3 class="title title-{{ size }} {{ class }}" {{ attrs }}>{{ slot }}</h3>
+{% else %}<h1 class="title title-{{ size }} {{ class }}" {{ attrs }}>{{ slot }}</h1>{% endif %}

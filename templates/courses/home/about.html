@@ -23,8 +23,8 @@
                     <video x-ref="video" src="{% static 'videos/presentation.mp4' %}" loop muted playsinline preload="none" class="w-full h-full border-2 border-gray-100 rounded-lg object-cover aspect-[4/5] cursor-pointer" @click="toggleMute()"></video>
                     
                     <!-- Manga tape -->
-                    <div class="absolute -top-2 -left-2 w-10 h-3 bg-white border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
-                    <div class="absolute -bottom-2 -right-2 w-10 h-3 bg-white border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
+                    <c-ui.tape tone="white" />
+                    <c-ui.tape corner="br" tone="white" />
                     
                     <!-- Sound Toggle Button -->
                     <c-ui.btn @click="toggleMute()" aria-label="Activer/Désactiver le son" variant="outline" size="md" icon="true" class="absolute bottom-6 right-6 z-30">
@@ -36,25 +36,21 @@
 
             <!-- Text Content -->
             <div>
-                <div class="drop-shadow-sm mb-6 inline-block">
-                    <div class="inline-block bg-gray-900 text-white rounded-lg px-4 py-1.5 manga-tape transform -rotate-1 shadow-brutal-sm">
-                        <span class="font-bold tracking-widest uppercase text-xs">Votre Sensei (先生)</span>
-                    </div>
-                </div>
+                <c-ui.kicker class="mb-6">Votre Sensei (先生)</c-ui.kicker>
                 
                 <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight drop-shadow-md mb-8">
                     Des cours pensés<br>pour la répétition espacée.
                 </h2>
                 
                 <div class="space-y-6">
-                    <div class="bg-white border-2 border-gray-900 rounded-2xl p-6 text-gray-900 shadow-sm hover:shadow-brutal hover:-translate-y-0.5 transition-all manga-drawn">
+                    <c-ui.card drawn="true" class="text-gray-900 shadow-sm hover:shadow-brutal hover:-translate-y-0.5 transition-all">
                         <h3 class="font-bold text-xl mb-2 flex items-center gap-2 uppercase tracking-wide">
                             <span class="text-primary text-2xl">🧠</span> Révision intégrée via Anki
                         </h3>
                         <p class="font-medium text-lg leading-relaxed text-gray-600">
                             Fini les oublis au bout d'une semaine. Je fournis des decks Anki (flashcards) pour chaque leçon afin d'ancrer le vocabulaire et la grammaire sur le long terme via la répétition espacée.
                         </p>
-                    </div>
+                    </c-ui.card>
 
                     <div class="bg-gray-900 border-2 border-gray-800 rounded-2xl p-6 text-white shadow-sm hover:shadow-brutal hover:-translate-y-0.5 transition-all manga-drawn-alt">
                         <h3 class="font-bold text-xl mb-2 flex items-center gap-2 uppercase tracking-wide">

@@ -1,0 +1,4 @@
+{# Conteneur de page centré, avec marges latérales responsives. size : md | lg | 2xl | 3xl | 4xl | 5xl | 6xl | 7xl (défaut) #}
+<c-vars size="7xl" class="" />
+
+<div class="{% if size == 'md' %}max-w-md{% elif size == 'lg' %}max-w-lg{% elif size == '2xl' %}max-w-2xl{% elif size == '3xl' %}max-w-3xl{% elif size == '4xl' %}max-w-4xl{% elif size == '5xl' %}max-w-5xl{% elif size == '6xl' %}max-w-6xl{% else %}max-w-7xl{% endif %} mx-auto px-4 sm:px-6 lg:px-8 {{ class }}" {{ attrs }}>{{ slot }}</div>

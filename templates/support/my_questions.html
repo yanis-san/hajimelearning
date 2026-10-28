@@ -3,13 +3,13 @@
 {% block title %}Questions & Support{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto py-10 px-4 space-y-8"
+<c-layout.container size="5xl" class="py-10 space-y-8"
      x-data="supportHub('{{ courses_data.0.course.slug|default:'all' }}')">
 
   {# ── En-tête ── #}
   <div class="flex items-start justify-between gap-4 flex-wrap">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">💬 Questions & Support</h1>
+      <c-ui.title>💬 Questions & Support</c-ui.title>
       <p class="text-sm text-gray-500 mt-1">Retrouvez vos questions et celles de vos camarades par formation.</p>
     </div>
     <div class="flex items-center gap-2">
@@ -61,10 +61,7 @@
               · {{ cd.my_count }} de moi
             </p>
           </div>
-          <a href="{% url 'course_detail' cd.course.slug %}"
-             class="text-xs text-primary hover:text-primary-dark transition">
-            Voir le cours →
-          </a>
+          <c-ui.link href="{% url 'course_detail' cd.course.slug %}" class="text-xs">Voir le cours →</c-ui.link>
         </div>
 
         {# Filtre Toutes / Mes questions #}
@@ -121,5 +118,5 @@
   </c-ui.empty-state>
   {% endif %}
 
-</div>
+</c-layout.container>
 {% endblock %}

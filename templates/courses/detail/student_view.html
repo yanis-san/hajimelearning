@@ -11,15 +11,15 @@
     </nav>
 
     {# Carte de progression #}
-    <div class="bg-white border-2 border-gray-900 rounded-2xl p-6 lg:p-10 shadow-brutal-md mb-12 relative overflow-hidden manga-drawn">
+    <c-ui.card padding="xl" drawn="true" class="mb-12 relative overflow-hidden">
       <div class="absolute -right-8 -top-8 w-32 h-32 bg-[radial-gradient(circle,rgba(255,0,60,0.1)_2px,transparent_2px)] bg-[size:10px_10px] pointer-events-none transform rotate-12"></div>
       
       <!-- Manga tape -->
-      <div class="absolute -top-2 -left-2 w-10 h-3 bg-primary border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
+      <c-ui.tape />
 
       <c-ui.badge variant="green" class="absolute top-6 right-6 shadow-sm border-2 border-green-800">Inscrit</c-ui.badge>
 
-      <h1 class="text-3xl lg:text-5xl font-extrabold text-gray-900 mb-4 pr-20 tracking-tight drop-shadow-sm">{{ course.title }}</h1>
+      <c-ui.title size="lg" class="lg:text-5xl mb-4 pr-20 drop-shadow-sm">{{ course.title }}</c-ui.title>
       <p class="text-gray-600 mb-8 max-w-2xl font-medium text-lg">{{ course.short_description }}</p>
 
       <div class="max-w-md p-5 border-2 border-gray-900 rounded-xl bg-gray-50 shadow-brutal relative overflow-hidden manga-drawn-alt">
@@ -68,7 +68,7 @@
           </c-ui.btn>
         </div>
       {% endif %}
-    </div>
+    </c-ui.card>
 
     {# Programme (vue inscrit) #}
     <div class="max-w-4xl mx-auto">

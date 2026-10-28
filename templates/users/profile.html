@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-10 px-4">
+<c-layout.container size="4xl" class="py-10">
 
   <c-ui.page-header title="Mon Compte">
     <c-ui.btn variant="outline" size="sm" href="{% url 'user_dashboard' %}">
@@ -43,14 +43,8 @@
         {% csrf_token %}
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="space-y-1">
-            <label for="id_first_name" class="block text-sm font-bold text-gray-700">Prénom</label>
-            {{ form.first_name }}
-          </div>
-          <div class="space-y-1">
-            <label for="id_last_name" class="block text-sm font-bold text-gray-700">Nom</label>
-            {{ form.last_name }}
-          </div>
+          <c-form.field :field="form.first_name" label="Prénom" variant="plain" class="space-y-1" />
+          <c-form.field :field="form.last_name" label="Nom" variant="plain" class="space-y-1" />
         </div>
 
         <c-ui.card variant="muted" padding="sm" class="space-y-1 relative">
@@ -60,31 +54,16 @@
         </c-ui.card>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="space-y-1">
-            <label for="id_phone_number" class="block text-sm font-bold text-gray-700">Téléphone</label>
-            {{ form.phone_number }}
-          </div>
-          <div class="space-y-1">
-            <label for="id_birth_date" class="block text-sm font-bold text-gray-700">Date de naissance</label>
-            {{ form.birth_date }}
-          </div>
+          <c-form.field :field="form.phone_number" label="Téléphone" variant="plain" class="space-y-1" />
+          <c-form.field :field="form.birth_date" label="Date de naissance" variant="plain" class="space-y-1" />
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="space-y-1">
-            <label for="id_country" class="block text-sm font-bold text-gray-700">Pays</label>
-            {{ form.country }}
-          </div>
-          <div class="md:col-span-2 space-y-1">
-            <label for="id_city" class="block text-sm font-bold text-gray-700">Ville</label>
-            {{ form.city }}
-          </div>
+          <c-form.field :field="form.country" label="Pays" variant="plain" class="space-y-1" />
+          <c-form.field :field="form.city" label="Ville" variant="plain" class="md:col-span-2 space-y-1" />
         </div>
 
-        <div class="space-y-1">
-          <label for="id_address" class="block text-sm font-bold text-gray-700">Adresse complète</label>
-          {{ form.address }}
-        </div>
+        <c-form.field :field="form.address" label="Adresse complète" variant="plain" class="space-y-1" />
 
         <div class="flex justify-end pt-6 border-t-2 border-gray-100 mt-6">
           <c-ui.btn variant="primary" type="submit">
@@ -144,5 +123,5 @@
     </div>
   </div>
 
-</div>
+</c-layout.container>
 {% endblock %}

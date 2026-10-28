@@ -1,0 +1,6 @@
+{# Morceau de ruban adhésif décoratif aux coins d'une carte. corner : tl | tr | br ; tone : primary | white #}
+<c-vars corner="tl" tone="primary" />
+
+<div class="absolute w-10 h-3 border-2 border-gray-900 rounded-sm z-20 pointer-events-none
+            {% if corner == 'br' %}-bottom-2 -right-2 transform -rotate-45{% elif corner == 'tr' %}-top-2 -right-2 transform rotate-45{% else %}-top-2 -left-2 transform -rotate-45{% endif %}
+            {% if tone == 'white' %}bg-white{% else %}bg-primary{% endif %}" {{ attrs }}></div>

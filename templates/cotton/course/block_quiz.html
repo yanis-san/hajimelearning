@@ -3,6 +3,7 @@
 
 <c-course.block-frame icon="🎯" tone="emerald">
   <c-slot name="title">{{ block.quiz_title|furigana|default:"Quiz d'évaluation" }}</c-slot>
+  <c-slot name="footer">{{ slot }}</c-slot>
 
 
 {% quiz_data block %}
@@ -123,13 +124,5 @@
       Recommencer
     </button>
   </c-ui.card>
-
-  {% if slot %}
-    <div class="px-6 pb-6 pt-0">
-      <div class="pt-4 border-t border-gray-100">
-        {{ slot }}
-      </div>
-    </div>
-  {% endif %}
 
 </c-course.block-frame>

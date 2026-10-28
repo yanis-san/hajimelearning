@@ -1,0 +1,24 @@
+/*
+ * Titres (composant <c-ui.title />) : quatre tailles, une seule échelle pour tout le site.
+ *   lg : titre de page éditorial (fiche cours, offres, connexion)
+ *   md : titre de page applicative (tableaux de bord, formulaires, confirmations) — défaut
+ *   sm : titre de section de page ou de carte
+ */
+.title {
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.25;
+}
+
+.title-lg {
+  font-size: 1.875rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.title-md { font-size: 1.5rem; }
+.title-sm { font-size: 1.25rem; }
+
+@media (min-width: 1024px) {
+  .title-lg { font-size: 2.25rem; }
+}

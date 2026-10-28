@@ -1,5 +1,7 @@
 """Tests pour le Landing Page Builder (sections vitrines éditables par cours)."""
 
+import html
+
 import pytest
 from django.test import Client
 from django.urls import reverse
@@ -432,7 +434,7 @@ class TestTextImageSection:
     def test_text_image_form_shows_position(self, admin_client, course):
         url = reverse('add_landing_section', kwargs={'course_slug': course.slug, 'section_type': 'text_image'})
         resp = admin_client.get(url)
-        assert "Position de l'image" in resp.content.decode()
+        assert "Position de l'image" in html.unescape(resp.content.decode())
 
 
 class TestFaqSection:

@@ -4,7 +4,7 @@
 {% block title %}{% if is_edit %}Modifier « {{ course.title }} »{% else %}Nouvelle formation{% endif %} — Hajime Learning{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto px-4 py-10">
+<c-layout.container size="3xl" class="py-10">
 
   {# ── En-tête ── #}
   <div class="mb-8">
@@ -15,9 +15,9 @@
       </svg>
       Retour au dashboard
     </a>
-    <h1 class="text-2xl font-bold text-gray-900">
+    <c-ui.title>
       {% if is_edit %}Modifier « {{ course.title }} »{% else %}Créer une formation{% endif %}
-    </h1>
+    </c-ui.title>
     {% if not is_edit %}
       <p class="mt-1 text-sm text-gray-500">
         Formations restantes :
@@ -51,49 +51,16 @@
       <legend class="text-sm font-semibold text-gray-800 px-1">Informations principales</legend>
 
       {# Titre #}
-      <div>
-        <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-          Titre <span class="text-red-400">*</span>
-        </label>
-        {{ form.title }}
-        {% if form.title.errors %}
-          <p class="mt-1 text-xs text-red-500">{{ form.title.errors.0 }}</p>
-        {% endif %}
-      </div>
+      <c-form.field :field="form.title" label="Titre" variant="plain" required="true" />
 
       {# Slug #}
-      <div>
-        <label for="{{ form.slug.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-          Slug (URL)
-        </label>
-        {{ form.slug }}
-        <p class="mt-1 text-xs text-gray-500">{{ form.slug.help_text }}</p>
-        {% if form.slug.errors %}
-          <p class="mt-1 text-xs text-red-500">{{ form.slug.errors.0 }}</p>
-        {% endif %}
-      </div>
+      <c-form.field :field="form.slug" label="Slug (URL)" variant="plain" :hint="form.slug.help_text" />
 
       {# Description courte #}
-      <div>
-        <label for="{{ form.short_description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-          Description courte <span class="text-red-400">*</span>
-        </label>
-        {{ form.short_description }}
-        {% if form.short_description.errors %}
-          <p class="mt-1 text-xs text-red-500">{{ form.short_description.errors.0 }}</p>
-        {% endif %}
-      </div>
+      <c-form.field :field="form.short_description" label="Description courte" variant="plain" required="true" />
 
       {# Description complète #}
-      <div>
-        <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-          Description complète
-        </label>
-        {{ form.description }}
-        {% if form.description.errors %}
-          <p class="mt-1 text-xs text-red-500">{{ form.description.errors.0 }}</p>
-        {% endif %}
-      </div>
+      <c-form.field :field="form.description" label="Description complète" variant="plain" />
     </fieldset>
 
     {# ── Section : Contenu pédagogique ── #}
@@ -113,15 +80,7 @@
       </div>
 
       {# Prérequis #}
-      <div>
-        <label for="{{ form.prerequisites.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-          Prérequis
-        </label>
-        {{ form.prerequisites }}
-        {% if form.prerequisites.errors %}
-          <p class="mt-1 text-xs text-red-500">{{ form.prerequisites.errors.0 }}</p>
-        {% endif %}
-      </div>
+      <c-form.field :field="form.prerequisites" label="Prérequis" variant="plain" />
 
       {# Vidéo de présentation #}
       <div>
@@ -141,37 +100,13 @@
       <legend class="text-sm font-semibold text-gray-800 px-1">SEO & Tarification</legend>
 
       {# Méta description #}
-      <div>
-        <label for="{{ form.meta_description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-          Méta description
-        </label>
-        {{ form.meta_description }}
-        {% if form.meta_description.errors %}
-          <p class="mt-1 text-xs text-red-500">{{ form.meta_description.errors.0 }}</p>
-        {% endif %}
-      </div>
+      <c-form.field :field="form.meta_description" label="Méta description" variant="plain" />
 
       {# Mots-clés #}
-      <div>
-        <label for="{{ form.keywords.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-          Mots-clés
-        </label>
-        {{ form.keywords }}
-        {% if form.keywords.errors %}
-          <p class="mt-1 text-xs text-red-500">{{ form.keywords.errors.0 }}</p>
-        {% endif %}
-      </div>
+      <c-form.field :field="form.keywords" label="Mots-clés" variant="plain" />
 
       {# Prix #}
-      <div>
-        <label for="{{ form.price.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
-          Prix (DA) <span class="text-red-400">*</span>
-        </label>
-        {{ form.price }}
-        {% if form.price.errors %}
-          <p class="mt-1 text-xs text-red-500">{{ form.price.errors.0 }}</p>
-        {% endif %}
-      </div>
+      <c-form.field :field="form.price" label="Prix (DA)" variant="plain" required="true" />
     </fieldset>
 
     {# ── Section : Image & Options ── #}
@@ -235,5 +170,5 @@
       </c-ui.btn>
     </div>
   </form>
-</div>
+</c-layout.container>
 {% endblock %}

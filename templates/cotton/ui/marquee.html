@@ -1,0 +1,6 @@
+{# Bandeau défilant. Les éléments (c-ui.marquee-item) sont déclarés une fois ; le contenu est répété pour une boucle continue. #}
+<div class="absolute bottom-0 left-0 w-full bg-white border-t-2 border-gray-900 py-2.5 z-20 overflow-hidden flex whitespace-nowrap shadow-sm" {{ attrs }}>
+  <div class="animate-marquee flex items-center">
+    {{ slot }}{{ slot }}{{ slot }}{{ slot }}
+  </div>
+</div>

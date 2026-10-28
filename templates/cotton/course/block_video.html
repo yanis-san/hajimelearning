@@ -3,6 +3,7 @@
 
 <c-course.block-frame icon="🎬" tone="red">
   <c-slot name="title">{{ block.title|furigana|default:"Vidéo" }}</c-slot>
+  <c-slot name="footer">{{ slot }}</c-slot>
     <div class="p-6 bg-white space-y-4">
       <div class="bg-black rounded-xl overflow-hidden shadow-sm aspect-video w-full max-w-4xl mx-auto">
         <iframe src="https://www.youtube.com/embed/{{ block.video_id }}?rel=0&modestbranding=1"
@@ -12,12 +13,6 @@
                 allowfullscreen>
         </iframe>
       </div>
-
-      {% if slot %}
-        <div class="mt-6 pt-4 border-t border-gray-100">
-          {{ slot }}
-        </div>
-      {% endif %}
     </div>
   
 </c-course.block-frame>

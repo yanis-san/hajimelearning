@@ -3,7 +3,7 @@
 {% block title %}Demande en cours — Hajime Learning{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto px-4 py-20 text-center">
+<c-layout.container size="md" class="py-20 text-center">
 
   <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
     <svg class="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -11,7 +11,7 @@
     </svg>
   </div>
 
-  <h1 class="text-2xl font-bold text-gray-900 mb-3">Demande envoyée !</h1>
+  <c-ui.title class="mb-3">Demande envoyée !</c-ui.title>
   <p class="text-gray-500 mb-8">
     Votre demande pour l'offre
     {% if request_obj %}<strong>{{ request_obj.plan.name }}</strong>{% endif %}
@@ -22,5 +22,5 @@
     Retour à l'accueil
   </c-ui.btn>
 
-</div>
+</c-layout.container>
 {% endblock %}

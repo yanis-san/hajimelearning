@@ -1,0 +1,6 @@
+{# Lien de navigation. `mobile="true"` : version du menu déroulant. #}
+<c-vars href="" mobile="false" />
+
+<a href="{{ href }}"
+   class="{% if mobile == 'true' %}block text-sm font-bold text-gray-800 hover:bg-gray-50 rounded-xl px-4 py-3 transition-all{% else %}text-sm font-semibold text-gray-700 hover:text-gray-900 border-2 border-transparent hover:border-gray-200 hover:bg-gray-50 rounded-xl px-3 py-1.5 transition-all{% endif %}"
+   {{ attrs }}>{{ slot }}</a>

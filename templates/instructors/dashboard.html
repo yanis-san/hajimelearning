@@ -4,17 +4,15 @@
 {% block title %}Espace Instructeur — Hajime Learning{% endblock %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<c-layout.container size="5xl" class="py-10">
 
   {# ── En-tête ── #}
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Espace Instructeur</h1>
+      <c-ui.title>Espace Instructeur</c-ui.title>
       <p class="text-sm text-gray-500 mt-1">
         Offre <strong>{{ profile.plan.name }}</strong> — {{ profile.revenue_percent }}% de revenus
-        <a href="{% url 'instructor_plans' %}" class="text-primary hover:text-primary-dark font-medium ml-2 text-xs transition">
-          Changer d'offre →
-        </a>
+        <c-ui.link href="{% url 'instructor_plans' %}" class="ml-2 text-xs">Changer d'offre →</c-ui.link>
       </p>
     </div>
     {% if profile.can_create_course %}
@@ -172,5 +170,5 @@
       message="Créez votre première formation pour commencer à enseigner." />
   {% endif %}
 
-</div>
+</c-layout.container>
 {% endblock %}

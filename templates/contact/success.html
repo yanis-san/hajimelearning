@@ -3,7 +3,7 @@
 {% block title %}Message envoyé — Hajime Learning{% endblock %}
 
 {% block content %}
-<div class="max-w-lg mx-auto py-20 px-4 text-center"
+<c-layout.container size="lg" class="py-20 text-center"
      x-data="{ count: 5 }"
      x-init="
        let t = setInterval(() => {
@@ -19,7 +19,7 @@
     </svg>
   </div>
 
-  <h1 class="text-2xl font-bold text-gray-900 mb-3">Message bien reçu !</h1>
+  <c-ui.title class="mb-3">Message bien reçu !</c-ui.title>
   <p class="text-gray-500 mb-8">
     Merci de nous avoir contactés. Nous vous répondrons dans les plus brefs délais
     (généralement sous 24–48 h).
@@ -45,5 +45,5 @@
     {% endif %}
   </div>
 
-</div>
+</c-layout.container>
 {% endblock %}

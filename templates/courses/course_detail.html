@@ -21,14 +21,14 @@
 {# ── Mode Gestion / Administration du cours ── #}
 {% include "courses/detail/manager_bar.html" %}
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<c-layout.container class="py-8">
 
   {% if has_access and not preview_landing %}
     {% include "courses/detail/student_view.html" %}
   {% else %}
     {% include "courses/detail/sales_view.html" %}
   {% endif %}
-</div>
+</c-layout.container>
 
 {% if is_manager or user.is_staff %}
   <c-manage.furigana-guide />

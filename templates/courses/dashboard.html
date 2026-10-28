@@ -3,7 +3,7 @@
 {% block title %}Mes cours | Hajime Learning{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<c-layout.container class="py-8">
 
   <c-ui.page-header title="Mes cours" subtitle="Retrouvez vos formations et suivez votre progression.">
     <div class="flex items-center gap-2">
@@ -37,5 +37,5 @@
     </c-ui.empty-state>
   {% endif %}
 
-</div>
+</c-layout.container>
 {% endblock %}

@@ -7,27 +7,11 @@
         <c-ui.card class="space-y-6">
           <c-ui.card-header icon="🔍" title="Optimisation Google & Référencement (SEO)"><c-ui.badge tone="soft" variant="blue">Moteurs de recherche</c-ui.badge></c-ui.card-header>
 
-          <div>
-            <div class="flex items-center justify-between mb-1.5">
-              <label for="id_meta_description" class="block text-xs font-black uppercase tracking-wider text-gray-800">
-                Meta Description (Google Snippet)
-              </label>
-              <div class="text-xs font-mono font-bold"
-                   :class="metaDescLength > 160 ? 'text-red-600' : (metaDescLength >= 120 ? 'text-emerald-600' : 'text-gray-500')">
-                <span x-text="metaDescLength">0</span> / 160 caractères
-              </div>
-            </div>
+          <c-form.field :field="form.meta_description" label="Meta Description (Google Snippet)">
+            <c-slot name="aside"><span class="font-mono font-bold" :class="metaDescLength > 160 ? 'text-red-600' : (metaDescLength >= 120 ? 'text-emerald-600' : 'text-gray-500')"><span x-text="metaDescLength">0</span> / 160 caractères</span></c-slot>
+            <c-slot name="hint">Court résumé qui s'affiche sous le lien bleu dans les résultats de recherche Google. Idéal : 120 à 160 caractères.</c-slot>
             {{ form.meta_description }}
-            {% if form.meta_description.errors %}
-              <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
-                <span>⚠️</span> {{ form.meta_description.errors.0 }}
-              </p>
-            {% else %}
-              <p class="text-xs text-gray-500 font-medium mt-1.5">
-                Court résumé qui s'affiche sous le lien bleu dans les résultats de recherche Google. Idéal : 120 à 160 caractères.
-              </p>
-            {% endif %}
-          </div>
+          </c-form.field>
 
           {# Mockup réaliste du résultat Google #}
           <div class="p-5 rounded-xl border-2 border-gray-200 bg-stone-50/70 space-y-2">

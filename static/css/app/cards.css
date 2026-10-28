@@ -5,7 +5,7 @@
  *            soft            contour gris + ombre légère — cartes d'information ;
  *            flat            contour gris sans ombre — blocs imbriqués ;
  *            muted           fond gris clair — encarts secondaires.
- *  padding : none | xs | sm | md (défaut) | lg
+ *  padding : none | xs | sm | md (défaut) | lg | xl (grand écran : 2.5rem)
  */
 .card {
   background-color: #fff;
@@ -31,7 +31,12 @@
 .card-pad-sm { padding: 1rem; }
 .card-pad-md { padding: 1.5rem; }
 .card-pad-lg { padding: 2rem; }
+.card-pad-xl { padding: 1.5rem; }
 
 @media (min-width: 640px) {
   .card-pad-md { padding: 1.75rem; }
+}
+
+@media (min-width: 1024px) {
+  .card-pad-xl { padding: 2.5rem; }
 }

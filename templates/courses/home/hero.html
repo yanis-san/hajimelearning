@@ -41,11 +41,11 @@
             <div class="absolute -inset-2 lg:-inset-3 bg-gray-900 rounded-2xl rotate-[-3deg] z-0 shadow-lg"></div>
             
             <!-- Conteneur Photo -->
-            <div class="relative bg-white border-2 border-gray-900 rounded-xl p-2 lg:p-3 z-10 aspect-[4/5] shadow-brutal-md">
+            <c-ui.card padding="none" class="relative p-2 lg:p-3 rounded-xl z-10 aspect-[4/5]">
                 
                 <!-- Scotch Manga -->
-                <div class="absolute -top-2 -left-2 w-10 h-3 bg-primary transform -rotate-45 z-20 border-2 border-gray-900 rounded-sm"></div>
-                <div class="absolute -bottom-2 -right-2 w-10 h-3 bg-primary transform -rotate-45 z-20 border-2 border-gray-900 rounded-sm"></div>
+                <c-ui.tape />
+                <c-ui.tape corner="br" />
 
                 <!-- Image / Vidéo Hero -->
                 <div class="w-full h-full bg-gray-100 rounded-lg overflow-hidden relative group">
@@ -59,57 +59,20 @@
                     <!-- Trame Manga -->
                     <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-multiply halftone-md"></div>
                 </div>
-            </div>
+            </c-ui.card>
             
             <!-- Badge Flottant -->
-            <div class="absolute -bottom-4 lg:-bottom-6 -left-4 z-30 bg-white border-2 border-gray-900 rounded-xl px-4 py-2 transform rotate-6 shadow-brutal">
+            <c-ui.card padding="none" class="absolute -bottom-4 lg:-bottom-6 -left-4 z-30 rounded-xl px-4 py-2 transform rotate-6 shadow-brutal">
                 <span class="font-bold text-gray-900 text-lg lg:text-xl">ヤニス先生</span>
-            </div>
+            </c-ui.card>
         </div>
     </div>
 
-    <!-- Bandeau défilant (Marquee) à la pub japonaise -->
-    <div class="absolute bottom-0 left-0 w-full bg-white border-t-2 border-gray-900 py-2.5 z-20 overflow-hidden flex whitespace-nowrap shadow-sm">
-        <div class="animate-marquee flex items-center">
-            <!-- Bloc 1 -->
-            <span class="font-bold uppercase tracking-widest text-lg text-primary">Apprendre le Japonais de Zéro</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Préparation JLPT (N5-N1)</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-            <span class="font-bold uppercase tracking-widest text-lg text-primary">Méthode Intuitive & Pratique</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Maîtrisez les Kanji</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-
-            <!-- Répétition -->
-            <span class="font-bold uppercase tracking-widest text-lg text-primary">Apprendre le Japonais de Zéro</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Préparation JLPT (N5-N1)</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-            <span class="font-bold uppercase tracking-widest text-lg text-primary">Méthode Intuitive & Pratique</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Maîtrisez les Kanji</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-            
-            <!-- Bloc 2 (copie exacte pour la boucle fluide) -->
-            <span class="font-bold uppercase tracking-widest text-lg text-primary">Apprendre le Japonais de Zéro</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Préparation JLPT (N5-N1)</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-            <span class="font-bold uppercase tracking-widest text-lg text-primary">Méthode Intuitive & Pratique</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Maîtrisez les Kanji</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-
-            <!-- Répétition -->
-            <span class="font-bold uppercase tracking-widest text-lg text-primary">Apprendre le Japonais de Zéro</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Préparation JLPT (N5-N1)</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-            <span class="font-bold uppercase tracking-widest text-lg text-primary">Méthode Intuitive & Pratique</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Maîtrisez les Kanji</span>
-            <span class="text-primary/30 mx-6 text-xl">✖</span>
-        </div>
-    </div>
+    {# Bandeau défilant à la manière des publicités japonaises #}
+    <c-ui.marquee>
+        <c-ui.marquee-item tone="primary">Apprendre le Japonais de Zéro</c-ui.marquee-item>
+        <c-ui.marquee-item>Préparation JLPT (N5-N1)</c-ui.marquee-item>
+        <c-ui.marquee-item tone="primary">Méthode Intuitive &amp; Pratique</c-ui.marquee-item>
+        <c-ui.marquee-item>Maîtrisez les Kanji</c-ui.marquee-item>
+    </c-ui.marquee>
 </section>

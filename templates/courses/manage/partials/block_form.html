@@ -101,12 +101,7 @@
 
     {# ── Vidéo ── #}
     {% if block_type == 'video' or block.type == 'video' %}
-      <div class="space-y-1">
-        <label for="id_video_id" class="block text-sm font-medium text-gray-700">
-          ID Vidéo <span class="text-red-500">*</span>
-        </label>
-        {{ form.video_id }}
-      </div>
+      <c-form.field :field="form.video_id" label="ID Vidéo" variant="plain" required="true" class="space-y-1" />
     {% endif %}
 
     {# ── Audio ── #}
@@ -117,12 +112,7 @@
           {{ form.title }}
           <p class="text-xs text-gray-500">Optionnel</p>
         </div>
-        <div class="space-y-1">
-          <label for="id_file_content" class="block text-sm font-medium text-gray-700">
-            Fichier MP3 <span class="text-red-500">*</span>
-          </label>
-          {{ form.file_content }}
-        </div>
+        <c-form.field :field="form.file_content" label="Fichier MP3" variant="plain" required="true" class="space-y-1" />
         <div class="space-y-1">
           <label for="id_text_content" class="block text-sm font-medium text-gray-700">Consigne</label>
           <textarea name="text_content" rows="2"
@@ -139,16 +129,8 @@
     {# ── Fichier ── #}
     {% if block_type == 'file' or block.type == 'file' %}
       <div class="space-y-4">
-        <div class="space-y-1">
-          <label for="id_title" class="block text-sm font-medium text-gray-700">Nom du fichier (affiché)</label>
-          {{ form.title }}
-        </div>
-        <div class="space-y-1">
-          <label for="id_file_content" class="block text-sm font-medium text-gray-700">
-            Sélectionner le fichier <span class="text-red-500">*</span>
-          </label>
-          {{ form.file_content }}
-        </div>
+        <c-form.field :field="form.title" label="Nom du fichier (affiché)" variant="plain" class="space-y-1" />
+        <c-form.field :field="form.file_content" label="Sélectionner le fichier" variant="plain" required="true" class="space-y-1" />
       </div>
     {% endif %}
 

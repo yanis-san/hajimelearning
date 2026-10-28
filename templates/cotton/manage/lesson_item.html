@@ -48,16 +48,8 @@
           <input type="text" name="slug" value="{{ lesson.slug }}"
                  class="w-40 px-3 py-2 border border-gray-300 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent"
                  placeholder="slug">
-          <label class="flex items-center gap-1.5 text-sm text-gray-600">
-            <input type="checkbox" name="is_free" {% if lesson.is_free %}checked{% endif %}
-                   class="rounded border-gray-300 text-primary focus:ring-primary/40">
-            Gratuit
-          </label>
-          <label class="flex items-center gap-1.5 text-sm text-gray-600">
-            <input type="checkbox" name="is_published" {% if lesson.is_published %}checked{% endif %}
-                   class="rounded border-gray-300 text-primary focus:ring-primary/40">
-            Publié
-          </label>
+          <c-form.check name="is_free" checked="{% if lesson.is_free %}true{% else %}false{% endif %}">Gratuit</c-form.check>
+          <c-form.check name="is_published" checked="{% if lesson.is_published %}true{% else %}false{% endif %}">Publié</c-form.check>
           <c-ui.btn variant="primary" size="sm" type="submit">
             Enregistrer
           </c-ui.btn>

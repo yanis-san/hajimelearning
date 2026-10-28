@@ -1,9 +1,10 @@
 {# Champ de formulaire Django : libellé, contrôle (le champ, ou le slot s'il est fourni), erreur ou aide. #}
 <c-vars field label="" hint="" aside="" required="false" variant="caps" />
+{# variant : caps (formulaires du studio) | plain (formulaires courants) | compact (grilles denses) #}
 
 <div {{ attrs }}>
   <label for="{{ field.id_for_label }}"
-         class="{% if variant == 'plain' %}block text-sm font-medium text-gray-700 mb-1{% else %}block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between{% endif %}">
+         class="{% if variant == 'plain' %}block text-sm font-medium text-gray-700 mb-1{% elif variant == 'compact' %}block text-xs font-medium text-gray-600 mb-1{% else %}block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between{% endif %}">
     <span>{{ label|default:field.label }}</span>
     {% if aside %}
       <span class="text-xs font-semibold text-gray-500 normal-case tracking-normal">{{ aside }}</span>
