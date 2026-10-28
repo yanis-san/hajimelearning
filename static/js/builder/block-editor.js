@@ -58,7 +58,11 @@ document.addEventListener('alpine:init', () => {
       this.lastSavedText = `✓ Enregistré automatiquement à ${savedAt}`;
       notify({ state: 'saved', time: savedAt });
       // Premier enregistrement d'un nouveau bloc : les suivants vont vers l'URL d'édition.
-      if (editUrl) this.$refs.blockForm.setAttribute('hx-post', editUrl);
+      // (htmx lit l'URL à l'initialisation : il faut ré-initialiser le formulaire après le changement)
+      if (editUrl) {
+        this.$refs.blockForm.setAttribute('hx-post', editUrl);
+        htmx.process(this.$refs.blockForm);
+      }
     },
 
     onError() {
