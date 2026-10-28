@@ -2,91 +2,16 @@
 {% load static %}
 
 {% block extra_head %}
-  <script src="{% static 'js/marked.min.js' %}"></script>
-  <script>
-    function convertCourseFurigana(text) {
-      if (!text) return '';
-      return text
-        .replace(/\{([^\}]+)\}\(([^\)]+)\)/g, (m, k, r) => {
-          if (r.includes('|')) {
-            const parts = r.split('|').map(s => s.trim());
-            if (k.trim().length === parts.length) {
-              return parts.map((p, i) => `<ruby>${k.trim()[i]}<rt>${p}</rt></ruby>`).join('');
-            }
-          }
-          return `<ruby>${k.trim()}<rt>${r.trim()}</rt></ruby>`;
-        })
-        .replace(/\[([^\]\n]+)\]\{([^{}\n]+)\}/g, (m, k, r) => {
-          if (r.includes('|')) {
-            const parts = r.split('|').map(s => s.trim());
-            if (k.trim().length === parts.length) {
-              return parts.map((p, i) => `<ruby>${k.trim()[i]}<rt>${p}</rt></ruby>`).join('');
-            }
-          }
-          return `<ruby>${k.trim()}<rt>${r.trim()}</rt></ruby>`;
-        })
-        .replace(/[｜\|]([^《\n]+)《([^》\n]+)》/g, '<ruby>$1<rt>$2</rt></ruby>')
-        .replace(/([\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff々〆ヵヶ]+)《([^》\n]+)》/g, '<ruby>$1<rt>$2</rt></ruby>');
-    }
-
-    function renderCourseMarkdown(srcText, targetId) {
-      const el = document.getElementById(targetId);
-      if (!el) return;
-      const converted = convertCourseFurigana(srcText || '');
-      const parsed = (window.marked && window.marked.parse) ? window.marked.parse(converted) : converted;
-      el.innerHTML = '<div class="prose prose-sm max-w-none prose-headings:text-gray-900 prose-headings:font-bold prose-p:text-gray-700 prose-a:text-orange-600 prose-strong:text-gray-900 prose-ul:list-disc prose-ul:pl-5">' + (parsed || '<p class="text-gray-400 italic">Aucun contenu rédigé pour le moment…</p>') + '</div>';
-    }
-  </script>
+  <script src="{% static 'js/vendor/marked.min.js' %}"></script>
+  <script src="{% static 'js/builder/furigana.js' %}"></script>
+  <script src="{% static 'js/builder/markdown-preview.js' %}"></script>
 {% endblock %}
 
 {% block content %}
 <c-layout.course_builder :course="course" active_tab="infos" :is_edit="is_edit">
 
   <form method="post" enctype="multipart/form-data" class="max-w-4xl" novalidate
-        x-data="{
-          tab: 'infos',
-          mdTab: 'edit',
-          metaDescLength: 0,
-          trailerId: '',
-          courseTitle: '',
-          courseSlug: '',
-          init() {
-            const descEl = document.getElementById('id_meta_description');
-            if (descEl) {
-              this.metaDescLength = descEl.value.length;
-              descEl.addEventListener('input', () => { this.metaDescLength = descEl.value.length; });
-            }
-            const trailerEl = document.getElementById('id_trailer_video_id');
-            if (trailerEl) {
-              this.trailerId = trailerEl.value;
-              trailerEl.addEventListener('input', () => { this.trailerId = trailerEl.value.trim(); });
-            }
-            const titleEl = document.getElementById('id_title');
-            if (titleEl) {
-              this.courseTitle = titleEl.value;
-              titleEl.addEventListener('input', () => { this.courseTitle = titleEl.value; });
-            }
-            const slugEl = document.getElementById('id_slug');
-            if (slugEl) {
-              this.courseSlug = slugEl.value;
-              slugEl.addEventListener('input', () => { this.courseSlug = slugEl.value; });
-            }
-          },
-          syncSplitPreview() {
-            const mainEl = document.getElementById('id_description');
-            const splitEl = this.$refs.splitEditor;
-            if (mainEl && splitEl) {
-              splitEl.value = mainEl.value;
-              renderCourseMarkdown(splitEl.value, 'desc-split-preview');
-            }
-          },
-          syncFullPreview() {
-            const mainEl = document.getElementById('id_description');
-            if (mainEl) {
-              renderCourseMarkdown(mainEl.value, 'desc-full-preview');
-            }
-          }
-        }"
+        x-data="courseForm"
         {% if is_edit %}
         hx-post="."
         hx-trigger="change delay:1s from:input, change delay:1s from:textarea, change delay:1s from:select, submit"

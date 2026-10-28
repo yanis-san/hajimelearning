@@ -2,122 +2,12 @@
 {% load static %}
 
 {% block extra_head %}
-  <script src="{% static 'js/marked.min.js' %}"></script>
-  <script>
-    window.renderLessonBlockMarkdown = function(src, targetId) {
-      const el = document.getElementById(targetId);
-      if (!el) return;
-      if (!src || !src.trim()) {
-        el.innerHTML = '<p class="text-gray-400 italic text-sm">L\'aperçu apparaîtra ici…</p>';
-        return;
-      }
-      let converted = src
-        .replace(/\{([^{|\n]+)\|([^{}\n]+)\}/g, (m, k, r) => {
-          if (r.includes('|')) {
-            const parts = r.split('|').map(s => s.trim());
-            if (k.trim().length === parts.length) {
-              return parts.map((p, i) => `<ruby>${k.trim()[i]}<rt>${p}</rt></ruby>`).join('');
-            }
-          }
-          return `<ruby>${k.trim()}<rt>${r.trim()}</rt></ruby>`;
-        })
-        .replace(/\[([^\]\n]+)\]\{([^{}\n]+)\}/g, (m, k, r) => {
-          if (r.includes('|')) {
-            const parts = r.split('|').map(s => s.trim());
-            if (k.trim().length === parts.length) {
-              return parts.map((p, i) => `<ruby>${k.trim()[i]}<rt>${p}</rt></ruby>`).join('');
-            }
-          }
-          return `<ruby>${k.trim()}<rt>${r.trim()}</rt></ruby>`;
-        })
-        .replace(/[｜\|]([^《\n]+)《([^》\n]+)》/g, '<ruby>$1<rt>$2</rt></ruby>')
-        .replace(/([\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff々〆ヵヶ]+)《([^》\n]+)》/g, '<ruby>$1<rt>$2</rt></ruby>');
-
-      const parsed = (window.marked && window.marked.parse) ? window.marked.parse(converted) : converted;
-      el.innerHTML = '<div class="prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-600 prose-a:text-orange-600 prose-strong:text-gray-800 prose-table:text-sm">' + parsed + '</div>';
-    };
-
-    window.initBlockEditorData = function(postUrl) {
-      return {
-        tab: 'edit',
-        autosaveState: 'saved',
-        lastSavedText: 'Tous les changements sont enregistrés',
-        saveTimer: null,
-        hasUnsaved: false,
-        postUrl: postUrl,
-        init() {
-          window.addEventListener('beforeunload', (e) => {
-            if (this.hasUnsaved) {
-              this.autosave();
-              e.preventDefault();
-              e.returnValue = '';
-            }
-          });
-          document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'hidden' && this.hasUnsaved) {
-              this.autosave();
-            }
-          });
-        },
-        markDirty() {
-          this.hasUnsaved = true;
-          this.autosaveState = 'dirty';
-          this.lastSavedText = 'Modifications en cours…';
-          window.dispatchEvent(new CustomEvent('builder-status', { detail: { state: 'dirty' } }));
-          clearTimeout(this.saveTimer);
-          this.saveTimer = setTimeout(() => this.autosave(), 1200);
-        },
-        async autosave() {
-          if (!this.hasUnsaved && this.autosaveState === 'saved') return;
-          clearTimeout(this.saveTimer);
-          this.autosaveState = 'saving';
-          this.lastSavedText = 'Sauvegarde automatique…';
-          window.dispatchEvent(new CustomEvent('builder-status', { detail: { state: 'saving' } }));
-
-          const formEl = this.$refs.blockForm;
-          if (!formEl) return;
-          const formData = new FormData(formEl);
-          formData.append('is_autosave', '1');
-
-          try {
-            const res = await fetch(this.postUrl, {
-              method: 'POST',
-              headers: {
-                'X-Autosave': 'true',
-                'X-Requested-With': 'XMLHttpRequest'
-              },
-              body: formData
-            });
-
-            if (!res.ok) throw new Error();
-            const data = await res.json();
-            if (data.ok) {
-              this.hasUnsaved = false;
-              this.autosaveState = 'saved';
-              this.lastSavedText = '✓ Enregistré automatiquement à ' + data.saved_at;
-              window.dispatchEvent(new CustomEvent('builder-status', { detail: { state: 'saved', time: data.saved_at } }));
-
-              if (data.created && data.edit_url) {
-                this.postUrl = data.edit_url;
-                formEl.setAttribute('hx-post', data.edit_url);
-              }
-              if (data.block_list_html) {
-                const bl = document.getElementById('block-list');
-                if (bl) bl.innerHTML = data.block_list_html;
-              }
-            } else {
-              throw new Error();
-            }
-          } catch (e) {
-            this.autosaveState = 'error';
-            this.lastSavedText = '⚠️ Erreur de sauvegarde, nouvel essai…';
-            window.dispatchEvent(new CustomEvent('builder-status', { detail: { state: 'error' } }));
-            this.saveTimer = setTimeout(() => this.autosave(), 3000);
-          }
-        }
-      };
-    };
-  </script>
+  <script src="{% static 'js/vendor/marked.min.js' %}"></script>
+  <script src="{% static 'js/builder/furigana.js' %}"></script>
+  <script src="{% static 'js/builder/markdown-preview.js' %}"></script>
+  <script src="{% static 'js/builder/block-editor.js' %}"></script>
+  <script src="{% static 'js/vendor/sortable.min.js' %}"></script>
+  <script src="{% static 'js/builder/sortable-init.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -153,16 +43,7 @@
 
   {# ── Toolbar: palette de blocs + autosave status ── #}
   <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 sticky top-20 z-10 flex flex-wrap gap-3 justify-between items-center"
-       x-data="{
-         autosaveStatus: 'saved',
-         lastSavedTime: '',
-         init() {
-           window.addEventListener('builder-status', (e) => {
-             this.autosaveStatus = e.detail.state;
-             if (e.detail.time) this.lastSavedTime = e.detail.time;
-           });
-         }
-       }">
+       x-data="builderStatus">
     <div class="flex flex-wrap items-center gap-2">
       <span class="text-sm font-medium text-gray-400">Ajouter :</span>
 
@@ -258,24 +139,6 @@
   </form>
 
   <div id="reorder-msg"></div>
-
-  {# ── SortableJS init ── #}
-  <script>
-    htmx.onLoad(function(content) {
-      var sortables = content.querySelectorAll(".sortable-list");
-      for (var i = 0; i < sortables.length; i++) {
-        var sortable = sortables[i];
-        new Sortable(sortable, {
-          animation: 150,
-          handle: '.handle',
-          ghostClass: 'bg-orange-50',
-          onEnd: function (evt) {
-            this.el.dispatchEvent(new Event('end'));
-          }
-        });
-      }
-    });
-  </script>
 
 </c-layout.admin-card>
 

@@ -1,5 +1,5 @@
 {% load md %}
-<c-vars block="" csrf_token="" />
+<c-vars block="" />
 
 <div x-data="{ open: true }"
      @expand-all-blocks.window="open = true"
@@ -33,89 +33,9 @@
 
   <div x-show="open" x-collapse>
 
+{% quiz_data block %}
 <div {{ attrs }}
-     x-data="{
-       state: 'start',
-       questions: [
-         {% for q in block.questions.all %}
-         {
-           text: `{{ q.question_text|furigana|escapejs }}`,
-           duration: {{ q.duration }},
-           correct: '{{ q.correct_answer }}',
-           explanation: `{{ q.explanation|furigana|escapejs }}`,
-           choices: {
-             a: `{{ q.choice_a|furigana|escapejs }}`,
-             b: `{{ q.choice_b|furigana|escapejs }}`,
-             {% if q.choice_c %}c: `{{ q.choice_c|furigana|escapejs }}`,{% endif %}
-             {% if q.choice_d %}d: `{{ q.choice_d|furigana|escapejs }}`,{% endif %}
-           }
-         }{% if not forloop.last %},{% endif %}
-         {% endfor %}
-       ],
-       currentIdx: 0,
-       score: 0,
-       timeLeft: 0,
-       timePercent: 100,
-       timerInterval: null,
-       selected: null,
-
-       get currentQuestion() { return this.questions[this.currentIdx]; },
-
-       startQuiz() {
-         this.state = 'playing';
-         this.currentIdx = 0;
-         this.score = 0;
-         this.loadQuestion();
-       },
-
-       loadQuestion() {
-         this.selected = null;
-         this.state = 'playing';
-         this.timeLeft = this.currentQuestion.duration;
-         this.timePercent = 100;
-         if (this.timerInterval) clearInterval(this.timerInterval);
-         this.timerInterval = setInterval(() => {
-           this.timeLeft--;
-           this.timePercent = (this.timeLeft / this.currentQuestion.duration) * 100;
-           if (this.timeLeft <= 0) this.handleTimeUp();
-         }, 1000);
-       },
-
-       handleTimeUp() {
-         clearInterval(this.timerInterval);
-         this.state = 'time_up';
-       },
-
-       submitAnswer(key) {
-         clearInterval(this.timerInterval);
-         this.selected = key;
-         this.state = 'feedback';
-         if (key === this.currentQuestion.correct) this.score++;
-       },
-
-       revealAnswer() { this.state = 'feedback'; },
-       skipQuestion() { this.nextStep(); },
-
-       nextStep() {
-         if (this.currentIdx < this.questions.length - 1) {
-           this.currentIdx++;
-           this.loadQuestion();
-         } else {
-           this.finishGame();
-         }
-       },
-
-       finishGame() {
-         this.state = 'end';
-         fetch(`{% url 'save_quiz_result' block.id %}`, {
-           method: 'POST',
-           headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-           body: JSON.stringify({ score: this.score, total: this.questions.length })
-         });
-       },
-
-       resetGame() { this.state = 'start'; }
-     }">
+     x-data="quiz('quiz-data-{{ block.id }}', '{% url 'save_quiz_result' block.id %}')">
 
   {# ── Écran de démarrage ── #}
   <div x-show="state === 'start'" class="bg-white border border-gray-200 rounded-xl p-8 text-center shadow-sm">
@@ -140,11 +60,9 @@
        class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md">
 
     {# Barre de temps #}
-    <div class="h-1.5 bg-gray-100 w-full">
-      <div class="h-full transition-all duration-100 ease-linear rounded-r-full"
-           :style="`width: ${timePercent}%`"
-           :class="timePercent < 20 ? 'bg-red-500' : 'bg-blue-500'"></div>
-    </div>
+    <progress class="meter meter-blue rounded-none"
+              :class="timePercent < 20 ? 'meter-red' : 'meter-blue'"
+              :value="timePercent" max="100"></progress>
 
     <div class="p-6">
       {# Indicateur question + timer #}

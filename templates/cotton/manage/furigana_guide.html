@@ -1,13 +1,4 @@
-<div x-data="{
-       open: false,
-       copiedIndex: null,
-       copyText(text, index) {
-         navigator.clipboard.writeText(text).then(() => {
-           this.copiedIndex = index;
-           setTimeout(() => { this.copiedIndex = null; }, 1800);
-         });
-       }
-     }"
+<div x-data="furiganaGuide"
      @open-furigana-guide.window="open = true"
      @keydown.escape.window="open = false">
 

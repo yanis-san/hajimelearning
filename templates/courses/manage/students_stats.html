@@ -53,11 +53,8 @@
             </span>
             <span class="text-xs text-gray-400">{{ stat.completed }}/{{ total_lessons }}</span>
           </div>
-          <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-            <div class="h-full rounded-full
-                        {% if stat.percent == 100 %}bg-green-500{% elif stat.percent < 20 %}bg-red-400{% else %}bg-orange-500{% endif %}"
-                 style="width: {{ stat.percent }}%"></div>
-          </div>
+          <progress class="meter {% if stat.percent == 100 %}meter-green{% elif stat.percent < 20 %}meter-redsoft{% else %}meter-orange{% endif %}"
+                    value="{{ stat.percent }}" max="100">{{ stat.percent }}%</progress>
         </div>
 
         {# Dernière activité #}
@@ -83,10 +80,8 @@
               <span class="text-xs font-semibold {% if stat.percent == 100 %}text-green-600{% else %}text-orange-500{% endif %}">{{ stat.percent }}%</span>
               <span class="text-xs text-gray-400">{{ stat.completed }}/{{ total_lessons }} leçons</span>
             </div>
-            <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div class="h-full rounded-full {% if stat.percent == 100 %}bg-green-500{% else %}bg-orange-500{% endif %}"
-                   style="width: {{ stat.percent }}%"></div>
-            </div>
+            <progress class="meter {% if stat.percent == 100 %}meter-green{% else %}meter-orange{% endif %}"
+                      value="{{ stat.percent }}" max="100">{{ stat.percent }}%</progress>
           </div>
 
           {# Modules + leçons + quiz #}

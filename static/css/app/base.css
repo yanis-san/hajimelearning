@@ -1,0 +1,21 @@
+/* Utilitaires de base (Alpine, formes manga) */
+
+[x-cloak] {
+  display: none !important;
+}
+
+/* ── Bords « dessinés à la main » ── */
+.manga-drawn {
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px !important;
+}
+
+.manga-drawn-alt {
+  border-radius: 15px 255px 15px 225px / 225px 15px 255px 15px !important;
+}
+
+.manga-tape {
+  clip-path: polygon(
+    0% 6%, 3% 0%, 8% 7%, 12% 0%, 88% 2%, 92% 8%, 97% 0%, 100% 5%,
+    99% 95%, 96% 100%, 92% 93%, 88% 98%, 12% 96%, 8% 100%, 4% 93%, 0% 98%
+  );
+}

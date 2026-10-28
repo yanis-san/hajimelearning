@@ -1,0 +1,74 @@
+{% load static %}
+{# ====== A PROPOS (PRESENTATION SENSEI) ====== #}
+<section class="py-24 bg-primary text-white relative overflow-hidden border-b-2 border-primary-dark">
+    <!-- Manga Halftone background -->
+    <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-multiply halftone"></div>
+
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            
+            <!-- Video Presentation -->
+            <div class="relative group"
+                 x-data="autoplayVideo" x-init="observe()">
+                <!-- Background Offset -->
+                <div class="absolute -inset-2 bg-gray-900 transform rotate-[-2deg] rounded-2xl z-0 opacity-20"></div>
+                
+                <div class="relative bg-white border-2 border-gray-900 rounded-xl p-2 z-10 shadow-[4px_4px_0_0_#111827]">
+                    <!-- 
+                      🎬 VIDÉO 3 : presentation.mp4
+                      - Chemin : static/videos/presentation.mp4
+                      - Format : Vertical (ratio 4:5), 720p, max 5 à 8 Mo
+                      - Usage  : Présentation du Sensei (démarre au scroll via IntersectionObserver)
+                    -->
+                    <video x-ref="video" src="{% static 'videos/presentation.mp4' %}" loop muted playsinline preload="none" class="w-full h-full border-2 border-gray-100 rounded-lg object-cover aspect-[4/5] cursor-pointer" @click="toggleMute()"></video>
+                    
+                    <!-- Manga tape -->
+                    <div class="absolute -top-2 -left-2 w-10 h-3 bg-white border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
+                    <div class="absolute -bottom-2 -right-2 w-10 h-3 bg-white border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
+                    
+                    <!-- Sound Toggle Button -->
+                    <button @click="toggleMute()"
+                            class="absolute bottom-6 right-6 z-30 bg-primary border-2 border-gray-900 rounded-xl p-3 text-white shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#111827] transition-all cursor-pointer group/btn"
+                            aria-label="Activer/Désactiver le son">
+                        <svg x-show="isMuted" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+                        <svg x-show="!isMuted" x-cloak class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Text Content -->
+            <div>
+                <div class="drop-shadow-sm mb-6 inline-block">
+                    <div class="inline-block bg-gray-900 text-white rounded-lg px-4 py-1.5 manga-tape transform -rotate-1 shadow-[2px_2px_0_0_#111827]">
+                        <span class="font-bold tracking-widest uppercase text-xs">Votre Sensei (先生)</span>
+                    </div>
+                </div>
+                
+                <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight drop-shadow-md mb-8">
+                    Des cours pensés<br>pour la répétition espacée.
+                </h2>
+                
+                <div class="space-y-6">
+                    <div class="bg-white border-2 border-gray-900 rounded-2xl p-6 text-gray-900 shadow-sm hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 transition-all manga-drawn">
+                        <h3 class="font-bold text-xl mb-2 flex items-center gap-2 uppercase tracking-wide">
+                            <span class="text-primary text-2xl">🧠</span> Révision intégrée via Anki
+                        </h3>
+                        <p class="font-medium text-lg leading-relaxed text-gray-600">
+                            Fini les oublis au bout d'une semaine. Je fournis des decks Anki (flashcards) pour chaque leçon afin d'ancrer le vocabulaire et la grammaire sur le long terme via la répétition espacée.
+                        </p>
+                    </div>
+
+                    <div class="bg-gray-900 border-2 border-gray-800 rounded-2xl p-6 text-white shadow-sm hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 transition-all manga-drawn-alt">
+                        <h3 class="font-bold text-xl mb-2 flex items-center gap-2 uppercase tracking-wide">
+                            <span class="text-2xl">🎌</span> Formé à Saitama (Japon)
+                        </h3>
+                        <p class="font-medium text-lg leading-relaxed text-gray-300">
+                            J'ai été formé à l'enseignement de la langue japonaise à la Japan Foundation à Saitama. Ce que j'y ai appris, je m'efforce aujourd'hui de vous le transmettre de la façon la plus claire possible.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>

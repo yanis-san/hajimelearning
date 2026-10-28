@@ -1,0 +1,25 @@
+/* Motifs de fond : trame manga et grille de cahier de kanji */
+
+/* ── Motifs de fond (trame d'impression manga) ── */
+.halftone,
+.halftone-md,
+.halftone-sm {
+  background-image: radial-gradient(#000 var(--halftone-dot, 2px), transparent var(--halftone-dot, 2px));
+  background-size: var(--halftone-step, 16px) var(--halftone-step, 16px);
+}
+
+.halftone-md {
+  --halftone-dot: 1.5px;
+  --halftone-step: 10px;
+}
+
+.halftone-sm {
+  --halftone-dot: 1.5px;
+  --halftone-step: 8px;
+}
+
+/* Grille de cahier de kanji (carreaux avec croix médiane) */
+.kanji-grid {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect x='0.5' y='0.5' width='79' height='79' fill='none' stroke='%23ffffff' stroke-width='1'/%3E%3Cline x1='40' y1='0' x2='40' y2='80' stroke='%23ffffff' stroke-width='1' stroke-dasharray='4 4'/%3E%3Cline x1='0' y1='40' x2='80' y2='40' stroke='%23ffffff' stroke-width='1' stroke-dasharray='4 4'/%3E%3C/svg%3E");
+  background-size: 80px 80px;
+}

@@ -1,0 +1,8 @@
+/*
+ * Feuille de styles applicative (hors Tailwind) : point d'entrée.
+ * Écrite à la main, sans étape de build ; chaque fichier a une responsabilité unique.
+ */
+@import url("app/base.css");
+@import url("app/patterns.css");
+@import url("app/animations.css");
+@import url("app/meter.css");

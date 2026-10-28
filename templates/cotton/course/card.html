@@ -13,10 +13,10 @@
            alt="{{ course.title }}"
            loading="lazy"
            class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-[1.05] transition-transform duration-500">
-      <div class="absolute inset-0 opacity-10 pointer-events-none mix-blend-multiply" style="background-image: radial-gradient(#000 1.5px, transparent 1.5px); background-size: 8px 8px;"></div>
+      <div class="absolute inset-0 opacity-10 pointer-events-none mix-blend-multiply halftone-sm"></div>
     {% else %}
       <div class="w-full h-full bg-gray-100 flex items-center justify-center relative">
-        <div class="absolute inset-0 opacity-10 pointer-events-none mix-blend-multiply" style="background-image: radial-gradient(#000 1.5px, transparent 1.5px); background-size: 8px 8px;"></div>
+        <div class="absolute inset-0 opacity-10 pointer-events-none mix-blend-multiply halftone-sm"></div>
         <span class="text-6xl font-bold text-gray-200 opacity-50 transform rotate-12">無</span>
       </div>
     {% endif %}
@@ -77,7 +77,7 @@
   {# Barre de progression toujours visible en bas (dashboard) #}
   {% if show_progress == 'true' %}
     <div class="absolute inset-x-0 bottom-0 h-2 bg-white border-t-2 border-gray-900">
-      <div class="h-full bg-primary border-r-2 border-gray-900 transition-all duration-500 ease-out" style="width: {{ progress }}%"></div>
+      <progress class="meter meter-manga meter-primary" value="{{ progress }}" max="100">{{ progress }}%</progress>
     </div>
   {% endif %}
 

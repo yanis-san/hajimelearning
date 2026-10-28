@@ -1,0 +1,84 @@
+{% load static %}
+{# ====== PROMO VIDEO & STATS ====== #}
+<section class="relative bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 pt-24 pb-20 lg:py-20 border-b-2 border-gray-100 overflow-hidden">
+    <!-- Grille authentique de cahier d'entraînement de kanji (Kanji Drill / 漢字練習帳) : carreaux avec croix médiane en pointillés -->
+    <div class="absolute inset-0 opacity-[0.05] pointer-events-none kanji-grid"></div>
+
+    <!-- 3 kanji tracés directement dans les 3 premières cases de la grille de fond (日 • 本 • 語) -->
+    <div class="absolute top-0 left-0 flex pointer-events-none select-none z-0">
+        <div class="w-[80px] h-[80px] flex items-center justify-center">
+            <span class="text-4xl sm:text-5xl font-['Klee_One',cursive] text-white/30 leading-none">日</span>
+        </div>
+        <div class="w-[80px] h-[80px] flex items-center justify-center">
+            <span class="text-4xl sm:text-5xl font-['Klee_One',cursive] text-white/30 leading-none">本</span>
+        </div>
+        <div class="w-[80px] h-[80px] flex items-center justify-center">
+            <span class="text-4xl sm:text-5xl font-['Klee_One',cursive] text-white/30 leading-none">語</span>
+        </div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center z-10">
+        
+        <!-- Video Container -->
+        <div class="lg:col-span-7 relative group"
+             x-data="autoplayVideo" x-init="observe()">
+            <div class="absolute -inset-1 bg-primary transform rotate-1 rounded-2xl z-0 opacity-50"></div>
+            <div class="relative bg-white border-2 border-gray-900 rounded-xl p-2 z-10 shadow-[4px_4px_0_0_#111827] flex items-center justify-center aspect-video cursor-pointer">
+                <!-- 
+                  🎬 VIDÉO 2 : other.mp4
+                  - Chemin : static/videos/other.mp4
+                  - Format : Horizontal (ratio 16:9), 720p, max 5 à 8 Mo
+                  - Usage  : Démo de la méthode / cours (démarre au scroll via IntersectionObserver)
+                -->
+                <video x-ref="video" src="{% static 'videos/other.mp4' %}" loop muted playsinline preload="none" class="w-full h-full border-2 border-gray-100 rounded-lg object-cover aspect-video cursor-pointer" @click="toggleMute()"></video>
+                
+                <!-- Manga tape -->
+                <div class="absolute -top-2 -left-2 w-10 h-3 bg-primary border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
+                <div class="absolute -bottom-2 -right-2 w-10 h-3 bg-primary border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
+                
+                <!-- Sound Toggle Button -->
+                <button @click="toggleMute()"
+                        class="absolute bottom-6 right-6 z-30 bg-white border-2 border-gray-200 rounded-xl p-3 text-gray-900 shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[4px_4px_0_0_#111827] transition-all cursor-pointer group/btn"
+                        aria-label="Activer/Désactiver le son">
+                    <svg x-show="isMuted" class="w-6 h-6 group-hover/btn:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+                    <svg x-show="!isMuted" x-cloak class="w-6 h-6 group-hover/btn:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats / Personal Selling Points -->
+        <div class="lg:col-span-5 grid grid-cols-1 gap-6">
+            
+            <div class="relative bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 transition-all manga-drawn transform rotate-1 hover:rotate-2">
+                <!-- Speech Bubble Tail -->
+                <div class="absolute -bottom-2 left-8 w-4 h-4 bg-white border-b-2 border-r-2 border-gray-200 transform rotate-45"></div>
+                <div class="flex items-center justify-between mb-2 relative z-10">
+                    <span class="block font-bold text-gray-900 uppercase tracking-widest text-sm">Formé au Japon</span>
+                    <span class="text-2xl">🎌</span>
+                </div>
+                <p class="font-medium text-gray-600 leading-relaxed text-sm relative z-10">J'ai été formé à l'enseignement du japonais à la Japan Foundation (Saitama). J'enseigne la méthode officielle.</p>
+            </div>
+            
+            <div class="relative bg-primary text-white border-2 border-primary rounded-2xl p-6 shadow-sm hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 transition-all manga-drawn-alt transform -rotate-1 hover:-rotate-2">
+                <!-- Speech Bubble Tail -->
+                <div class="absolute top-8 -right-2 w-4 h-4 bg-primary border-t-2 border-r-2 border-primary transform rotate-45"></div>
+                <div class="flex items-center justify-between mb-2 relative z-10">
+                    <span class="block font-bold text-white uppercase tracking-widest text-sm">Suivi Personnel</span>
+                    <span class="text-2xl">👨‍🏫</span>
+                </div>
+                <p class="font-medium text-white/90 leading-relaxed text-sm relative z-10">Pas d'intermédiaires. Je conçois les cours, je les anime, et je réponds directement à vos questions.</p>
+            </div>
+
+            <div class="relative bg-gray-800/90 text-white border-2 border-gray-700 rounded-2xl p-6 shadow-sm hover:shadow-[3px_3px_0_0_#111827] hover:-translate-y-0.5 transition-all manga-drawn transform rotate-1 hover:rotate-2">
+                <!-- Speech Bubble Tail -->
+                <div class="absolute -left-2 bottom-8 w-4 h-4 bg-gray-800 border-b-2 border-l-2 border-gray-700 transform rotate-45"></div>
+                <div class="flex items-center justify-between mb-2 relative z-10">
+                    <span class="block font-bold text-white uppercase tracking-widest text-sm">Pratique & Concret</span>
+                    <span class="text-2xl">🎯</span>
+                </div>
+                <p class="font-medium text-gray-300 leading-relaxed text-sm relative z-10">L'objectif est simple : vous donner les clés pour comprendre et parler le japonais de tous les jours.</p>
+            </div>
+
+        </div>
+    </div>
+</section>

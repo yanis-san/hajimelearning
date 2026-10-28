@@ -12,7 +12,7 @@
     {% if course.thumbnail %}
         <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ course.thumbnail.url }}">
     {% else %}
-        <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/default-share.jpg' %}">
+        <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/hanko_square.png' %}">
     {% endif %}
 {% endblock %}
 
@@ -124,7 +124,7 @@
           </div>
           <!-- progress bar is hard to stylize via c-ui if it's not neo-brutalist inside, let's wrap it in a brutalist frame -->
           <div class="border-2 border-gray-900 rounded-full overflow-hidden bg-white h-4 shadow-inner mb-5">
-            <div class="h-full bg-primary transition-all duration-500 ease-out border-r-2 border-gray-900" style="width: {{ progress_percent }}%"></div>
+            <progress class="meter meter-manga meter-primary" value="{{ progress_percent }}" max="100">{{ progress_percent }}%</progress>
           </div>
           
           {% if progress_percent == 100 %}

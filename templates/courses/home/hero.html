@@ -1,0 +1,115 @@
+{% load static %}
+{# ====== HERO ====== #}
+<section class="bg-primary min-h-[85vh] flex items-center justify-center relative overflow-hidden py-20 px-6 border-b-2 border-primary-dark">
+    <!-- Background élégant (dynamique mais sobre) -->
+    <div class="elegant-sunburst pointer-events-none"></div>
+    <!-- Halftone dots over it -->
+    <div class="absolute inset-0 opacity-10 pointer-events-none halftone"></div>
+
+    <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-8 items-center z-10">
+        <!-- Text Content -->
+        <div class="animate-fade-in-up">
+            <div class="drop-shadow-sm mb-6 inline-block">
+                <div class="inline-flex items-center gap-2 px-6 py-2 bg-gray-900 text-white manga-tape transform -skew-x-6 -rotate-1 hover:rotate-0 hover:-translate-y-0.5 transition-all cursor-default shadow-[2px_2px_0_0_#111827]">
+                    <span class="text-xs md:text-sm font-bold tracking-widest uppercase">⚡ Méthode Hybride d'Enseignement</span>
+                </div>
+            </div>
+
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-[1.1] tracking-tight drop-shadow-md mb-6">
+                <ruby>燃<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">mo</rt></ruby><ruby>え<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">e</rt></ruby><ruby>ろ<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">ro</rt></ruby>！<br>
+                <ruby>日<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">ni</rt></ruby><ruby>本<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">hon</rt></ruby><ruby>語<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">go</rt></ruby><ruby>能<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">nō</rt></ruby><ruby>力<rt class="text-xl md:text-3xl text-white font-bold lowercase font-sans pb-1">ryoku</rt></ruby>！<br>
+                <span class="text-gray-900 bg-white px-4 md:px-5 py-2 rounded-xl leading-none border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] transform -rotate-2 inline-block mt-4 text-xl md:text-2xl font-bold tracking-wide">Enflamme tes compétences en japonais !</span>
+            </h1>
+
+            <p class="text-white/95 font-medium text-lg md:text-xl leading-relaxed mb-10 max-w-lg drop-shadow-sm">
+                Des formations que je conçois et anime moi-même : du contenu pratique, un suivi personnalisé, et des réponses directes à vos questions pour maîtriser le japonais.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center gap-4">
+                <a href="{% url 'contact' %}?reason=Cours particulier" class="w-full sm:w-auto bg-gray-900 text-white font-bold rounded-xl px-8 py-3.5 border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#111827] active:translate-y-0.5 active:shadow-[2px_2px_0_0_#111827] transition-all text-center">
+                    Cours particulier
+                </a>
+                <a href="{% if user.is_authenticated %}{% url 'user_dashboard' %}{% else %}#catalogue{% endif %}" class="w-full sm:w-auto bg-white text-gray-900 font-bold rounded-xl px-8 py-3.5 border-2 border-gray-900 hover:border-gray-900 hover:bg-gray-50 shadow-[4px_4px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[5px_5px_0_0_#111827] active:translate-y-0.5 active:shadow-[2px_2px_0_0_#111827] transition-all text-center">
+                    Voir mes formations
+                </a>
+            </div>
+        </div>
+
+        <!-- Image / Manga Box -->
+        <div class="relative max-w-sm lg:max-w-md mx-auto transform rotate-2 hover:rotate-1 transition-transform duration-500 w-full animate-fade-in-up delay-100">
+            <!-- Cadre de fond décalé -->
+            <div class="absolute -inset-2 lg:-inset-3 bg-gray-900 rounded-2xl rotate-[-3deg] z-0 shadow-lg"></div>
+            
+            <!-- Conteneur Photo -->
+            <div class="relative bg-white border-2 border-gray-900 rounded-xl p-2 lg:p-3 z-10 aspect-[4/5] shadow-[4px_4px_0_0_#111827]">
+                
+                <!-- Scotch Manga -->
+                <div class="absolute -top-2 -left-2 w-10 h-3 bg-primary transform -rotate-45 z-20 border-2 border-gray-900 rounded-sm"></div>
+                <div class="absolute -bottom-2 -right-2 w-10 h-3 bg-primary transform -rotate-45 z-20 border-2 border-gray-900 rounded-sm"></div>
+
+                <!-- Image / Vidéo Hero -->
+                <div class="w-full h-full bg-gray-100 rounded-lg overflow-hidden relative group">
+                    <!-- 
+                      🎬 VIDÉO 1 : hero.mp4
+                      - Chemin : static/videos/hero.mp4
+                      - Format : Vertical (ratio 4:5), 720p ou 540p, max 1 à 2 Mo
+                      - Usage  : Boucle d'ambiance en tête de page (autoplay muet)
+                    -->
+                    <video src="{% static 'videos/hero.mp4' %}" autoplay loop muted playsinline preload="metadata" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"></video>
+                    <!-- Trame Manga -->
+                    <div class="absolute inset-0 opacity-20 pointer-events-none mix-blend-multiply halftone-md"></div>
+                </div>
+            </div>
+            
+            <!-- Badge Flottant -->
+            <div class="absolute -bottom-4 lg:-bottom-6 -left-4 z-30 bg-white border-2 border-gray-900 rounded-xl px-4 py-2 transform rotate-6 shadow-[3px_3px_0_0_#111827]">
+                <span class="font-bold text-gray-900 text-lg lg:text-xl">ヤニス先生</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bandeau défilant (Marquee) à la pub japonaise -->
+    <div class="absolute bottom-0 left-0 w-full bg-white border-t-2 border-gray-900 py-2.5 z-20 overflow-hidden flex whitespace-nowrap shadow-sm">
+        <div class="animate-marquee flex items-center">
+            <!-- Bloc 1 -->
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Apprendre le Japonais de Zéro</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Préparation JLPT (N5-N1)</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Méthode Intuitive & Pratique</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Maîtrisez les Kanji</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+
+            <!-- Répétition -->
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Apprendre le Japonais de Zéro</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Préparation JLPT (N5-N1)</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Méthode Intuitive & Pratique</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Maîtrisez les Kanji</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            
+            <!-- Bloc 2 (copie exacte pour la boucle fluide) -->
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Apprendre le Japonais de Zéro</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Préparation JLPT (N5-N1)</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Méthode Intuitive & Pratique</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Maîtrisez les Kanji</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+
+            <!-- Répétition -->
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Apprendre le Japonais de Zéro</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Préparation JLPT (N5-N1)</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-primary">Méthode Intuitive & Pratique</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+            <span class="font-bold uppercase tracking-widest text-lg text-gray-900">Maîtrisez les Kanji</span>
+            <span class="text-primary/30 mx-6 text-xl">✖</span>
+        </div>
+    </div>
+</section>

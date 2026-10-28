@@ -24,14 +24,9 @@
      class="lg:hidden fixed inset-0 z-30 bg-black/30"></div>
 
 {# ── Sidebar ── #}
-<aside x-data="{
-         initScroll() {
-           let pos = sessionStorage.getItem('sidebar-scroll-{{ course.slug }}');
-           if (pos) this.$el.scrollTop = pos;
-         }
-       }"
-       x-init="$nextTick(() => initScroll())"
-       @scroll.debounce="sessionStorage.setItem('sidebar-scroll-{{ course.slug }}', $el.scrollTop)"
+<aside x-data="persistScroll('sidebar-scroll-{{ course.slug }}')"
+       x-init="restore()"
+       @scroll.debounce="save()"
        :class="sidebarOpen
          ? 'translate-x-0 lg:translate-x-0 lg:w-80 border-r-2'
          : '-translate-x-full lg:translate-x-0 lg:w-0 lg:overflow-hidden border-r-0'"

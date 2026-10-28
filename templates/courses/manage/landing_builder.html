@@ -2,7 +2,11 @@
 {% load static %}
 
 {% block extra_head %}
-  <script src="{% static 'js/marked.min.js' %}"></script>
+  <script src="{% static 'js/vendor/marked.min.js' %}"></script>
+  <script src="{% static 'js/builder/furigana.js' %}"></script>
+  <script src="{% static 'js/builder/markdown-preview.js' %}"></script>
+  <script src="{% static 'js/vendor/sortable.min.js' %}"></script>
+  <script src="{% static 'js/builder/sortable-init.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -100,24 +104,6 @@
     </div>
   {% endif %}
 
-  {# ── SortableJS init ── #}
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-  <script>
-    htmx.onLoad(function(content) {
-      var sortables = content.querySelectorAll(".sortable-list");
-      for (var i = 0; i < sortables.length; i++) {
-        var sortable = sortables[i];
-        new Sortable(sortable, {
-          animation: 150,
-          handle: '.handle',
-          ghostClass: 'bg-orange-50',
-          onEnd: function (evt) {
-            this.el.dispatchEvent(new Event('end'));
-          }
-        });
-      }
-    });
-  </script>
 
 </c-layout.course_builder>
 {% endblock %}

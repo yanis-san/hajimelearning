@@ -1,4 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+  <script src="{% static 'js/vendor/sortable.min.js' %}"></script>
+  <script src="{% static 'js/builder/sortable-init.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 <c-layout.course_builder :course="course" active_tab="modules">
@@ -39,20 +45,6 @@
 
   <div id="reorder-msg"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-  <script>
-    htmx.onLoad(function(content) {
-      const el = content.querySelector('#lesson-list') || document.getElementById('lesson-list');
-      if (el && !el._sortable) {
-        el._sortable = new Sortable(el, {
-          animation: 200,
-          handle: '.handle',
-          ghostClass: 'bg-orange-50',
-          onEnd() { htmx.trigger(el, 'end'); }
-        });
-      }
-    });
-  </script>
 
 </c-layout.course_builder>
 {% endblock %}

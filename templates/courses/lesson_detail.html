@@ -105,42 +105,42 @@
         {% if block.type == 'text' %}
           <c-course.block-text :block="block">
             {% if user.is_authenticated %}
-              <c-course.block-note :block="block" course_slug="{{ course.slug }}" csrf_token="{{ csrf_token }}" />
+              <c-course.block-note :block="block" course_slug="{{ course.slug }}" />
             {% endif %}
           </c-course.block-text>
 
         {% elif block.type == 'video' %}
           <c-course.block-video :block="block">
             {% if user.is_authenticated %}
-              <c-course.block-note :block="block" course_slug="{{ course.slug }}" csrf_token="{{ csrf_token }}" />
+              <c-course.block-note :block="block" course_slug="{{ course.slug }}" />
             {% endif %}
           </c-course.block-video>
 
         {% elif block.type == 'audio' %}
           <c-course.block-audio :block="block">
             {% if user.is_authenticated %}
-              <c-course.block-note :block="block" course_slug="{{ course.slug }}" csrf_token="{{ csrf_token }}" />
+              <c-course.block-note :block="block" course_slug="{{ course.slug }}" />
             {% endif %}
           </c-course.block-audio>
 
         {% elif block.type == 'file' %}
           <c-course.block-file :block="block">
             {% if user.is_authenticated %}
-              <c-course.block-note :block="block" course_slug="{{ course.slug }}" csrf_token="{{ csrf_token }}" />
+              <c-course.block-note :block="block" course_slug="{{ course.slug }}" />
             {% endif %}
           </c-course.block-file>
 
         {% elif block.type == 'quiz' %}
-          <c-course.block-quiz :block="block" csrf_token="{{ csrf_token }}">
+          <c-course.block-quiz :block="block">
             {% if user.is_authenticated %}
-              <c-course.block-note :block="block" course_slug="{{ course.slug }}" csrf_token="{{ csrf_token }}" />
+              <c-course.block-note :block="block" course_slug="{{ course.slug }}" />
             {% endif %}
           </c-course.block-quiz>
 
         {% elif block.type == 'anki' %}
           <c-course.block-anki :block="block">
             {% if user.is_authenticated %}
-              <c-course.block-note :block="block" course_slug="{{ course.slug }}" csrf_token="{{ csrf_token }}" />
+              <c-course.block-note :block="block" course_slug="{{ course.slug }}" />
             {% endif %}
           </c-course.block-anki>
 
@@ -170,17 +170,7 @@
       </div>
 
       <div class="flex items-center gap-4 flex-wrap justify-center sm:justify-end"
-           x-data="{
-             playAndSubmit(e) {
-               {% if course.completion_sound %}
-                 e.preventDefault();
-                 const audio = new Audio('{{ course.completion_sound.url }}');
-                 audio.volume = 0.5;
-                 audio.play().catch(() => {});
-                 setTimeout(() => e.target.closest('form').submit(), 600);
-               {% endif %}
-             }
-           }">
+           x-data="lessonCompletion('{% if course.completion_sound %}{{ course.completion_sound.url }}{% endif %}')">
         
         {% if lesson.id in completed_lesson_ids %}
           <div class="flex items-center gap-2 mr-2">
