@@ -8,4 +8,3 @@ urlpatterns = [
     path('validate-coupon/<int:course_id>/', views.validate_coupon, name='validate_coupon'),
     path('receipt/<int:request_id>/', views.download_receipt, name='download_receipt'),
 ]
-

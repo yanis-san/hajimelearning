@@ -1,4 +1,5 @@
 """Gestion des formations : liste, création, édition, suppression, suivi des étudiants."""
+
 from collections import defaultdict
 
 from django.contrib import messages
@@ -15,15 +16,24 @@ from ..permissions import builder_access_required, get_managed_course
 
 User = get_user_model()
 
-COURSE_SORTS = frozenset({
-    'title', '-title',
-    'price', '-price',
-    'created_at', '-created_at',
-    'is_published', '-is_published',
-    'modules_count', '-modules_count',
-})
+COURSE_SORTS = frozenset(
+    {
+        'title',
+        '-title',
+        'price',
+        '-price',
+        'created_at',
+        '-created_at',
+        'is_published',
+        '-is_published',
+        'modules_count',
+        '-modules_count',
+    }
+)
 
-SAVE_OK = '<span id="save-indicator" class="text-green-500 text-sm font-medium flex items-center gap-1">🟢 Sauvegardé</span>'
+SAVE_OK = (
+    '<span id="save-indicator" class="text-green-500 text-sm font-medium flex items-center gap-1">🟢 Sauvegardé</span>'
+)
 SAVE_ERROR = '<span id="save-indicator" class="text-red-500 text-sm font-medium flex items-center gap-1">🔴 Erreur de sauvegarde</span>'
 
 
@@ -100,23 +110,22 @@ def manage_course_students(request, course_slug):
     ).distinct()
 
     total_lessons = Lesson.objects.filter(module__course=course).count()
-    quiz_blocks = list(
-        ContentBlock.objects.filter(lesson__module__course=course, type='quiz').select_related('lesson')
-    )
+    quiz_blocks = list(ContentBlock.objects.filter(lesson__module__course=course, type='quiz').select_related('lesson'))
     quizzes_by_lesson = defaultdict(list)
     for block in quiz_blocks:
         quizzes_by_lesson[block.lesson_id].append(block)
 
     # Structure du cours pour le template : modules → leçons → quiz
-    modules = Module.objects.filter(course=course).prefetch_related(
-        Prefetch('lessons', queryset=Lesson.objects.order_by('order'))
-    ).order_by('order')
+    modules = (
+        Module.objects.filter(course=course)
+        .prefetch_related(Prefetch('lessons', queryset=Lesson.objects.order_by('order')))
+        .order_by('order')
+    )
     modules_structure = [
         {
             'module': module,
             'lessons': [
-                {'lesson': lesson, 'quiz_blocks': quizzes_by_lesson[lesson.id]}
-                for lesson in module.lessons.all()
+                {'lesson': lesson, 'quiz_blocks': quizzes_by_lesson[lesson.id]} for lesson in module.lessons.all()
             ],
         }
         for module in modules
@@ -132,9 +141,9 @@ def manage_course_students(request, course_slug):
         last_active_by_student[student_id] = max(completed_at, last_active_by_student.get(student_id, completed_at))
 
     quiz_results_by_student = defaultdict(dict)
-    for student_id, block_id, score, total in QuizResult.objects.filter(
-        block__in=quiz_blocks
-    ).values_list('student_id', 'block_id', 'score', 'total_questions'):
+    for student_id, block_id, score, total in QuizResult.objects.filter(block__in=quiz_blocks).values_list(
+        'student_id', 'block_id', 'score', 'total_questions'
+    ):
         quiz_results_by_student[student_id][block_id] = {
             'score': score,
             'total': total,
@@ -144,19 +153,25 @@ def manage_course_students(request, course_slug):
     student_stats = []
     for student in students:
         completed_ids = completed_by_student.get(student.id, set())
-        student_stats.append({
-            'user': student,
-            'percent': int(len(completed_ids) * 100 / total_lessons) if total_lessons else 0,
-            'completed': len(completed_ids),
-            'completed_ids': completed_ids,
-            'last_active': last_active_by_student.get(student.id, student.last_login),
-            'quiz_results': quiz_results_by_student.get(student.id, {}),
-        })
+        student_stats.append(
+            {
+                'user': student,
+                'percent': int(len(completed_ids) * 100 / total_lessons) if total_lessons else 0,
+                'completed': len(completed_ids),
+                'completed_ids': completed_ids,
+                'last_active': last_active_by_student.get(student.id, student.last_login),
+                'quiz_results': quiz_results_by_student.get(student.id, {}),
+            }
+        )
     student_stats.sort(key=lambda stat: stat['percent'], reverse=True)
 
-    return render(request, 'courses/manage/students_stats.html', {
-        'course': course,
-        'student_stats': student_stats,
-        'total_lessons': total_lessons,
-        'modules_structure': modules_structure,
-    })
+    return render(
+        request,
+        'courses/manage/students_stats.html',
+        {
+            'course': course,
+            'student_stats': student_stats,
+            'total_lessons': total_lessons,
+            'modules_structure': modules_structure,
+        },
+    )

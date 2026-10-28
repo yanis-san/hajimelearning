@@ -7,6 +7,7 @@ class CustomUserManager(BaseUserManager):
     Gestionnaire d'utilisateur personnalisé où l'email est l'identifiant unique
     pour l'authentification au lieu du nom d'utilisateur.
     """
+
     def create_user(self, email, password, **extra_fields):
         """
         Crée et enregistre un utilisateur avec l'email et le mot de passe donnés.

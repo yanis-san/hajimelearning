@@ -69,7 +69,7 @@ EMAIL_HOST = os.environ.get('EMAIL_HOST', 'mail.hajimelearning.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 465))
 EMAIL_USE_SSL = True  # Port 465 utilise SSL
 EMAIL_USE_TLS = False
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER') # noreply@hajimelearning.com
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')  # noreply@hajimelearning.com
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 # L'expéditeur affiché
@@ -107,7 +107,7 @@ SECURE_HSTS_SECONDS = 31_536_000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 # Cookies
-CSRF_COOKIE_HTTPONLY = False   # HTMX/Alpine ont besoin de lire le cookie CSRF
+CSRF_COOKIE_HTTPONLY = False  # HTMX/Alpine ont besoin de lire le cookie CSRF
 SESSION_COOKIE_HTTPONLY = True
 X_FRAME_OPTIONS = 'DENY'
 
@@ -162,4 +162,4 @@ LOGGING = {
             'propagate': False,
         },
     },
-}
+}

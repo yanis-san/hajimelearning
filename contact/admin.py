@@ -6,22 +6,28 @@ from .models import ContactMessage, ContactReason
 
 @admin.register(ContactReason)
 class ContactReasonAdmin(ModelAdmin):
-    list_display  = ['label', 'order', 'is_active']
+    list_display = ['label', 'order', 'is_active']
     list_editable = ['order', 'is_active']
-    ordering      = ['order', 'label']
+    ordering = ['order', 'label']
 
 
 @admin.register(ContactMessage)
 class ContactMessageAdmin(ModelAdmin):
-    list_display  = ['__str__', 'email', 'reason', 'status', 'created_at']
-    list_filter   = ['status', 'reason', 'created_at']
+    list_display = ['__str__', 'email', 'reason', 'status', 'created_at']
+    list_filter = ['status', 'reason', 'created_at']
     search_fields = ['first_name', 'last_name', 'email', 'message']
     readonly_fields = [
-        'first_name', 'last_name', 'email', 'user',
-        'reason', 'message', 'created_at', 'updated_at',
+        'first_name',
+        'last_name',
+        'email',
+        'user',
+        'reason',
+        'message',
+        'created_at',
+        'updated_at',
     ]
-    ordering        = ['-created_at']
-    actions         = ['mark_as_read', 'mark_as_resolved']
+    ordering = ['-created_at']
+    actions = ['mark_as_read', 'mark_as_resolved']
 
     @admin.action(description='Marquer comme lu')
     def mark_as_read(self, request, queryset):

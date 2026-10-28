@@ -1,0 +1,33 @@
+{% load md progress_tags %}
+    {% if user.is_authenticated %}
+    <div x-data="{ showHelp: false }" class="bg-white border-2 border-gray-900 rounded-2xl p-6 lg:p-10 shadow-[4px_4px_0_0_#111827] relative mt-16 mb-8 group manga-drawn-alt">
+      <!-- Manga tape -->
+      <div class="absolute -top-2 -right-2 w-10 h-3 bg-primary border-2 border-gray-900 rounded-sm transform rotate-45 z-20 pointer-events-none"></div>
+
+      <div class="absolute -top-6 -right-6 text-6xl opacity-10 font-bold group-hover:rotate-12 transition-transform">?</div>
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+              <h3 class="text-2xl font-extrabold text-gray-900 tracking-wide flex items-center gap-2">
+                <span class="text-3xl">🙋‍♂️</span> Besoin d'aide (助け) ?
+              </h3>
+              <p class="font-medium text-gray-600 mt-2 text-lg">Posez votre question à votre Sensei.</p>
+          </div>
+          <c-ui.btn x-show="!showHelp" x-on:click="showHelp = true" variant="secondary" size="md">
+              Poser une question
+          </c-ui.btn>
+      </div>
+
+      <form x-show="showHelp" x-collapse method="POST" action="{% url 'ask_question' lesson.id %}" class="space-y-6 relative z-10 mt-8 pt-6 border-t-2 border-gray-100 border-dashed">
+        {% csrf_token %}
+        <c-form.input name="title" label="Sujet" placeholder="Ex : Je ne comprends pas la particule Wa..." required="true" />
+        <c-form.textarea name="content" label="Votre question" placeholder="Décrivez votre problème en détail..." rows="4" required="true" />
+        <div class="pt-2 flex items-center gap-4">
+          <c-ui.btn type="submit" variant="secondary" size="lg" class="w-full sm:w-auto">
+            Envoyer ma question
+          </c-ui.btn>
+          <button type="button" x-on:click="showHelp = false" class="text-sm font-bold text-gray-500 hover:text-gray-900 transition">Annuler</button>
+        </div>
+      </form>
+    </div>
+    {% endif %}

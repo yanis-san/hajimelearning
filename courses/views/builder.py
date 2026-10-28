@@ -1,4 +1,5 @@
 """Builder de leçons : blocs de contenu, questions de quiz, modules et leçons."""
+
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -6,9 +7,9 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 from django.views.decorators.http import require_POST
-from markdownx.utils import markdownify
 
 from ..forms import ContentBlockForm, LessonForm, ModuleForm, QuizQuestionForm
+from ..markdown import render_markdown_safe
 from ..models import ContentBlock, Course, Lesson, Module
 from ..permissions import (
     builder_access_required,
@@ -25,6 +26,7 @@ CLEAR_BLOCK_FORM = '<div id="block-form-container" hx-swap-oob="innerHTML" class
 
 # ── Aperçu Markdown ─────────────────────────────────
 
+
 @builder_access_required
 @require_POST
 def preview_markdown(request):
@@ -32,10 +34,11 @@ def preview_markdown(request):
     text = request.POST.get('text', '')
     if not text.strip():
         return render(request, 'courses/manage/partials/markdown_preview.html', {'empty': True})
-    return render(request, 'courses/manage/partials/markdown_preview.html', {'html': markdownify(text)})
+    return render(request, 'courses/manage/partials/markdown_preview.html', {'html': render_markdown_safe(text)})
 
 
 # ── Blocs de contenu ────────────────────────────────
+
 
 def _save_block_response(request, lesson, block, created):
     """Réponse commune à la création / l'édition d'un bloc (auto-save JSON ou HTMX)."""
@@ -75,11 +78,15 @@ def add_block(request, lesson_id, block_type):
     else:
         form = ContentBlockForm()
 
-    return render(request, 'courses/manage/partials/block_form.html', {
-        'form': form,
-        'lesson': lesson,
-        'block_type': block_type,
-    })
+    return render(
+        request,
+        'courses/manage/partials/block_form.html',
+        {
+            'form': form,
+            'lesson': lesson,
+            'block_type': block_type,
+        },
+    )
 
 
 @builder_access_required
@@ -96,11 +103,15 @@ def edit_block(request, block_id):
     else:
         form = ContentBlockForm(instance=block)
 
-    return render(request, 'courses/manage/partials/block_form.html', {
-        'form': form,
-        'block': block,
-        'block_type': block.type,
-    })
+    return render(
+        request,
+        'courses/manage/partials/block_form.html',
+        {
+            'form': form,
+            'block': block,
+            'block_type': block.type,
+        },
+    )
 
 
 @builder_access_required
@@ -144,6 +155,7 @@ def update_block_order(request):
 
 # ── Questions de quiz ───────────────────────────────
 
+
 @builder_access_required
 def add_quiz_question(request, block_id):
     block, _course = get_managed_course_from_block(request.user, block_id)
@@ -169,6 +181,7 @@ def delete_quiz_question(request, question_id):
 
 # ── Page du builder ─────────────────────────────────
 
+
 @builder_access_required
 def manage_lesson_content(request, course_slug, lesson_slug):
     course = get_managed_course(request.user, course_slug)
@@ -177,6 +190,7 @@ def manage_lesson_content(request, course_slug, lesson_slug):
 
 
 # ── Modules ─────────────────────────────────────────
+
 
 def _course_with_modules(course):
     return Course.objects.prefetch_related('modules__lessons').get(pk=course.pk)
@@ -200,10 +214,14 @@ def manage_course_modules(request, course_slug):
             return render(request, 'courses/manage/partials/module_list.html', {'course': _course_with_modules(course)})
         return redirect('manage_course_modules', course_slug=course.slug)
 
-    return render(request, 'courses/manage/modules.html', {
-        'course': _course_with_modules(course),
-        'form': form,
-    })
+    return render(
+        request,
+        'courses/manage/modules.html',
+        {
+            'course': _course_with_modules(course),
+            'form': form,
+        },
+    )
 
 
 @builder_access_required
@@ -240,6 +258,7 @@ def manage_module_reorder(request, course_slug):
 
 # ── Leçons ──────────────────────────────────────────
 
+
 def _unique_lesson_slug(course, wanted, exclude_id=None):
     """Slug de leçon unique dans le cours (les URLs publiques sont /cours/leçon)."""
     base = slugify(wanted)[:45] or 'lecon'
@@ -275,9 +294,14 @@ def manage_module_lessons(request, course_slug, module_id):
         lesson.order = next_order(module.lessons)
         lesson.save()
         if request.headers.get('HX-Request'):
-            return render(request, 'courses/manage/partials/lesson_list.html', {
-                'module': _module_with_lessons(module_id, course), 'course': course,
-            })
+            return render(
+                request,
+                'courses/manage/partials/lesson_list.html',
+                {
+                    'module': _module_with_lessons(module_id, course),
+                    'course': course,
+                },
+            )
         return redirect('manage_module_lessons', course_slug=course.slug, module_id=module.id)
 
     return render(request, 'courses/manage/lessons.html', {'course': course, 'module': module, 'form': form})

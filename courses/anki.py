@@ -1,4 +1,5 @@
 """Lecture des decks Anki (.apkg) : comptage des cartes."""
+
 import contextlib
 import io
 import logging

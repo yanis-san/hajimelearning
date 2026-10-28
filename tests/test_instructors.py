@@ -14,9 +14,13 @@ pytestmark = pytest.mark.django_db
 @pytest.fixture
 def starter_plan():
     return InstructorPlan.objects.create(
-        name='Starter', slug='starter', price=5000,
-        max_courses=1, max_modules_per_course=5,
-        max_lessons_per_course=10, revenue_percent=70,
+        name='Starter',
+        slug='starter',
+        price=5000,
+        max_courses=1,
+        max_modules_per_course=5,
+        max_lessons_per_course=10,
+        revenue_percent=70,
         features="1 formation\n70% des revenus",
         order=1,
     )
@@ -25,18 +29,28 @@ def starter_plan():
 @pytest.fixture
 def pro_plan():
     return InstructorPlan.objects.create(
-        name='Pro', slug='pro', price=12000,
-        max_courses=3, max_modules_per_course=15,
-        max_lessons_per_course=50, revenue_percent=80,
-        is_featured=True, order=2,
+        name='Pro',
+        slug='pro',
+        price=12000,
+        max_courses=3,
+        max_modules_per_course=15,
+        max_lessons_per_course=50,
+        revenue_percent=80,
+        is_featured=True,
+        order=2,
     )
 
 
 @pytest.fixture
 def inactive_plan():
     return InstructorPlan.objects.create(
-        name='Ancien', slug='ancien', price=999,
-        max_courses=1, revenue_percent=50, is_active=False, order=99,
+        name='Ancien',
+        slug='ancien',
+        price=999,
+        max_courses=1,
+        revenue_percent=50,
+        is_active=False,
+        order=99,
     )
 
 
@@ -84,7 +98,9 @@ class TestInstructorRequestModel:
 
     def test_default_status_is_pending(self, student, starter_plan):
         req = InstructorRequest.objects.create(
-            user=student, plan=starter_plan, payment_proof='test.jpg',
+            user=student,
+            plan=starter_plan,
+            payment_proof='test.jpg',
         )
         assert req.status == 'PENDING'
 
@@ -100,8 +116,10 @@ class TestInstructorProfileModel:
 
     def test_courses_remaining_after_creating_course(self, instructor_user):
         Course.objects.create(
-            title='Mon Cours', slug='mon-cours',
-            short_description='desc', price=1000,
+            title='Mon Cours',
+            slug='mon-cours',
+            short_description='desc',
+            price=1000,
             instructor=instructor_user,
         )
         profile = instructor_user.instructor_profile
@@ -109,8 +127,10 @@ class TestInstructorProfileModel:
 
     def test_courses_remaining_unlimited(self, student, pro_plan):
         profile = InstructorProfile.objects.create(
-            user=student, plan=pro_plan,
-            max_courses=0, revenue_percent=80,
+            user=student,
+            plan=pro_plan,
+            max_courses=0,
+            revenue_percent=80,
         )
         assert profile.courses_remaining is None
 
@@ -119,8 +139,10 @@ class TestInstructorProfileModel:
 
     def test_can_create_course_false_when_limit_reached(self, instructor_user):
         Course.objects.create(
-            title='Cours 1', slug='cours-1',
-            short_description='desc', price=1000,
+            title='Cours 1',
+            slug='cours-1',
+            short_description='desc',
+            price=1000,
             instructor=instructor_user,
         )
         assert instructor_user.instructor_profile.can_create_course is False
@@ -132,7 +154,9 @@ class TestInstructorProfileModel:
 class TestApprovalSignal:
     def test_approval_creates_profile(self, student, starter_plan):
         req = InstructorRequest.objects.create(
-            user=student, plan=starter_plan, payment_proof='test.jpg',
+            user=student,
+            plan=starter_plan,
+            payment_proof='test.jpg',
         )
         req.status = 'APPROVED'
         req.save()
@@ -146,7 +170,9 @@ class TestApprovalSignal:
     def test_approval_updates_existing_profile(self, instructor_user, pro_plan):
         """Si l'instructeur upgrade, le profil est mis à jour."""
         InstructorRequest.objects.create(
-            user=instructor_user, plan=pro_plan, payment_proof='test.jpg',
+            user=instructor_user,
+            plan=pro_plan,
+            payment_proof='test.jpg',
             status='APPROVED',
         )
         # Le signal a déjà tourné au create. Force re-save pour tester.
@@ -156,7 +182,9 @@ class TestApprovalSignal:
 
     def test_rejection_does_not_create_profile(self, student, starter_plan):
         req = InstructorRequest.objects.create(
-            user=student, plan=starter_plan, payment_proof='test.jpg',
+            user=student,
+            plan=starter_plan,
+            payment_proof='test.jpg',
         )
         req.status = 'REJECTED'
         req.save()
@@ -165,7 +193,9 @@ class TestApprovalSignal:
 
     def test_pending_does_not_create_profile(self, student, starter_plan):
         InstructorRequest.objects.create(
-            user=student, plan=starter_plan, payment_proof='test.jpg',
+            user=student,
+            plan=starter_plan,
+            payment_proof='test.jpg',
         )
         assert not InstructorProfile.objects.filter(user=student).exists()
 
@@ -209,7 +239,9 @@ class TestPlansView:
 
     def test_authenticated_with_pending_request(self, client, student, starter_plan):
         InstructorRequest.objects.create(
-            user=student, plan=starter_plan, payment_proof='test.jpg',
+            user=student,
+            plan=starter_plan,
+            payment_proof='test.jpg',
         )
         client.force_login(student)
         resp = client.get(reverse('instructor_plans'))
@@ -237,7 +269,9 @@ class TestRequestView:
 
     def test_already_pending_redirects(self, client, student, starter_plan):
         InstructorRequest.objects.create(
-            user=student, plan=starter_plan, payment_proof='test.jpg',
+            user=student,
+            plan=starter_plan,
+            payment_proof='test.jpg',
         )
         client.force_login(student)
         resp = client.get(reverse('instructor_request', args=[starter_plan.slug]))
@@ -256,7 +290,9 @@ class TestPendingView:
 
     def test_shows_pending_page(self, client, student, starter_plan):
         InstructorRequest.objects.create(
-            user=student, plan=starter_plan, payment_proof='test.jpg',
+            user=student,
+            plan=starter_plan,
+            payment_proof='test.jpg',
         )
         client.force_login(student)
         resp = client.get(reverse('instructor_request_pending'))
@@ -280,8 +316,10 @@ class TestDashboardView:
 
     def test_dashboard_shows_courses(self, client, instructor_user):
         Course.objects.create(
-            title='Mon Cours', slug='mon-cours-dash',
-            short_description='desc', price=1000,
+            title='Mon Cours',
+            slug='mon-cours-dash',
+            short_description='desc',
+            price=1000,
             instructor=instructor_user,
         )
         client.force_login(instructor_user)
@@ -291,8 +329,10 @@ class TestDashboardView:
     def test_dashboard_context_has_counters(self, client, instructor_user):
         """Le contexte du dashboard contient les compteurs globaux."""
         course = Course.objects.create(
-            title='Compteur Test', slug='compteur-test',
-            short_description='desc', price=1000,
+            title='Compteur Test',
+            slug='compteur-test',
+            short_description='desc',
+            price=1000,
             instructor=instructor_user,
         )
         m = Module.objects.create(course=course, title='M1', order=1)
@@ -308,8 +348,10 @@ class TestDashboardView:
     def test_dashboard_annotates_per_course_counts(self, client, instructor_user):
         """Chaque cours du dashboard a modules_count, lessons_count, students_count."""
         course = Course.objects.create(
-            title='Annotated', slug='annotated-c',
-            short_description='desc', price=1000,
+            title='Annotated',
+            slug='annotated-c',
+            short_description='desc',
+            price=1000,
             instructor=instructor_user,
         )
         m1 = Module.objects.create(course=course, title='M1', order=1)
@@ -320,6 +362,7 @@ class TestDashboardView:
 
         from access.models import AccessRequest
         from users.models import User
+
         s1 = User.objects.create_user(email='s1@t.com', password='pw')
         AccessRequest.objects.create(student=s1, course=course, status='APPROVED')
         s2 = User.objects.create_user(email='s2@t.com', password='pw')
@@ -335,8 +378,10 @@ class TestDashboardView:
     def test_dashboard_students_link_present(self, client, instructor_user):
         """Le dashboard affiche un lien vers la page étudiants de chaque cours."""
         course = Course.objects.create(
-            title='Lien Étudiants', slug='lien-etudiants',
-            short_description='desc', price=1000,
+            title='Lien Étudiants',
+            slug='lien-etudiants',
+            short_description='desc',
+            price=1000,
             instructor=instructor_user,
         )
         client.force_login(instructor_user)
@@ -351,13 +396,17 @@ class TestDashboardView:
         instructor_user.instructor_profile.save()
 
         c1 = Course.objects.create(
-            title='C1', slug='c1-multi',
-            short_description='d', price=1000,
+            title='C1',
+            slug='c1-multi',
+            short_description='d',
+            price=1000,
             instructor=instructor_user,
         )
         c2 = Course.objects.create(
-            title='C2', slug='c2-multi',
-            short_description='d', price=2000,
+            title='C2',
+            slug='c2-multi',
+            short_description='d',
+            price=2000,
             instructor=instructor_user,
         )
         m1 = Module.objects.create(course=c1, title='M1', order=1)
@@ -370,6 +419,7 @@ class TestDashboardView:
 
         from access.models import AccessRequest
         from users.models import User
+
         s = User.objects.create_user(email='sm@t.com', password='pw')
         AccessRequest.objects.create(student=s, course=c1, status='APPROVED')
         AccessRequest.objects.create(student=s, course=c2, status='APPROVED')
@@ -377,7 +427,7 @@ class TestDashboardView:
         client.force_login(instructor_user)
         resp = client.get(reverse('instructor_dashboard'))
         assert resp.context['total_modules'] == 3  # 1 + 2
-        assert resp.context['total_lessons'] == 4   # 1 + 3
+        assert resp.context['total_lessons'] == 4  # 1 + 3
         assert resp.context['total_students'] == 2  # 1 per course
 
     def test_dashboard_empty_state(self, client, instructor_user):
@@ -403,13 +453,16 @@ class TestCourseCreateView:
 
     def test_create_course(self, client, instructor_user):
         client.force_login(instructor_user)
-        resp = client.post(reverse('instructor_course_create'), {
-            'title': 'Nouveau Cours',
-            'slug': 'nouveau-cours',
-            'short_description': 'Un cours test',
-            'description': 'Description complète',
-            'price': 3000,
-        })
+        resp = client.post(
+            reverse('instructor_course_create'),
+            {
+                'title': 'Nouveau Cours',
+                'slug': 'nouveau-cours',
+                'short_description': 'Un cours test',
+                'description': 'Description complète',
+                'price': 3000,
+            },
+        )
         assert resp.status_code == 302
         course = Course.objects.get(slug='nouveau-cours')
         assert course.instructor == instructor_user
@@ -417,27 +470,33 @@ class TestCourseCreateView:
     def test_create_course_can_publish(self, client, instructor_user):
         """L'instructeur peut choisir de publier son cours."""
         client.force_login(instructor_user)
-        client.post(reverse('instructor_course_create'), {
-            'title': 'Tentative Publi',
-            'slug': 'tentative-publi',
-            'short_description': 'desc',
-            'description': 'desc',
-            'price': 1000,
-            'is_published': 'on',
-        })
+        client.post(
+            reverse('instructor_course_create'),
+            {
+                'title': 'Tentative Publi',
+                'slug': 'tentative-publi',
+                'short_description': 'desc',
+                'description': 'desc',
+                'price': 1000,
+                'is_published': 'on',
+            },
+        )
         course = Course.objects.get(slug='tentative-publi')
         assert course.is_published is True
 
     def test_create_course_default_unpublished(self, client, instructor_user):
         """Sans cocher 'publier', le cours reste en brouillon."""
         client.force_login(instructor_user)
-        client.post(reverse('instructor_course_create'), {
-            'title': 'Brouillon',
-            'slug': 'brouillon',
-            'short_description': 'desc',
-            'description': 'desc',
-            'price': 1000,
-        })
+        client.post(
+            reverse('instructor_course_create'),
+            {
+                'title': 'Brouillon',
+                'slug': 'brouillon',
+                'short_description': 'desc',
+                'description': 'desc',
+                'price': 1000,
+            },
+        )
         course = Course.objects.get(slug='brouillon')
         assert course.is_published is False
 
@@ -451,8 +510,10 @@ class TestCourseCreateView:
 
     def test_limit_reached_redirects(self, client, instructor_user):
         Course.objects.create(
-            title='Cours Existant', slug='cours-existant',
-            short_description='desc', price=1000,
+            title='Cours Existant',
+            slug='cours-existant',
+            short_description='desc',
+            price=1000,
             instructor=instructor_user,
         )
         client.force_login(instructor_user)
@@ -464,8 +525,10 @@ class TestCourseCreateView:
 class TestCourseEditView:
     def test_edit_own_course(self, client, instructor_user):
         course = Course.objects.create(
-            title='Mon Cours', slug='mon-cours-edit',
-            short_description='desc', price=1000,
+            title='Mon Cours',
+            slug='mon-cours-edit',
+            short_description='desc',
+            price=1000,
             instructor=instructor_user,
         )
         client.force_login(instructor_user)
@@ -475,12 +538,16 @@ class TestCourseEditView:
     def test_cannot_edit_others_course(self, client, instructor_user, admin_user, starter_plan):
         # Créer un autre instructeur
         InstructorProfile.objects.create(
-            user=admin_user, plan=starter_plan,
-            max_courses=5, revenue_percent=70,
+            user=admin_user,
+            plan=starter_plan,
+            max_courses=5,
+            revenue_percent=70,
         )
         course = Course.objects.create(
-            title='Autre Cours', slug='autre-cours',
-            short_description='desc', price=1000,
+            title='Autre Cours',
+            slug='autre-cours',
+            short_description='desc',
+            price=1000,
             instructor=admin_user,
         )
         client.force_login(instructor_user)
@@ -489,18 +556,23 @@ class TestCourseEditView:
 
     def test_edit_saves_changes(self, client, instructor_user):
         course = Course.objects.create(
-            title='Ancien Titre', slug='ancien-titre',
-            short_description='desc', price=1000,
+            title='Ancien Titre',
+            slug='ancien-titre',
+            short_description='desc',
+            price=1000,
             instructor=instructor_user,
         )
         client.force_login(instructor_user)
-        resp = client.post(reverse('instructor_course_edit', args=[course.slug]), {
-            'title': 'Nouveau Titre',
-            'slug': 'ancien-titre',
-            'short_description': 'desc modifiée',
-            'description': 'nouvelle description',
-            'price': 2000,
-        })
+        resp = client.post(
+            reverse('instructor_course_edit', args=[course.slug]),
+            {
+                'title': 'Nouveau Titre',
+                'slug': 'ancien-titre',
+                'short_description': 'desc modifiée',
+                'description': 'nouvelle description',
+                'price': 2000,
+            },
+        )
         assert resp.status_code == 302
         course.refresh_from_db()
         assert course.title == 'Nouveau Titre'
@@ -508,19 +580,25 @@ class TestCourseEditView:
     def test_edit_can_toggle_publish(self, client, instructor_user):
         """L'instructeur peut publier/dépublier son cours via l'édition."""
         course = Course.objects.create(
-            title='Draft Cours', slug='draft-cours',
-            short_description='desc', price=1000,
-            instructor=instructor_user, is_published=False,
+            title='Draft Cours',
+            slug='draft-cours',
+            short_description='desc',
+            price=1000,
+            instructor=instructor_user,
+            is_published=False,
         )
         client.force_login(instructor_user)
-        client.post(reverse('instructor_course_edit', args=[course.slug]), {
-            'title': 'Draft Cours',
-            'slug': 'draft-cours',
-            'short_description': 'desc',
-            'description': 'new',
-            'price': 1000,
-            'is_published': 'on',
-        })
+        client.post(
+            reverse('instructor_course_edit', args=[course.slug]),
+            {
+                'title': 'Draft Cours',
+                'slug': 'draft-cours',
+                'short_description': 'desc',
+                'description': 'new',
+                'price': 1000,
+                'is_published': 'on',
+            },
+        )
         course.refresh_from_db()
         assert course.is_published is True
 
@@ -550,6 +628,7 @@ class TestPlanUpgrade:
 
         from django.core.files.uploadedfile import SimpleUploadedFile
         from PIL import Image
+
         # Créer une vraie image
         buf = io.BytesIO()
         Image.new('RGB', (10, 10), color='red').save(buf, format='JPEG')
@@ -576,8 +655,10 @@ class TestPlanUpgrade:
     def test_upgrade_approval_updates_profile(self, instructor_user, pro_plan):
         """L'approbation d'un upgrade met à jour le profil avec les nouvelles limites."""
         req = InstructorRequest.objects.create(
-            user=instructor_user, plan=pro_plan,
-            payment_proof='fake.jpg', status='PENDING',
+            user=instructor_user,
+            plan=pro_plan,
+            payment_proof='fake.jpg',
+            status='PENDING',
         )
         req.status = 'APPROVED'
         req.save()
@@ -592,8 +673,10 @@ class TestPlanUpgrade:
     def test_pending_request_blocks_second_request(self, client, instructor_user, pro_plan):
         """Impossible de soumettre un 2e upgrade si un est déjà en attente."""
         InstructorRequest.objects.create(
-            user=instructor_user, plan=pro_plan,
-            payment_proof='fake.jpg', status='PENDING',
+            user=instructor_user,
+            plan=pro_plan,
+            payment_proof='fake.jpg',
+            status='PENDING',
         )
         client.force_login(instructor_user)
         resp = client.get(reverse('instructor_request', args=[pro_plan.slug]))
@@ -615,6 +698,7 @@ class TestPlanUpgrade:
 class TestSeedCommand:
     def test_seed_creates_plans(self):
         from django.core.management import call_command
+
         call_command('seed_instructor_plans')
         assert InstructorPlan.objects.count() == 3
         assert InstructorPlan.objects.get(slug='starter').price == 5000
@@ -623,6 +707,7 @@ class TestSeedCommand:
 
     def test_seed_is_idempotent(self):
         from django.core.management import call_command
+
         call_command('seed_instructor_plans')
         call_command('seed_instructor_plans')
         assert InstructorPlan.objects.count() == 3
@@ -635,23 +720,31 @@ class TestSeedCommand:
 def instructor_course(instructor_user):
     """Un cours appartenant à l'instructeur."""
     return Course.objects.create(
-        title='Mon Cours Instructeur', slug='mon-cours-inst',
-        short_description='desc', price=1000,
-        instructor=instructor_user, is_published=True,
+        title='Mon Cours Instructeur',
+        slug='mon-cours-inst',
+        short_description='desc',
+        price=1000,
+        instructor=instructor_user,
+        is_published=True,
     )
 
 
 @pytest.fixture
 def instructor_module(instructor_course):
     return Module.objects.create(
-        course=instructor_course, title='Module 1', order=1,
+        course=instructor_course,
+        title='Module 1',
+        order=1,
     )
 
 
 @pytest.fixture
 def instructor_lesson(instructor_module):
     return Lesson.objects.create(
-        module=instructor_module, title='Leçon 1', slug='lecon-1', order=1,
+        module=instructor_module,
+        title='Leçon 1',
+        slug='lecon-1',
+        order=1,
     )
 
 
@@ -659,9 +752,12 @@ def instructor_lesson(instructor_module):
 def other_course(admin_user):
     """Un cours appartenant à un autre utilisateur (admin)."""
     return Course.objects.create(
-        title='Cours Admin', slug='cours-admin',
-        short_description='desc', price=1000,
-        instructor=admin_user, is_published=True,
+        title='Cours Admin',
+        slug='cours-admin',
+        short_description='desc',
+        price=1000,
+        instructor=admin_user,
+        is_published=True,
     )
 
 
@@ -718,6 +814,7 @@ class TestInstructorBuilderAccess:
         """Un étudiant sans profil instructeur ne peut pas accéder au builder."""
         # Need a fresh student (not the instructor_user fixture)
         from users.models import User
+
         normal_user = User.objects.create_user(email='normal@test.com', password='pass123')
         client.force_login(normal_user)
         resp = client.get(reverse('manage_course_modules', args=[instructor_course.slug]))

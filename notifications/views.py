@@ -25,10 +25,14 @@ def _clean_type(value):
 def _badge_html(request):
     """Badge de la cloche (swap hors-bande) : notifications étudiant non lues."""
     unread_count = Notification.objects.filter(
-        recipient=request.user, is_read=False, notification_type=Notification.TYPE_STUDENT,
+        recipient=request.user,
+        is_read=False,
+        notification_type=Notification.TYPE_STUDENT,
     ).count()
     return render_to_string(
-        'notifications/partials/badge.html', {'unread_count': unread_count, 'oob': True}, request=request,
+        'notifications/partials/badge.html',
+        {'unread_count': unread_count, 'oob': True},
+        request=request,
     )
 
 
@@ -38,11 +42,15 @@ def my_notifications(request):
     type_filter = _clean_type(request.GET.get('type'))
     profile = getattr(request.user, 'instructor_profile', None)
 
-    return render(request, 'notifications/list.html', {
-        'notifications': _notifications_for(request.user, type_filter),
-        'current_type': type_filter,
-        'is_instructor': bool(profile and profile.is_active),
-    })
+    return render(
+        request,
+        'notifications/list.html',
+        {
+            'notifications': _notifications_for(request.user, type_filter),
+            'current_type': type_filter,
+            'is_instructor': bool(profile and profile.is_active),
+        },
+    )
 
 
 @login_required

@@ -8,6 +8,7 @@ from .models import InstructorProfile
 
 def instructor_required(view_func):
     """Décorateur : l'utilisateur doit être un instructeur actif."""
+
     @wraps(view_func)
     def _wrapped(request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -21,6 +22,7 @@ def instructor_required(view_func):
             messages.error(request, "Vous devez être instructeur pour accéder à cette page.")
             return redirect('instructor_plans')
         return view_func(request, *args, **kwargs)
+
     return _wrapped
 
 

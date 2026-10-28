@@ -7,9 +7,8 @@ from access.tasks import send_access_confirmation_email
 
 @pytest.mark.django_db
 class TestAsyncEmailing:
-
     def test_task_sends_email_directly(self, student, course):
-        """ Test Unitaire : La tâche Celery envoie-t-elle un mail ? """
+        """Test Unitaire : La tâche Celery envoie-t-elle un mail ?"""
         # 1. On crée une demande (peu importe le statut, on teste la tâche brute)
         req = AccessRequest.objects.create(student=student, course=course, status='PENDING')
 
@@ -25,7 +24,7 @@ class TestAsyncEmailing:
         assert course.title in email.body
 
     def test_signal_triggers_task_on_approval(self, student, course, settings):
-        """ Test Intégration : Est-ce que sauvegarder en 'APPROVED' lance la tâche ? """
+        """Test Intégration : Est-ce que sauvegarder en 'APPROVED' lance la tâche ?"""
 
         # --- MAGIE CELERY ---
         # On dit à Celery : "Exécute les tâches immédiatement en local, pas via Redis"
@@ -39,7 +38,7 @@ class TestAsyncEmailing:
         assert "Accès validé" in mail.outbox[0].subject
 
     def test_signal_does_not_trigger_on_pending(self, student, course, settings):
-        """ Vérifie qu'on n'envoie PAS de mail si c'est juste 'En attente' """
+        """Vérifie qu'on n'envoie PAS de mail si c'est juste 'En attente'"""
         settings.CELERY_TASK_ALWAYS_EAGER = True
 
         # 1. Création en PENDING
@@ -49,7 +48,7 @@ class TestAsyncEmailing:
         assert len(mail.outbox) == 0
 
     def test_signal_does_not_trigger_on_rejected(self, student, course, settings):
-        """ Vérifie qu'on n'envoie PAS de mail si c'est 'Refusé' """
+        """Vérifie qu'on n'envoie PAS de mail si c'est 'Refusé'"""
         settings.CELERY_TASK_ALWAYS_EAGER = True
 
         AccessRequest.objects.create(student=student, course=course, status='REJECTED')

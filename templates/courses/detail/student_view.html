@@ -1,0 +1,91 @@
+{% load static md progress_tags %}
+    {# ══════════════════════════════════════════════════════ #}
+    {# ──              VUE ÉTUDIANT INSCRIT                ── #}
+    {# ══════════════════════════════════════════════════════ #}
+
+    {# Breadcrumb #}
+    <nav class="flex items-center gap-2 text-sm text-gray-400 mb-8 font-bold tracking-widest uppercase">
+      <a href="{% url 'user_dashboard' %}" class="hover:text-dark transition-colors">Mes cours</a>
+      <svg class="w-4 h-4 text-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"/></svg>
+      <span class="text-dark truncate">{{ course.title }}</span>
+    </nav>
+
+    {# Carte de progression #}
+    <div class="bg-white border-2 border-gray-900 rounded-2xl p-6 lg:p-10 shadow-[4px_4px_0_0_#111827] mb-12 relative overflow-hidden manga-drawn">
+      <div class="absolute -right-8 -top-8 w-32 h-32 bg-[radial-gradient(circle,rgba(255,0,60,0.1)_2px,transparent_2px)] bg-[size:10px_10px] pointer-events-none transform rotate-12"></div>
+      
+      <!-- Manga tape -->
+      <div class="absolute -top-2 -left-2 w-10 h-3 bg-primary border-2 border-gray-900 rounded-sm transform -rotate-45 z-20 pointer-events-none"></div>
+
+      <c-ui.badge variant="green" class="absolute top-6 right-6 shadow-sm border-2 border-green-800">Inscrit</c-ui.badge>
+
+      <h1 class="text-3xl lg:text-5xl font-extrabold text-gray-900 mb-4 pr-20 tracking-tight drop-shadow-sm">{{ course.title }}</h1>
+      <p class="text-gray-600 mb-8 max-w-2xl font-medium text-lg">{{ course.short_description }}</p>
+
+      <div class="max-w-md p-5 border-2 border-gray-900 rounded-xl bg-gray-50 shadow-[3px_3px_0_0_#111827] relative overflow-hidden manga-drawn-alt">
+        <div class="absolute inset-0 bg-[radial-gradient(circle,rgba(0,0,0,0.03)_2px,transparent_2px)] bg-[size:8px_8px] pointer-events-none"></div>
+        <div class="relative z-10">
+          <div class="flex justify-between items-end mb-3">
+            <span class="text-sm font-bold uppercase tracking-widest text-gray-900">Progression</span>
+            <span class="text-2xl font-extrabold text-primary leading-none">{{ progress_percent }}%</span>
+          </div>
+          <!-- progress bar is hard to stylize via c-ui if it's not neo-brutalist inside, let's wrap it in a brutalist frame -->
+          <div class="border-2 border-gray-900 rounded-full overflow-hidden bg-white h-4 shadow-inner mb-5">
+            <progress class="meter meter-manga meter-primary" value="{{ progress_percent }}" max="100">{{ progress_percent }}%</progress>
+          </div>
+          
+          {% if progress_percent == 100 %}
+          <div class="pt-4 border-t-2 border-gray-900 border-dashed">
+            <a href="{% url 'download_certificate' course.slug %}" class="block w-full text-center bg-gray-900 text-white font-bold rounded-xl px-4 py-3 border-2 border-gray-900 shadow-[2px_2px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_#111827] transition-all">
+              🎓 Télécharger mon certificat
+            </a>
+          </div>
+          {% else %}
+          <div class="pt-4 border-t-2 border-gray-900 border-dashed">
+            {% if course.user_progress.resume_lesson %}
+              <a href="{% url 'lesson_detail' course.slug course.user_progress.resume_lesson.slug %}" class="block w-full text-center bg-primary text-white font-bold rounded-xl px-4 py-3 border-2 border-gray-900 shadow-[2px_2px_0_0_#111827] hover:-translate-y-0.5 hover:shadow-[3px_3px_0_0_#111827] transition-all">
+                {% if progress_percent > 0 %}Continuer{% else %}Commencer{% endif %}
+              </a>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if user.is_staff %}
+        <div class="mt-8 pt-6 border-t-2 border-gray-200 flex flex-wrap items-center gap-4">
+          <c-ui.btn href="{% url 'manage_course_students' course.slug %}" variant="secondary" size="sm">
+            <svg class="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Stats étudiants
+          </c-ui.btn>
+          <c-ui.btn href="{% url 'course_detail' course.slug %}?view=landing" variant="secondary" size="sm">
+            👁️ Voir la vitrine
+          </c-ui.btn>
+          <c-ui.btn href="{% url 'manage_course_landing' course.slug %}" variant="secondary" size="sm">
+            🎨 Éditer la vitrine
+          </c-ui.btn>
+        </div>
+      {% endif %}
+    </div>
+
+    {# Programme (vue inscrit) #}
+    <div class="max-w-4xl mx-auto">
+      <div class="flex items-center gap-4 mb-8 border-b-2 border-gray-200 pb-4">
+        <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
+          <span class="text-2xl">📚</span> Votre progression
+        </h2>
+      </div>
+
+      <div class="space-y-6">
+        {% for module in course.modules.all %}
+          <c-course.module-accordion
+            :module="module"
+            index="{{ forloop.counter0 }}"
+            has_access="true"
+            :completed_ids="completed_lesson_ids"
+            is_manager="{% if is_manager %}true{% else %}false{% endif %}" />
+        {% endfor %}
+      </div>
+    </div>

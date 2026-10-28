@@ -24,7 +24,7 @@ def user_notifications(request):
 
     student_qs = base_qs.filter(notification_type=Notification.TYPE_STUDENT)
     navbar_notifications = student_qs.order_by('-created_at')[:10]
-    navbar_unread_count  = student_qs.filter(is_read=False).count()
+    navbar_unread_count = student_qs.filter(is_read=False).count()
 
     # Badge instructeur uniquement si l'utilisateur a un profil actif
     navbar_instructor_unread_count = 0

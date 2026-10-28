@@ -1,4 +1,5 @@
 """Builder de la page vitrine d'un cours (sections de landing page)."""
+
 from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -82,11 +83,15 @@ def manage_course_landing(request, course_slug):
     else:
         courses_url = reverse('instructor_dashboard')
         course_edit_url = reverse('instructor_course_edit', args=[course.slug])
-    return render(request, 'courses/manage/landing_builder.html', {
-        'course': course,
-        'courses_url': courses_url,
-        'course_edit_url': course_edit_url,
-    })
+    return render(
+        request,
+        'courses/manage/landing_builder.html',
+        {
+            'course': course,
+            'courses_url': courses_url,
+            'course_edit_url': course_edit_url,
+        },
+    )
 
 
 @builder_access_required
@@ -122,12 +127,16 @@ def edit_landing_section(request, section_id):
     else:
         form = LandingSectionForm(instance=section)
 
-    return render(request, SECTION_FORM_TEMPLATE, {
-        'form': form,
-        'course': course,
-        'section': section,
-        'section_type': section.section_type,
-    })
+    return render(
+        request,
+        SECTION_FORM_TEMPLATE,
+        {
+            'form': form,
+            'course': course,
+            'section': section,
+            'section_type': section.section_type,
+        },
+    )
 
 
 @builder_access_required
@@ -198,9 +207,11 @@ def prefill_landing_template(request, course_slug):
             'text': {'body': course.description or 'Décrivez votre formation ici...'},
             'features': {'body': course.what_you_will_learn or '- Point fort 1\n- Point fort 2\n- Point fort 3'},
         }
-        LandingSection.objects.bulk_create([
-            LandingSection(course=course, order=position, **{**spec, **dynamic.get(spec['section_type'], {})})
-            for position, spec in enumerate(SECTION_TEMPLATE_SPECS, start=1)
-        ])
+        LandingSection.objects.bulk_create(
+            [
+                LandingSection(course=course, order=position, **{**spec, **dynamic.get(spec['section_type'], {})})
+                for position, spec in enumerate(SECTION_TEMPLATE_SPECS, start=1)
+            ]
+        )
 
     return _section_list(request, course)

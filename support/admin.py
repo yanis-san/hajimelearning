@@ -10,6 +10,7 @@ class ResponseInline(TabularInline):
     fields = ['author', 'content', 'created_at']
     readonly_fields = ['created_at']
 
+
 @admin.register(Question)
 class QuestionAdmin(ModelAdmin):
     list_display = ['title', 'student', 'course', 'status', 'created_at']

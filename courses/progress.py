@@ -5,6 +5,7 @@ Source unique de vérité pour : % de progression, leçon à reprendre,
 navigation précédente/suivante et état « cours terminé ».
 Seules les leçons PUBLIÉES (dans des modules publiés) comptent.
 """
+
 from dataclasses import dataclass, field
 
 from django.db.models import Prefetch
@@ -25,9 +26,7 @@ def lessons_prefetch(include_drafts=False):
     qs = Lesson.objects.all()
     if not include_drafts:
         qs = qs.filter(is_published=True)
-    qs = qs.prefetch_related(
-        Prefetch('blocks', queryset=ContentBlock.objects.only('id', 'lesson_id', 'type', 'order'))
-    )
+    qs = qs.prefetch_related(Prefetch('blocks', queryset=ContentBlock.objects.only('id', 'lesson_id', 'type', 'order')))
     return Prefetch('lessons', queryset=qs)
 
 
@@ -127,9 +126,9 @@ def get_course_progress(user, course, lessons=None):
         return progress
 
     completed_ids = set(
-        StudentProgress.objects.filter(
-            student=user, lesson_id__in=[entry.id for entry in lessons]
-        ).values_list('lesson_id', flat=True)
+        StudentProgress.objects.filter(student=user, lesson_id__in=[entry.id for entry in lessons]).values_list(
+            'lesson_id', flat=True
+        )
     )
     activity = CourseActivity.objects.filter(student=user, course=course).only('last_lesson_id').first()
     return _build_progress(lessons, completed_ids, activity)
@@ -148,13 +147,15 @@ def get_courses_progress(user, courses):
         lessons_by_course[lesson.module.course_id].append(lesson)
 
     completed = set(
-        StudentProgress.objects.filter(student=user, lesson__module__course_id__in=course_ids)
-        .values_list('lesson_id', flat=True)
+        StudentProgress.objects.filter(student=user, lesson__module__course_id__in=course_ids).values_list(
+            'lesson_id', flat=True
+        )
     )
     activities = {
         activity.course_id: activity
-        for activity in CourseActivity.objects.filter(student=user, course_id__in=course_ids)
-        .only('course_id', 'last_lesson_id')
+        for activity in CourseActivity.objects.filter(student=user, course_id__in=course_ids).only(
+            'course_id', 'last_lesson_id'
+        )
     }
 
     result = {}
@@ -168,6 +169,4 @@ def record_visit(user, course, lesson):
     """Mémorise la dernière leçon consultée (pour le bouton « Continuer »)."""
     if not getattr(user, 'is_authenticated', False):
         return
-    CourseActivity.objects.update_or_create(
-        student=user, course=course, defaults={'last_lesson': lesson}
-    )
+    CourseActivity.objects.update_or_create(student=user, course=course, defaults={'last_lesson': lesson})

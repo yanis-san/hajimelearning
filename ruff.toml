@@ -14,3 +14,6 @@ ignore = [
 [lint.per-file-ignores]
 "tests/*" = ["B", "SIM"]
 "config/settings/*" = ["F403", "F405"]
+
+[format]
+quote-style = "preserve"

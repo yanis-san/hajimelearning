@@ -7,23 +7,18 @@ from support.models import Question, Response
 
 @pytest.mark.django_db
 class TestSupportSystem:
-
     @pytest.fixture
     def lesson_with_question(self, student, course):
-        """ Une leçon avec une question déjà posée """
+        """Une leçon avec une question déjà posée"""
         module = course.modules.create(title="Mod", order=1)
         lesson = module.lessons.create(title="Lec", slug="lec", order=1)
         question = Question.objects.create(
-            student=student,
-            course=course,
-            lesson=lesson,
-            title="Help me",
-            content="I am stuck"
+            student=student, course=course, lesson=lesson, title="Help me", content="I am stuck"
         )
         return lesson, question
 
     def test_student_can_ask_question(self, client, student, course):
-        """ Un étudiant peut poster une question """
+        """Un étudiant peut poster une question"""
         module = course.modules.create(title="Mod", order=1)
         lesson = module.lessons.create(title="Lec", slug="lec", order=1)
 
@@ -41,7 +36,7 @@ class TestSupportSystem:
         assert q.status == 'OPEN'
 
     def test_instructor_reply_marks_as_official(self, client, admin_user, lesson_with_question):
-        """ Une réponse de l'admin doit être marquée 'is_instructor' """
+        """Une réponse de l'admin doit être marquée 'is_instructor'"""
         lesson, question = lesson_with_question
 
         client.force_login(admin_user)
@@ -56,8 +51,9 @@ class TestSupportSystem:
         assert reply.author == admin_user
 
     def test_resolve_question(self, client, student, lesson_with_question):
-        """ L'étudiant peut marquer sa propre question comme résolue """
+        """L'étudiant peut marquer sa propre question comme résolue"""
         from notifications.models import Notification
+
         lesson, question = lesson_with_question
 
         client.force_login(student)
@@ -76,7 +72,9 @@ class TestSupportSystem:
         assert notif is not None
         assert "résolue" in notif.title.lower()
 
-    def test_peer_student_with_course_access_can_reply_when_enabled(self, client, student, course, lesson_with_question, settings):
+    def test_peer_student_with_course_access_can_reply_when_enabled(
+        self, client, student, course, lesson_with_question, settings
+    ):
         """Un camarade inscrit au même cours peut voir et répondre si l'entraide est activée."""
         settings.ALLOW_STUDENT_REPLIES = True
         from access.models import AccessRequest
@@ -141,6 +139,7 @@ class TestSupportSystem:
     def test_new_question_sends_email_to_instructor(self, client, student, course, mailoutbox):
         """Quand un étudiant pose une question, un email de notification est envoyé à l'instructeur."""
         from users.models import User
+
         instructor = User.objects.create_user(email='prof@test.com', password='password123', first_name='Prof')
         course.instructor = instructor
         course.save()
@@ -161,7 +160,9 @@ class TestSupportSystem:
         assert "Question urgente" in email.subject or "Question urgente" in email.body
         assert "pip" in email.body
 
-    def test_instructor_reply_sends_email_to_question_author(self, client, admin_user, lesson_with_question, mailoutbox):
+    def test_instructor_reply_sends_email_to_question_author(
+        self, client, admin_user, lesson_with_question, mailoutbox
+    ):
         """Quand l'instructeur/admin répond, l'étudiant auteur reçoit un email."""
         lesson, question = lesson_with_question
 
@@ -178,7 +179,9 @@ class TestSupportSystem:
         assert question.title in email.subject or question.title in email.body
         assert "docs.python.org" in email.body
 
-    def test_peer_reply_sends_email_to_author_and_instructor(self, client, student, course, lesson_with_question, mailoutbox, settings):
+    def test_peer_reply_sends_email_to_author_and_instructor(
+        self, client, student, course, lesson_with_question, mailoutbox, settings
+    ):
         """Quand un camarade répond, l'étudiant auteur et l'instructeur sont notifiés par email."""
         settings.ALLOW_STUDENT_REPLIES = True
         from access.models import AccessRequest
@@ -209,7 +212,6 @@ class TestSupportSystem:
         # 3. Le camarade qui a écrit la réponse ne reçoit PAS d'email
         peer_emails = [m for m in mailoutbox if peer.email in m.to]
         assert len(peer_emails) == 0
-
 
     def test_student_without_access_cannot_ask_question(self, client, student, course):
         """Sans accès au cours (et leçon non gratuite), aucune question ne peut être posée."""

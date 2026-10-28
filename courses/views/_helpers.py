@@ -1,4 +1,5 @@
 """Utilitaires partagés par les vues de l'app courses."""
+
 from django.contrib import messages
 from django.db.models import Max, Prefetch
 from django.http import HttpResponse

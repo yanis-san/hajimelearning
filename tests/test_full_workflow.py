@@ -8,9 +8,8 @@ from support.models import Question
 
 @pytest.mark.django_db
 class TestFullNotifications:
-
     def test_admin_notified_on_question(self, client, student):
-        """ Vérifie que l'admin reçoit une notif quand un élève pose une question """
+        """Vérifie que l'admin reçoit une notif quand un élève pose une question"""
         User = get_user_model()
 
         # CORRECTION : On ne met PAS username, seulement email et password
@@ -22,10 +21,7 @@ class TestFullNotifications:
         lesson = Lesson.objects.create(module=module, title="1+1", slug="un-plus-un")
 
         # L'étudiant pose une question
-        Question.objects.create(
-            student=student, course=course, lesson=lesson,
-            title="Help", content="Besoin d'aide"
-        )
+        Question.objects.create(student=student, course=course, lesson=lesson, title="Help", content="Besoin d'aide")
 
         # L'admin doit avoir 1 notif
         assert Notification.objects.filter(recipient=admin).count() == 1

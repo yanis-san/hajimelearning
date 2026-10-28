@@ -13,6 +13,7 @@ def get_upload_path(instance, filename):
     # On trie par type de contenu pour rester organisé
     return os.path.join('uploads/secure/', filename)
 
+
 # 2. VALIDATEUR DE TAILLE
 @deconstructible
 class FileSizeValidator:
@@ -23,6 +24,7 @@ class FileSizeValidator:
         limit = self.max_mb * 1024 * 1024
         if value.size > limit:
             raise ValidationError(f"Fichier trop volumineux. Max : {self.max_mb} MB.")
+
 
 # LISTES BLANCHES (Ce qui est autorisé)
 # Images (Preuves de paiement, miniatures)

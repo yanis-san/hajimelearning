@@ -1,4 +1,5 @@
 """Stockage des fichiers de cours protégés (hors MEDIA_ROOT)."""
+
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 

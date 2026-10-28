@@ -6,23 +6,18 @@ from courses.models import ContentBlock
 
 @pytest.mark.django_db
 class TestCourseBuilder:
-
     @pytest.fixture
     def lesson(self, course):
-        """ Crée une leçon vide pour tester """
+        """Crée une leçon vide pour tester"""
         module = course.modules.create(title="Module Test", order=1)
         return module.lessons.create(title="Leçon Builder", slug="lecon-builder", order=1)
 
     def test_add_text_block(self, client, admin_user, lesson):
-        """ Un admin peut ajouter un bloc texte via HTMX """
+        """Un admin peut ajouter un bloc texte via HTMX"""
         client.force_login(admin_user)
 
         url = reverse('add_block', args=[lesson.id, 'text'])
-        data = {
-            'text_content': '# Titre Markdown',
-            'video_id': '',
-            'quiz_title': ''
-        }
+        data = {'text_content': '# Titre Markdown', 'video_id': '', 'quiz_title': ''}
 
         response = client.post(url, data)
 
@@ -34,7 +29,7 @@ class TestCourseBuilder:
         assert block.lesson == lesson
 
     def test_reorder_blocks(self, client, admin_user, lesson):
-        """ Teste le Drag & Drop (mise à jour de l'ordre) """
+        """Teste le Drag & Drop (mise à jour de l'ordre)"""
         client.force_login(admin_user)
 
         # On crée 3 blocs dans le désordre
@@ -43,7 +38,7 @@ class TestCourseBuilder:
         b3 = ContentBlock.objects.create(lesson=lesson, type='text', order=3)
 
         # On veut inverser l'ordre : 3, 2, 1
-        url = reverse('update_block_order') # Assure-toi que cette URL a un nom dans tes urls.py
+        url = reverse('update_block_order')  # Assure-toi que cette URL a un nom dans tes urls.py
         # Si tu l'as nommée 'update_block_order' ou similaire, sinon vérifie urls.py
 
         # HTMX envoie une liste d'IDs dans l'ordre visuel
@@ -68,7 +63,7 @@ class TestCourseBuilder:
         assert b1.order == 3
 
     def test_builder_access_denied_for_student(self, client, student, lesson):
-        """ Un étudiant ne doit PAS pouvoir ajouter de bloc """
+        """Un étudiant ne doit PAS pouvoir ajouter de bloc"""
         client.force_login(student)
         reverse('add_block', args=[lesson.id, 'text'])
 

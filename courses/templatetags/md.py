@@ -3,7 +3,8 @@ import re
 from django import template
 from django.utils.html import escape, json_script
 from django.utils.safestring import mark_safe
-from markdownx.utils import markdownify
+
+from ..markdown import render_markdown_safe
 
 register = template.Library()
 
@@ -32,31 +33,19 @@ def convert_furigana(text):
         return f'<ruby>{base}<rt>{reading}</rt></ruby>'
 
     # 1. Syntaxe {kanji|furigana}
-    text = re.sub(
-        r'\{([^{|\n]+)\|([^{}\n]+)\}',
-        lambda m: _replace_split(m.group(1), m.group(2)),
-        text
-    )
+    text = re.sub(r'\{([^{|\n]+)\|([^{}\n]+)\}', lambda m: _replace_split(m.group(1), m.group(2)), text)
 
     # 2. Syntaxe [kanji]{furigana}
-    text = re.sub(
-        r'\[([^\]\n]+)\]\{([^{}\n]+)\}',
-        lambda m: _replace_split(m.group(1), m.group(2)),
-        text
-    )
+    text = re.sub(r'\[([^\]\n]+)\]\{([^{}\n]+)\}', lambda m: _replace_split(m.group(1), m.group(2)), text)
 
     # 3. Syntaxe Aozora Bunko avec pipe: ｜base《reading》 ou |base《reading》
-    text = re.sub(
-        r'[｜\|]([^《\n]+)《([^》\n]+)》',
-        lambda m: _replace_split(m.group(1), m.group(2)),
-        text
-    )
+    text = re.sub(r'[｜\|]([^《\n]+)《([^》\n]+)》', lambda m: _replace_split(m.group(1), m.group(2)), text)
 
     # 4. Syntaxe directe Kanji《furigana》
     text = re.sub(
         r'([\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff々〆ヵヶ]+)《([^》\n]+)》',
         lambda m: _replace_split(m.group(1), m.group(2)),
-        text
+        text,
     )
 
     return text
@@ -76,13 +65,15 @@ def quiz_data(block):
     questions = []
     for q in block.questions.all():
         choices = {'a': q.choice_a, 'b': q.choice_b, 'c': q.choice_c, 'd': q.choice_d}
-        questions.append({
-            'text': convert_furigana(escape(q.question_text)),
-            'duration': q.duration,
-            'correct': q.correct_answer,
-            'explanation': convert_furigana(escape(q.explanation)),
-            'choices': {key: convert_furigana(escape(text)) for key, text in choices.items() if text},
-        })
+        questions.append(
+            {
+                'text': convert_furigana(escape(q.question_text)),
+                'duration': q.duration,
+                'correct': q.correct_answer,
+                'explanation': convert_furigana(escape(q.explanation)),
+                'choices': {key: convert_furigana(escape(text)) for key, text in choices.items() if text},
+            }
+        )
     return json_script(questions, f'quiz-data-{block.id}')
 
 
@@ -92,7 +83,7 @@ def render_markdown(value):
     if not value:
         return ""
     processed = convert_furigana(str(value))
-    return mark_safe(markdownify(processed))
+    return render_markdown_safe(processed)
 
 
 @register.filter(name="first_heading")
@@ -144,10 +135,10 @@ def faq_items(value):
         if not part:
             continue
         lines = part.split('\n', 1)
-        question = convert_furigana(lines[0].strip())
+        question = convert_furigana(escape(lines[0].strip()))
         answer_md = lines[1].strip() if len(lines) > 1 else ''
-        answer_html = markdownify(convert_furigana(answer_md)) if answer_md else ''
-        items.append((mark_safe(question), mark_safe(answer_html)))
+        answer_html = render_markdown_safe(convert_furigana(answer_md)) if answer_md else ''
+        items.append((mark_safe(question), answer_html))
     return items
 
 
@@ -173,7 +164,7 @@ def testimonial_items(value):
         lines = part.split('\n', 1)
         header = lines[0].strip()
         text_md = lines[1].strip() if len(lines) > 1 else ''
-        text_html = markdownify(convert_furigana(text_md)) if text_md else ''
+        text_html = render_markdown_safe(convert_furigana(text_md)) if text_md else ''
 
         # Parse "★★★★★ | Nom Prénom" or just "Nom Prénom"
         if '|' in header:
@@ -184,9 +175,11 @@ def testimonial_items(value):
             stars = '★★★★★'
             name = header
 
-        items.append({
-            'stars': stars,
-            'name': mark_safe(convert_furigana(name)),
-            'text_html': mark_safe(text_html),
-        })
+        items.append(
+            {
+                'stars': stars,
+                'name': mark_safe(convert_furigana(escape(name))),
+                'text_html': text_html,
+            }
+        )
     return items

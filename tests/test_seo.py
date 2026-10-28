@@ -6,7 +6,6 @@ from courses.models import Course
 
 @pytest.mark.django_db
 class TestSEO:
-
     @pytest.fixture
     def published_course(self):
         return Course.objects.create(
@@ -14,11 +13,11 @@ class TestSEO:
             slug="cours-seo",
             price=1000,
             is_published=True,
-            meta_description="Apprenez le SEO facilement."
+            meta_description="Apprenez le SEO facilement.",
         )
 
     def test_sitemap_xml_is_generated(self, client, published_course):
-        """ Vérifie que le fichier sitemap.xml existe et contient le cours """
+        """Vérifie que le fichier sitemap.xml existe et contient le cours"""
         response = client.get('/sitemap.xml')
 
         assert response.status_code == 200
@@ -27,7 +26,7 @@ class TestSEO:
         assert f"/course/{published_course.slug}/" in response.content.decode()
 
     def test_meta_tags_on_course_page(self, client, published_course):
-        """ Vérifie que les balises meta s'affichent bien sur la page """
+        """Vérifie que les balises meta s'affichent bien sur la page"""
         url = reverse('course_detail', args=[published_course.slug])
         response = client.get(url)
         content = response.content.decode()

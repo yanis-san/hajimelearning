@@ -9,7 +9,6 @@ from django.urls import reverse
 logger = logging.getLogger(__name__)
 
 
-
 @shared_task
 def send_question_notification_email(question_id):
     """
@@ -17,10 +16,11 @@ def send_question_notification_email(question_id):
     qu'un étudiant a posé une nouvelle question.
     """
     from .models import Question
+
     try:
-        question = Question.objects.select_related(
-            'student', 'course', 'course__instructor', 'lesson'
-        ).get(id=question_id)
+        question = Question.objects.select_related('student', 'course', 'course__instructor', 'lesson').get(
+            id=question_id
+        )
     except Question.DoesNotExist:
         return "Question introuvable"
 
@@ -78,6 +78,7 @@ def send_response_notification_email(response_id):
     - L'instructeur du cours (s'il n'est pas l'auteur de cette réponse et pas déjà notifié)
     """
     from .models import Response
+
     try:
         response = Response.objects.select_related(
             'question', 'question__student', 'question__course', 'question__course__instructor', 'author'
@@ -88,7 +89,9 @@ def send_response_notification_email(response_id):
     question = response.question
     course = question.course
     author = response.author
-    author_name = "Votre Sensei" if response.is_instructor else (author.get_full_name() or author.first_name or author.email)
+    author_name = (
+        "Votre Sensei" if response.is_instructor else (author.get_full_name() or author.first_name or author.email)
+    )
 
     question_url = f"{settings.SITE_URL}{reverse('question_detail', args=[question.id])}"
 

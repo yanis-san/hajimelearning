@@ -10,6 +10,7 @@ class InstructorPlan(models.Model):
     Offre instructeur (Starter, Pro, Expert).
     Gérée par le superadmin via Django Unfold.
     """
+
     name = models.CharField("Nom de l'offre", max_length=100)
     slug = models.SlugField(unique=True)
     price = models.DecimalField("Prix (DA)", max_digits=10, decimal_places=0)
@@ -74,6 +75,7 @@ class InstructorRequest(models.Model):
     Demande pour devenir instructeur (avec preuve de paiement).
     Même flow que AccessRequest pour les étudiants.
     """
+
     STATUS_CHOICES = (
         ('PENDING', 'En attente'),
         ('APPROVED', 'Approuvé'),
@@ -121,6 +123,7 @@ class InstructorProfile(models.Model):
     Profil instructeur (créé après approbation).
     Lie un utilisateur à un plan avec des limites concrètes.
     """
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -153,6 +156,7 @@ class InstructorProfile(models.Model):
         if self.max_courses == 0:
             return None  # Illimité
         from courses.models import Course
+
         used = Course.objects.filter(instructor=self.user).count()
         return max(0, self.max_courses - used)
 
@@ -164,6 +168,7 @@ class InstructorProfile(models.Model):
     def lessons_limit_reached(self, course):
         """Le plan interdit-il d'ajouter une leçon à ce cours ? (0 = illimité)"""
         from courses.models import Lesson
+
         limit = self.max_lessons_per_course
         return limit > 0 and Lesson.objects.filter(module__course=course).count() >= limit
 

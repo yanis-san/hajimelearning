@@ -7,16 +7,16 @@ from django.urls import reverse
 
 User = get_user_model()
 
+
 @pytest.mark.django_db
 class TestPasswordResetFlow:
-
     def test_full_password_reset_cycle(self, client, student):
-        """ Teste tout le cycle : Demande -> Mail -> Changement -> Login """
+        """Teste tout le cycle : Demande -> Mail -> Changement -> Login"""
 
         # 1. DEMANDE DE RESET
         url_request = reverse('account_reset_password')
         response = client.post(url_request, {'email': student.email})
-        assert response.status_code == 302 # Redirection vers "Email sent"
+        assert response.status_code == 302  # Redirection vers "Email sent"
         assert len(mail.outbox) == 1
 
         # 2. EXTRACTION DU LIEN DANS L'EMAIL
@@ -39,18 +39,24 @@ class TestPasswordResetFlow:
 
         # 4. TENTATIVE AVEC MOT DE PASSE FAIBLE (Doit échouer)
         weak_password = "low"
-        response = client.post(final_url, {
-            'password1': weak_password, # <--- CORRECTION ICI (password1)
-            'password2': weak_password  # <--- CORRECTION ICI (password2)
-        })
+        response = client.post(
+            final_url,
+            {
+                'password1': weak_password,  # <--- CORRECTION ICI (password1)
+                'password2': weak_password,  # <--- CORRECTION ICI (password2)
+            },
+        )
         assert response.status_code == 200
 
         # 5. TENTATIVE AVEC MOT DE PASSE FORT (Doit réussir)
         strong_password = "NewPassword123!"
-        response = client.post(final_url, {
-            'password1': strong_password, # <--- CORRECTION ICI (password1)
-            'password2': strong_password  # <--- CORRECTION ICI (password2)
-        })
+        response = client.post(
+            final_url,
+            {
+                'password1': strong_password,  # <--- CORRECTION ICI (password1)
+                'password2': strong_password,  # <--- CORRECTION ICI (password2)
+            },
+        )
 
         # Debug en cas d'erreur
         if response.status_code != 302:

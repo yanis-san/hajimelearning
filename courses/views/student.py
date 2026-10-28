@@ -1,4 +1,5 @@
 """Vues publiques et espace étudiant : catalogue, leçons, progression, certificat."""
+
 import json
 import logging
 
@@ -33,7 +34,9 @@ CATALOGUE_SORTS = frozenset({'title', '-title', 'price', '-price', 'created_at',
 
 
 def course_list(request):
-    courses = Course.objects.filter(is_published=True, is_featured=True).select_related('category').order_by('-created_at')
+    courses = (
+        Course.objects.filter(is_published=True, is_featured=True).select_related('category').order_by('-created_at')
+    )
     return render(request, 'courses/index.html', {'courses': courses, 'categories': Category.objects.all()})
 
 
@@ -51,9 +54,7 @@ def catalogue(request):
         courses = courses.filter(Q(title__icontains=query) | Q(short_description__icontains=query))
     if category_slug:
         courses = courses.filter(category__slug=category_slug)
-    courses = courses.annotate(
-        modules_count=Count('modules', filter=Q(modules__is_published=True))
-    ).order_by(sort)
+    courses = courses.annotate(modules_count=Count('modules', filter=Q(modules__is_published=True))).order_by(sort)
 
     context = {
         'courses': courses,
@@ -87,23 +88,28 @@ def course_detail(request, course_slug):
         completed_lesson_ids = user_progress.completed_ids
         progress_percent = user_progress.percent
 
-    return render(request, 'courses/course_detail.html', {
-        'course': course_with_modules,
-        'has_access': user_has_access(request.user, course),
-        'completed_lesson_ids': completed_lesson_ids,
-        'progress_percent': progress_percent,
-        'user_progress': user_progress,
-        'landing_sections': [s for s in course_with_modules.landing_sections.all() if s.is_visible],
-        # Staff/instructeur : aperçu de la vitrine avec ?view=landing
-        'preview_landing': request.GET.get('view') == 'landing' and is_manager,
-        'is_manager': is_manager,
-    })
+    return render(
+        request,
+        'courses/course_detail.html',
+        {
+            'course': course_with_modules,
+            'has_access': user_has_access(request.user, course),
+            'completed_lesson_ids': completed_lesson_ids,
+            'progress_percent': progress_percent,
+            'user_progress': user_progress,
+            'landing_sections': [s for s in course_with_modules.landing_sections.all() if s.is_visible],
+            # Staff/instructeur : aperçu de la vitrine avec ?view=landing
+            'preview_landing': request.GET.get('view') == 'landing' and is_manager,
+            'is_manager': is_manager,
+        },
+    )
 
 
 def lesson_detail(request, course_slug, lesson_slug):
     lesson = get_object_or_404(
         Lesson.objects.select_related('module__course'),
-        module__course__slug=course_slug, slug=lesson_slug,
+        module__course__slug=course_slug,
+        slug=lesson_slug,
     )
     course = lesson.module.course
     is_manager = is_course_manager(request.user, course)
@@ -134,23 +140,26 @@ def lesson_detail(request, course_slug, lesson_slug):
 
         # Notes personnelles par bloc
         notes = dict(
-            StudentNote.objects.filter(student=request.user, block__in=blocks)
-            .values_list('block_id', 'content')
+            StudentNote.objects.filter(student=request.user, block__in=blocks).values_list('block_id', 'content')
         )
         for block in blocks:
             block.my_note = notes.get(block.id, "")
 
-    return render(request, 'courses/lesson_detail.html', {
-        'lesson': lesson,
-        'course': course_for_sidebar,
-        'completed_lesson_ids': completed_lesson_ids,
-        'prev_lesson': prev_lesson,
-        'next_lesson': next_lesson,
-        'question_form': QuestionForm(),
-        'has_access': has_access,
-        'is_manager': is_manager,
-        'blocks': blocks,
-    })
+    return render(
+        request,
+        'courses/lesson_detail.html',
+        {
+            'lesson': lesson,
+            'course': course_for_sidebar,
+            'completed_lesson_ids': completed_lesson_ids,
+            'prev_lesson': prev_lesson,
+            'next_lesson': next_lesson,
+            'question_form': QuestionForm(),
+            'has_access': has_access,
+            'is_manager': is_manager,
+            'blocks': blocks,
+        },
+    )
 
 
 @login_required
@@ -163,7 +172,9 @@ def user_dashboard(request):
             | Q(id__in=ActivationCode.objects.filter(used_by=user, is_used=True).values('course_id'))
             | Q(instructor=user),
             is_published=True,
-        ).select_related('category').order_by('-created_at')
+        )
+        .select_related('category')
+        .order_by('-created_at')
     )
 
     progress_by_course = get_courses_progress(user, my_courses)
@@ -171,20 +182,23 @@ def user_dashboard(request):
         course.user_progress = progress_by_course[course.id]
 
     # Cours complétés → bouton certificat
-    completed_course_ids = set(
-        CourseCompletion.objects.filter(student=user).values_list('course_id', flat=True)
+    completed_course_ids = set(CourseCompletion.objects.filter(student=user).values_list('course_id', flat=True))
+    return render(
+        request,
+        'courses/dashboard.html',
+        {
+            'courses': my_courses,
+            'completed_course_ids': completed_course_ids,
+        },
     )
-    return render(request, 'courses/dashboard.html', {
-        'courses': my_courses,
-        'completed_course_ids': completed_course_ids,
-    })
 
 
 def _lesson_for_progress(request, course_slug, lesson_slug):
     """(leçon, cours) ; cours vaut None si l'utilisateur ne peut pas modifier sa progression."""
     lesson = get_object_or_404(
         Lesson.objects.select_related('module__course'),
-        module__course__slug=course_slug, slug=lesson_slug,
+        module__course__slug=course_slug,
+        slug=lesson_slug,
     )
     course = lesson.module.course
     if not is_course_manager(request.user, course) and not user_has_access(request.user, course):
@@ -238,7 +252,8 @@ def save_block_note(request, course_slug, block_id):
     """Enregistre (ou supprime si vide) la note personnelle d'un étudiant sur un bloc."""
     block = get_object_or_404(
         ContentBlock.objects.select_related('lesson__module__course'),
-        pk=block_id, lesson__module__course__slug=course_slug,
+        pk=block_id,
+        lesson__module__course__slug=course_slug,
     )
     lesson = block.lesson
     course = lesson.module.course
@@ -248,9 +263,7 @@ def save_block_note(request, course_slug, block_id):
 
     content = request.POST.get('note_content', '').strip()
     if content:
-        StudentNote.objects.update_or_create(
-            student=request.user, block=block, defaults={'content': content}
-        )
+        StudentNote.objects.update_or_create(student=request.user, block=block, defaults={'content': content})
     else:
         StudentNote.objects.filter(student=request.user, block=block).delete()
 
@@ -280,7 +293,9 @@ def download_certificate(request, course_slug):
         messages.warning(request, "Votre certificat est en cours de régénération, revenez dans quelques instants.")
         return redirect('user_dashboard')
 
-    return FileResponse(pdf, as_attachment=True, filename=f"Certificat_{course.slug}.pdf", content_type='application/pdf')
+    return FileResponse(
+        pdf, as_attachment=True, filename=f"Certificat_{course.slug}.pdf", content_type='application/pdf'
+    )
 
 
 @login_required
@@ -294,15 +309,14 @@ def save_quiz_result(request, block_id):
     if total <= 0 or not 0 <= score <= total:
         return JsonResponse({'status': 'error', 'message': 'Score invalide.'}, status=400)
 
-    block = get_object_or_404(
-        ContentBlock.objects.select_related('lesson__module__course'), id=block_id
-    )
+    block = get_object_or_404(ContentBlock.objects.select_related('lesson__module__course'), id=block_id)
     course = block.lesson.module.course
     if not is_course_manager(request.user, course) and not user_has_access(request.user, course):
         return JsonResponse({'status': 'error', 'message': 'Accès refusé.'}, status=403)
 
     QuizResult.objects.update_or_create(
-        student=request.user, block=block,
+        student=request.user,
+        block=block,
         defaults={'score': score, 'total_questions': total},
     )
     QuizAttempt.objects.create(student=request.user, block=block, score=score, total_questions=total)
@@ -312,9 +326,7 @@ def save_quiz_result(request, block_id):
 @login_required
 def download_protected_media(request, block_id, field_name):
     """Sert les fichiers protégés (file_content ou related_file) après contrôle d'accès."""
-    block = get_object_or_404(
-        ContentBlock.objects.select_related('lesson__module__course'), id=block_id
-    )
+    block = get_object_or_404(ContentBlock.objects.select_related('lesson__module__course'), id=block_id)
     course = block.lesson.module.course
 
     has_access = is_course_manager(request.user, course) or user_has_access(request.user, course)

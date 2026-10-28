@@ -6,6 +6,7 @@ Options de tri : title, price, created_at (défaut: -created_at).
 Recherche textuelle par titre.
 HTMX partial pour rechargement dynamique de la grille.
 """
+
 import pytest
 from django.urls import reverse
 
@@ -100,9 +101,9 @@ def catalogue_courses(db):
 
 # ── Accès ──────────────────────────────────────────────────
 
+
 @pytest.mark.django_db
 class TestCatalogueAccess:
-
     def test_anonymous_can_access(self, client, catalogue_courses):
         resp = client.get(reverse('catalogue'))
         assert resp.status_code == 200
@@ -120,9 +121,9 @@ class TestCatalogueAccess:
 
 # ── Seuls les cours publiés sont affichés ────────────────
 
+
 @pytest.mark.django_db
 class TestCatalogueOnlyPublished:
-
     def test_published_courses_visible(self, client, catalogue_courses):
         resp = client.get(reverse('catalogue'))
         content = resp.content.decode()
@@ -138,9 +139,9 @@ class TestCatalogueOnlyPublished:
 
 # ── Tri par titre ────────────────────────────────────────
 
+
 @pytest.mark.django_db
 class TestCatalogueSortTitle:
-
     def test_sort_title_asc(self, client, catalogue_courses):
         resp = client.get(reverse('catalogue'), {'sort': 'title'})
         content = resp.content.decode()
@@ -159,9 +160,9 @@ class TestCatalogueSortTitle:
 
 # ── Tri par prix ─────────────────────────────────────────
 
+
 @pytest.mark.django_db
 class TestCatalogueSortPrice:
-
     def test_sort_price_asc(self, client, catalogue_courses):
         resp = client.get(reverse('catalogue'), {'sort': 'price'})
         content = resp.content.decode()
@@ -181,9 +182,9 @@ class TestCatalogueSortPrice:
 
 # ── Tri par date ─────────────────────────────────────────
 
+
 @pytest.mark.django_db
 class TestCatalogueSortDate:
-
     def test_default_is_newest_first(self, client, catalogue_courses):
         """Sans ?sort, les plus récents apparaissent d'abord."""
         resp = client.get(reverse('catalogue'))
@@ -203,9 +204,9 @@ class TestCatalogueSortDate:
 
 # ── Tri invalide → défaut ───────────────────────────────
 
+
 @pytest.mark.django_db
 class TestCatalogueInvalidSort:
-
     def test_invalid_sort_fallback(self, client, catalogue_courses):
         resp = client.get(reverse('catalogue'), {'sort': 'hacked'})
         assert resp.status_code == 200
@@ -213,9 +214,9 @@ class TestCatalogueInvalidSort:
 
 # ── Recherche ────────────────────────────────────────────
 
+
 @pytest.mark.django_db
 class TestCatalogueSearch:
-
     def test_search_finds_match(self, client, catalogue_courses):
         resp = client.get(reverse('catalogue'), {'q': 'python'})
         content = resp.content.decode()
@@ -236,9 +237,9 @@ class TestCatalogueSearch:
 
 # ── HTMX partial ────────────────────────────────────────
 
+
 @pytest.mark.django_db
 class TestCatalogueHTMX:
-
     def test_htmx_returns_partial(self, client, catalogue_courses):
         resp = client.get(
             reverse('catalogue'),
@@ -263,9 +264,9 @@ class TestCatalogueHTMX:
 
 # ── Filtrage par catégorie ─────────────────────────────
 
+
 @pytest.mark.django_db
 class TestCatalogueCategoryFilter:
-
     def test_category_filter_shows_matching_only(self, client, courses_with_categories):
         """?category=python ne retourne que les cours de cette catégorie."""
         resp = client.get(reverse('catalogue'), {'category': 'python'})
@@ -317,9 +318,9 @@ class TestCatalogueCategoryFilter:
 
 # ── Pills HTMX — pas de redirection native ──────────────
 
+
 @pytest.mark.django_db
 class TestCataloguePillsHTMX:
-
     def test_pills_have_hx_get_attribute(self, client, courses_with_categories):
         """Les pills ont hx-get, pas de <a href> redirigé."""
         resp = client.get(reverse('catalogue'))
@@ -348,9 +349,9 @@ class TestCataloguePillsHTMX:
 
 # ── Page dédiée (pas le hero) ────────────────────────────
 
+
 @pytest.mark.django_db
 class TestCatalogueIsDedicated:
-
     def test_has_catalogue_title(self, client, catalogue_courses):
         """La page doit avoir un titre 'Catalogue' visible."""
         resp = client.get(reverse('catalogue'))

@@ -15,12 +15,14 @@ class Coupon(models.Model):
     discount_percent = models.IntegerField(
         "Réduction (%)",
         validators=[MinValueValidator(1), MaxValueValidator(100)],
-        help_text="Pourcentage de réduction (ex: 20 pour 20%)"
+        help_text="Pourcentage de réduction (ex: 20 pour 20%)",
     )
     is_active = models.BooleanField("Actif ?", default=True)
 
     valid_from = models.DateTimeField("Valable à partir du", default=timezone.now, help_text="Date de début")
-    valid_until = models.DateTimeField("Valable jusqu'au", null=True, blank=True, help_text="Laisser vide pour illimité")
+    valid_until = models.DateTimeField(
+        "Valable jusqu'au", null=True, blank=True, help_text="Laisser vide pour illimité"
+    )
 
     def __str__(self):
         return f"{self.code} (-{self.discount_percent}%)"
@@ -38,6 +40,7 @@ class Coupon(models.Model):
         """Prix après application de la réduction."""
         return price - (price * self.discount_percent) / 100
 
+
 # --- MODÈLE DEMANDE D'ACCÈS ---
 class AccessRequest(models.Model):
     STATUS_CHOICES = (
@@ -51,12 +54,12 @@ class AccessRequest(models.Model):
 
     # SÉCURITÉ RENFORCÉE ICI
     payment_proof = models.ImageField(
-        upload_to=get_upload_path, # Renommage UUID
+        upload_to=get_upload_path,  # Renommage UUID
         help_text="Reçu CCP/BaridiMob (JPG, PNG)",
         validators=[
-            FileExtensionValidator(allowed_extensions=IMAGE_EXTENSIONS), # Que des images
-            FileSizeValidator(max_mb=5) # Max 5 Mo
-        ]
+            FileExtensionValidator(allowed_extensions=IMAGE_EXTENSIONS),  # Que des images
+            FileSizeValidator(max_mb=5),  # Max 5 Mo
+        ],
     )
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
@@ -69,6 +72,7 @@ class AccessRequest(models.Model):
     def __str__(self):
         return f"{self.student.email} -> {self.course.title}"
 
+
 # --- MODÈLE CODE D'ACTIVATION ---
 class ActivationCode(models.Model):
     code = models.CharField(max_length=50, unique=True, default=uuid.uuid4)
@@ -80,9 +84,11 @@ class ActivationCode(models.Model):
     def __str__(self):
         return f"Code {self.course.title}"
 
+
 # --- INSCRIPTION (cours gratuits) ---
 class Enrollment(models.Model):
     """Inscription explicite à un cours (gratuit uniquement)."""
+
     student = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

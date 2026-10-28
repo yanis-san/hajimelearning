@@ -7,17 +7,16 @@ from courses.models import StudentProgress
 
 @pytest.mark.django_db
 class TestInstructorDashboard:
-
     @pytest.fixture
     def course_with_content(self, course):
-        """ Un cours avec 2 leçons pour faciliter les calculs (1 leçon = 50%) """
+        """Un cours avec 2 leçons pour faciliter les calculs (1 leçon = 50%)"""
         module = course.modules.create(title="Module 1", order=1)
         l1 = module.lessons.create(title="Leçon 1", slug="l1", order=1)
         l2 = module.lessons.create(title="Leçon 2", slug="l2", order=2)
         return course, l1, l2
 
     def test_dashboard_access_denied_for_student(self, client, student, course):
-        """ Un étudiant ne doit PAS pouvoir voir le tableau de bord prof """
+        """Un étudiant ne doit PAS pouvoir voir le tableau de bord prof"""
         client.force_login(student)
         url = reverse('manage_course_students', args=[course.slug])
 
@@ -26,7 +25,7 @@ class TestInstructorDashboard:
         assert response.status_code == 302
 
     def test_dashboard_stats_calculation(self, client, admin_user, student, course_with_content):
-        """ Vérifie que le calcul de progression (50%) est correct """
+        """Vérifie que le calcul de progression (50%) est correct"""
         course, l1, l2 = course_with_content
 
         # 1. On inscrit l'étudiant (Via CCP validé)
@@ -46,15 +45,16 @@ class TestInstructorDashboard:
         stats = response.context['student_stats']
         assert len(stats) == 1
         assert stats[0]['user'] == student
-        assert stats[0]['percent'] == 50 # 1 leçon sur 2
+        assert stats[0]['percent'] == 50  # 1 leçon sur 2
         assert stats[0]['completed'] == 1
 
     def test_dashboard_includes_code_users(self, client, admin_user, course_with_content):
-        """ Vérifie qu'un étudiant inscrit via CODE apparaît aussi """
+        """Vérifie qu'un étudiant inscrit via CODE apparaît aussi"""
         course, l1, l2 = course_with_content
 
         # On crée un 2ème étudiant à la volée
         from users.models import User
+
         student2 = User.objects.create_user(email="code@test.com", password="pw")
 
         # Il utilise un code

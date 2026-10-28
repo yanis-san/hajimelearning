@@ -1,4 +1,5 @@
 """Garde-fous ajoutés lors du nettoyage : portée des réordonnancements, validation du quiz, slugs."""
+
 import json
 
 import pytest
@@ -13,18 +14,38 @@ from users.models import User
 
 def _make_instructor(email):
     user = User.objects.create_user(email=email, password='password123')
-    plan, _ = InstructorPlan.objects.get_or_create(slug='test', defaults={'name': 'Test', 'price': 0, 'max_courses': 5, 'max_modules_per_course': 5, 'max_lessons_per_course': 5, 'revenue_percent': 0})
+    plan, _ = InstructorPlan.objects.get_or_create(
+        slug='test',
+        defaults={
+            'name': 'Test',
+            'price': 0,
+            'max_courses': 5,
+            'max_modules_per_course': 5,
+            'max_lessons_per_course': 5,
+            'revenue_percent': 0,
+        },
+    )
     InstructorProfile.objects.create(
-        user=user, plan=plan, is_active=True,
-        max_courses=5, max_modules_per_course=5, max_lessons_per_course=5, revenue_percent=0,
+        user=user,
+        plan=plan,
+        is_active=True,
+        max_courses=5,
+        max_modules_per_course=5,
+        max_lessons_per_course=5,
+        revenue_percent=0,
     )
     return user
 
 
 def _make_course(slug, instructor=None):
     return Course.objects.create(
-        title=slug, slug=slug, short_description='x', description='x',
-        price=0, is_published=True, instructor=instructor,
+        title=slug,
+        slug=slug,
+        short_description='x',
+        description='x',
+        price=0,
+        is_published=True,
+        instructor=instructor,
     )
 
 
@@ -83,19 +104,23 @@ class TestQuizValidation:
         lesson = module.lessons.create(title='L', slug='l', order=1)
         return ContentBlock.objects.create(lesson=lesson, type='quiz', order=1)
 
-    @pytest.mark.parametrize('payload', [
-        {'score': 11, 'total': 10},
-        {'score': -1, 'total': 10},
-        {'score': 1, 'total': 0},
-        {'score': 'abc', 'total': 10},
-        {'total': 10},
-    ])
+    @pytest.mark.parametrize(
+        'payload',
+        [
+            {'score': 11, 'total': 10},
+            {'score': -1, 'total': 10},
+            {'score': 1, 'total': 0},
+            {'score': 'abc', 'total': 10},
+            {'total': 10},
+        ],
+    )
     def test_invalid_scores_are_rejected(self, client, student, quiz_block, payload):
         AccessRequest.objects.create(student=student, course=quiz_block.lesson.module.course, status='APPROVED')
         client.force_login(student)
         response = client.post(
             reverse('save_quiz_result', args=[quiz_block.id]),
-            data=json.dumps(payload), content_type='application/json',
+            data=json.dumps(payload),
+            content_type='application/json',
         )
         assert response.status_code == 400
 
@@ -163,7 +188,11 @@ class TestTemplateComponents:
         lesson = module.lessons.create(title='L', slug='l', order=1)
         block = ContentBlock.objects.create(lesson=lesson, type='quiz', quiz_title='Quiz', order=1)
         block.questions.create(
-            question_text='<b>Q</b>', choice_a='A', choice_b='B', correct_answer='a', duration=10,
+            question_text='<b>Q</b>',
+            choice_a='A',
+            choice_b='B',
+            correct_answer='a',
+            duration=10,
         )
 
         client.force_login(admin_user)
@@ -194,3 +223,35 @@ class TestTemplateComponents:
                 if '<script' in line and ' src=' not in line and 'application/json' not in line:
                     offenders.append(f'{path}: {line.strip()}')
         assert not offenders, offenders
+
+
+@pytest.mark.django_db
+class TestMarkdownSanitization:
+    def test_md_filter_strips_dangerous_html(self):
+        from courses.templatetags.md import render_markdown
+
+        html = render_markdown(
+            '<script>alert(1)</script>\n\n<img src=x onerror=alert(1)>\n\n[clic](javascript:alert(1))\n\n**gras**'
+        )
+        assert '<script' not in html and 'onerror' not in html and 'javascript:' not in html
+        assert '<strong>gras</strong>' in html
+
+    def test_md_filter_keeps_furigana_tables_and_links(self):
+        from courses.templatetags.md import render_markdown
+
+        html = render_markdown('{漢字|かんじ}\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\n[site](https://example.com)')
+        assert '<ruby>漢字<rt>かんじ</rt></ruby>' in html
+        assert '<table>' in html
+        assert 'href="https://example.com"' in html and 'noopener' in html
+
+    def test_builder_preview_is_sanitized(self, client, admin_user):
+        client.force_login(admin_user)
+        response = client.post(reverse('preview_markdown'), {'text': '<script>x</script>**ok**'})
+        content = response.content.decode()
+        assert '<script>' not in content and '<strong>ok</strong>' in content
+
+    def test_faq_and_testimonial_names_are_escaped(self):
+        from courses.templatetags.md import faq_items, testimonial_items
+
+        assert '<img' not in str(faq_items('### <img src=x onerror=1>\nreponse')[0][0])
+        assert '<img' not in str(testimonial_items('### ★★★★★ | <img src=x onerror=1>\ntexte')[0]['name'])

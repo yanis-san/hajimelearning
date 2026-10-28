@@ -17,6 +17,7 @@ class AccessRequestInline(TabularInline):
     can_delete = True
     verbose_name = "Accès via Preuve/CCP"
 
+
 class ActivationCodeInline(TabularInline):
     model = ActivationCode
     fk_name = 'used_by'
@@ -25,6 +26,7 @@ class ActivationCodeInline(TabularInline):
     readonly_fields = ['course', 'code', 'used_at']
     can_delete = True
     verbose_name = "Code d'Activation"
+
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin, ModelAdmin):
@@ -42,10 +44,13 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
     )
 
     add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'first_name', 'last_name'),
-        }),
+        (
+            None,
+            {
+                'classes': ('wide',),
+                'fields': ('email', 'password1', 'password2', 'first_name', 'last_name'),
+            },
+        ),
     )
 
     inlines = [AccessRequestInline, ActivationCodeInline]

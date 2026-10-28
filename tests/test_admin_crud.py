@@ -6,7 +6,6 @@ from courses.models import Course, Lesson, Module
 
 @pytest.mark.django_db
 class TestManageCourseList:
-
     def test_staff_can_access_course_list(self, client, admin_user, course):
         client.force_login(admin_user)
         resp = client.get(reverse('manage_course_list'))
@@ -25,7 +24,6 @@ class TestManageCourseList:
 
 @pytest.mark.django_db
 class TestManageCourseCreate:
-
     def test_get_form(self, client, admin_user):
         client.force_login(admin_user)
         resp = client.get(reverse('manage_course_create'))
@@ -62,7 +60,6 @@ class TestManageCourseCreate:
 
 @pytest.mark.django_db
 class TestManageCourseEdit:
-
     def test_edit_form_prefilled(self, client, admin_user, course):
         client.force_login(admin_user)
         resp = client.get(reverse('manage_course_edit', args=[course.slug]))
@@ -93,11 +90,7 @@ class TestManageCourseEdit:
             'description': 'Contenu',
             'price': 4000,
         }
-        resp = client.post(
-            reverse('manage_course_edit', args=[course.slug]),
-            data,
-            HTTP_HX_REQUEST='true'
-        )
+        resp = client.post(reverse('manage_course_edit', args=[course.slug]), data, HTTP_HX_REQUEST='true')
         assert resp.status_code == 200
         assert 'Sauvegardé' in resp.content.decode()
         course.refresh_from_db()
@@ -107,21 +100,16 @@ class TestManageCourseEdit:
     def test_edit_htmx_error(self, client, admin_user, course):
         client.force_login(admin_user)
         data = {
-            'title': '', # Title is required, should trigger error
+            'title': '',  # Title is required, should trigger error
             'slug': course.slug,
         }
-        resp = client.post(
-            reverse('manage_course_edit', args=[course.slug]),
-            data,
-            HTTP_HX_REQUEST='true'
-        )
+        resp = client.post(reverse('manage_course_edit', args=[course.slug]), data, HTTP_HX_REQUEST='true')
         assert resp.status_code == 400
         assert 'Erreur' in resp.content.decode()
 
 
 @pytest.mark.django_db
 class TestManageCourseDelete:
-
     def test_delete_course(self, client, admin_user, course):
         client.force_login(admin_user)
         resp = client.post(reverse('manage_course_delete', args=[course.slug]))
@@ -131,7 +119,6 @@ class TestManageCourseDelete:
 
 @pytest.mark.django_db
 class TestManageModules:
-
     @pytest.fixture
     def module(self, course):
         return course.modules.create(title='Module 1', order=1)
@@ -182,7 +169,6 @@ class TestManageModules:
 
 @pytest.mark.django_db
 class TestManageLessons:
-
     @pytest.fixture
     def module(self, course):
         return course.modules.create(title='Module Test', order=1)

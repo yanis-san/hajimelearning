@@ -21,11 +21,14 @@ def generate_certificate_pdf(completion_id):
 
         completion = CourseCompletion.objects.select_related('student', 'course').get(id=completion_id)
 
-        pdf_content = render_pdf('courses/certificate.html', {
-            'student': completion.student,
-            'course': completion.course,
-            'completed_at': completion.completed_at,
-        })
+        pdf_content = render_pdf(
+            'courses/certificate.html',
+            {
+                'student': completion.student,
+                'course': completion.course,
+                'completed_at': completion.completed_at,
+            },
+        )
 
         if not pdf_content:
             logger.error("Certificat vide (completion_id=%s)", completion_id)
@@ -35,7 +38,9 @@ def generate_certificate_pdf(completion_id):
         completion.certificate_pdf.save(filename, ContentFile(pdf_content), save=True)
         logger.info(
             "Certificat généré : complétion #%s (%s - %s)",
-            completion_id, completion.student.email, completion.course.title,
+            completion_id,
+            completion.student.email,
+            completion.course.title,
         )
     except Exception:
         logger.exception("Erreur génération certificat (completion_id=%s)", completion_id)

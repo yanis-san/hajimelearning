@@ -7,31 +7,24 @@ from support.models import Question, Response
 
 @pytest.mark.django_db
 class TestNotificationSystem:
-
     @pytest.fixture
     def question(self, student, course):
-        """ Crée une question de base pour le test """
+        """Crée une question de base pour le test"""
         module = course.modules.create(title="Mod", order=1)
         lesson = module.lessons.create(title="Lec", slug="lec", order=1)
         return Question.objects.create(
-            student=student, course=course, lesson=lesson,
-            title="Help", content="Besoin d'aide"
+            student=student, course=course, lesson=lesson, title="Help", content="Besoin d'aide"
         )
 
     def test_reply_triggers_notification(self, client, admin_user, question):
-        """ Vérifie que si le prof répond, l'élève reçoit une notif """
+        """Vérifie que si le prof répond, l'élève reçoit une notif"""
 
         # CORRECTION ICI : On vérifie les notifs de l'étudiant SEULEMENT.
         # (Car il y a déjà une notif pour l'admin suite à la création de la question)
         assert Notification.objects.filter(recipient=question.student).count() == 0
 
         # Action : Le prof répond à la question
-        Response.objects.create(
-            question=question,
-            author=admin_user,
-            content="Voici la solution",
-            is_instructor=True
-        )
+        Response.objects.create(question=question, author=admin_user, content="Voici la solution", is_instructor=True)
 
         # Résultat attendu : 1 notif pour l'étudiant
         # (On filtre encore pour ignorer la notif de l'admin)
@@ -43,12 +36,8 @@ class TestNotificationSystem:
         assert "Nouvelle réponse" in notif.title
 
     def test_mark_as_read(self, client, student):
-        """ Vérifie qu'on peut marquer une notif comme lue """
-        notif = Notification.objects.create(
-            recipient=student,
-            message="Test",
-            link="/dashboard/"
-        )
+        """Vérifie qu'on peut marquer une notif comme lue"""
+        notif = Notification.objects.create(recipient=student, message="Test", link="/dashboard/")
 
         client.force_login(student)
 
@@ -57,7 +46,7 @@ class TestNotificationSystem:
         try:
             url = reverse('mark_read_and_redirect', args=[notif.id])
         except NoReverseMatch:
-             # Fallback si tu utilises le nom HTMX de l'autre fichier de test
+            # Fallback si tu utilises le nom HTMX de l'autre fichier de test
             url = reverse('mark_notif_read', args=[notif.id])
 
         client.get(url) if 'redirect' in url else client.post(url)

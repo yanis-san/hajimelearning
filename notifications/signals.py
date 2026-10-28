@@ -19,6 +19,7 @@ INS = Notification.CATEGORY_INSTRUCTOR
 
 # ── 1. PROGRESSION ÉTUDIANT ──────────────────────────────────────────────────
 
+
 @receiver(post_save, sender=StudentProgress)
 def handle_progress_notifications(sender, instance, created, **kwargs):
     """Leçon validée → notif étudiant. Cours 100% → notif étudiant."""
@@ -26,8 +27,8 @@ def handle_progress_notifications(sender, instance, created, **kwargs):
         return
 
     student = instance.student
-    lesson  = instance.lesson
-    course  = lesson.module.course
+    lesson = instance.lesson
+    course = lesson.module.course
 
     # A. Leçon terminée
     Notification.objects.create(
@@ -36,17 +37,18 @@ def handle_progress_notifications(sender, instance, created, **kwargs):
         category=P,
         title="Leçon validée ✅",
         message=f"Bravo ! Vous avez terminé « {lesson.title} ».",
-        link=reverse('lesson_detail', kwargs={
-            'course_slug': course.slug,
-            'lesson_slug': lesson.slug,
-        }),
+        link=reverse(
+            'lesson_detail',
+            kwargs={
+                'course_slug': course.slug,
+                'lesson_slug': lesson.slug,
+            },
+        ),
     )
 
     # B. Cours entier terminé ?
-    total     = Lesson.objects.filter(module__course=course).count()
-    completed = StudentProgress.objects.filter(
-        student=student, lesson__module__course=course
-    ).count()
+    total = Lesson.objects.filter(module__course=course).count()
+    completed = StudentProgress.objects.filter(student=student, lesson__module__course=course).count()
 
     if total > 0 and completed == total:
         Notification.objects.create(
@@ -60,6 +62,7 @@ def handle_progress_notifications(sender, instance, created, **kwargs):
 
 
 # ── 2. RÉPONSE SUPPORT → ÉTUDIANT ────────────────────────────────────────────
+
 
 @receiver(post_save, sender=Response)
 def notify_student_on_reply(sender, instance, created, **kwargs):
@@ -85,6 +88,7 @@ def notify_student_on_reply(sender, instance, created, **kwargs):
 
 # ── 2b. QUESTION RÉSOLUE → ÉTUDIANT ─────────────────────────────────────────
 
+
 @receiver(pre_save, sender=Question)
 def notify_student_on_resolved(sender, instance, **kwargs):
     """Quand le statut d'une question passe à RESOLVED → notifie l'étudiant."""
@@ -109,6 +113,7 @@ def notify_student_on_resolved(sender, instance, **kwargs):
 
 
 # ── 3. NOUVELLE QUESTION → INSTRUCTEUR + ADMINS ───────────────────────────────
+
 
 @receiver(post_save, sender=Question)
 def notify_instructors_on_new_question(sender, instance, created, **kwargs):

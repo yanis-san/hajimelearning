@@ -7,9 +7,8 @@ from courses.models import Course
 
 @pytest.mark.django_db
 class TestDashboardLogic:
-
     def test_dashboard_shows_only_purchased_courses(self, client, student):
-        """ Le dashboard ne doit montrer que les cours payés et validés """
+        """Le dashboard ne doit montrer que les cours payés et validés"""
         # 1. Cours Payé NON acheté
         Course.objects.create(title="Payant 1", slug="p1", price=1000, is_published=True)
 

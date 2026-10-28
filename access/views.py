@@ -16,6 +16,7 @@ from .utils import generate_receipt_pdf
 
 logger = logging.getLogger(__name__)
 
+
 @require_POST
 def validate_coupon(request, course_id):
     course = get_object_or_404(Course, id=course_id)
@@ -46,7 +47,7 @@ def validate_coupon(request, course_id):
 
 
 @login_required
-@transaction.atomic # <--- SÉCURITÉ 1 : Tout ou rien
+@transaction.atomic  # <--- SÉCURITÉ 1 : Tout ou rien
 def request_course_access(request, course_id):
     course = get_object_or_404(Course, id=course_id, is_published=True)
 
@@ -68,7 +69,6 @@ def request_course_access(request, course_id):
     code_form = CodeActivationForm()
 
     if request.method == 'POST':
-
         # --- CAS A : PAIEMENT PREUVE ---
         if 'submit_proof' in request.POST:
             if existing_req and existing_req.status == 'REJECTED':
@@ -80,8 +80,8 @@ def request_course_access(request, course_id):
                 # On vérifie encore une fois le doublon au dernier moment
                 # (Sauf si on update une rejetée)
                 if not existing_req and AccessRequest.objects.filter(student=request.user, course=course).exists():
-                     messages.warning(request, "Une demande existe déjà.")
-                     return redirect('course_detail', course_slug=course.slug)
+                    messages.warning(request, "Une demande existe déjà.")
+                    return redirect('course_detail', course_slug=course.slug)
 
                 req = proof_form.save(commit=False)
                 req.student = request.user
@@ -137,11 +137,9 @@ def request_course_access(request, course_id):
                 except ActivationCode.DoesNotExist:
                     messages.error(request, "Code invalide.")
 
-    return render(request, 'access/request_form.html', {
-        'proof_form': proof_form,
-        'code_form': code_form,
-        'course': course
-    })
+    return render(
+        request, 'access/request_form.html', {'proof_form': proof_form, 'code_form': code_form, 'course': course}
+    )
 
 
 @login_required
@@ -163,7 +161,9 @@ def download_receipt(request, request_id):
     # Seul l'étudiant concerné peut télécharger un reçu, et uniquement une fois le paiement validé
     access_req = get_object_or_404(
         AccessRequest.objects.select_related('course', 'applied_coupon'),
-        id=request_id, student=request.user, status='APPROVED',
+        id=request_id,
+        student=request.user,
+        status='APPROVED',
     )
 
     # Génération du PDF

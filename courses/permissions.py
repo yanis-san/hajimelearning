@@ -2,6 +2,7 @@
 Permissions pour le builder de cours.
 Permet aux staff ET aux instructeurs (propriétaires) d'utiliser le builder.
 """
+
 from functools import wraps
 
 from django.http import Http404
@@ -16,19 +17,19 @@ def _has_builder_access(user):
         return False
     if user.is_staff:
         return True
-    try:
-        return user.instructor_profile.is_active
-    except Exception:
-        return False
+    profile = getattr(user, 'instructor_profile', None)
+    return bool(profile and profile.is_active)
 
 
 def builder_access_required(view_func):
     """Décorateur : autorise staff + instructeurs actifs."""
+
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if not _has_builder_access(request.user):
             return redirect('account_login')
         return view_func(request, *args, **kwargs)
+
     return wrapper
 
 

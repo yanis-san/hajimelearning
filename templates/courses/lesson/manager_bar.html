@@ -1,0 +1,51 @@
+{% load md progress_tags %}
+{% if is_manager or user.is_staff %}
+  <div x-data="{ openBar: false }" class="bg-gray-950 text-white border-b-2 border-primary py-2 px-3 sm:px-4 shadow-md sticky top-16 z-30 transition-all">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-3 text-xs sm:text-sm font-bold">
+      <div class="flex items-center justify-between gap-2 min-w-0">
+        <div class="flex items-center gap-2 min-w-0">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded bg-primary text-white text-xs font-black shadow-sm shrink-0">⚙️</span>
+          <span class="text-gray-300 shrink-0">Mode Gestion :</span>
+          <span class="text-white truncate max-w-[160px] sm:max-w-xs">{{ lesson.title }}</span>
+        </div>
+
+        <button type="button"
+                x-on:click="openBar = !openBar"
+                class="md:hidden inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-800 hover:bg-gray-700 text-yellow-300 text-xs font-bold border border-gray-700 shrink-0 cursor-pointer transition active:scale-95"
+                title="Afficher ou masquer les outils de gestion">
+          <span x-text="openBar ? 'Réduire ▴' : '🛠️ Outils ▾'"></span>
+        </button>
+      </div>
+
+      <div :class="openBar ? 'flex' : 'hidden md:flex'"
+           class="items-center gap-2 flex-wrap pt-2 md:pt-0 border-t border-gray-800 md:border-t-0">
+        <a href="{% url 'manage_lesson_content' course.slug lesson.slug %}"
+           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary hover:bg-primary-dark text-white rounded-lg transition shadow-sm"
+           title="Modifier les blocs de texte, quiz, anki de cette leçon">
+          ✏️ Builder de cette leçon
+        </a>
+        <a href="{% url 'manage_module_lessons' course.slug lesson.module.id %}"
+           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-200 hover:text-white rounded-lg border border-gray-700 transition"
+           title="Ajouter, supprimer ou réordonner les leçons de ce module">
+          📦 Leçons du module
+        </a>
+        <a href="{% url 'manage_course_modules' course.slug %}"
+           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-200 hover:text-white rounded-lg border border-gray-700 transition"
+           title="Gérer l'ensemble des modules du cours">
+          🗂️ Structure du cours
+        </a>
+        <a href="{% url 'manage_course_edit' course.slug %}"
+           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-200 hover:text-white rounded-lg border border-gray-700 transition"
+           title="Paramètres, prix et informations du cours">
+          ⚙️ Paramètres
+        </a>
+        <button type="button"
+                x-on:click="$dispatch('open-furigana-guide')"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-yellow-400 hover:bg-yellow-300 text-gray-950 font-bold rounded-lg transition shadow-sm cursor-pointer"
+                title="Consulter le guide et copier des modèles furigana">
+          💡 Guide Furigana
+        </button>
+      </div>
+    </div>
+  </div>
+{% endif %}

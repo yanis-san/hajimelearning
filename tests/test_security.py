@@ -4,9 +4,8 @@ from django.urls import reverse
 
 @pytest.mark.django_db
 class TestSecurity:
-
     def test_student_cannot_access_builder(self, client, student, course):
-        """ Un étudiant ne doit PAS voir le Builder """
+        """Un étudiant ne doit PAS voir le Builder"""
         # On crée une leçon pour avoir une URL valide
         module = course.modules.create(title="Mod", order=1)
         lesson = module.lessons.create(title="Lecon", slug="lecon", order=1)
@@ -22,7 +21,7 @@ class TestSecurity:
         assert response.status_code == 302
 
     def test_student_cannot_add_block(self, client, student, course):
-        """ Un étudiant ne doit PAS pouvoir poster un bloc """
+        """Un étudiant ne doit PAS pouvoir poster un bloc"""
         module = course.modules.create(title="Mod", order=1)
         lesson = module.lessons.create(title="Lecon", slug="lecon", order=1)
 

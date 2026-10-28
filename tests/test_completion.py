@@ -13,9 +13,7 @@ class TestCourseCompletion:
         module = course.modules.create(title="Module A", order=1, is_published=True)
         lessons = []
         for i in range(1, n + 1):
-            lesson = module.lessons.create(
-                title=f"Leçon {i}", slug=f"lecon-{i}", order=i, is_published=True
-            )
+            lesson = module.lessons.create(title=f"Leçon {i}", slug=f"lecon-{i}", order=i, is_published=True)
             lessons.append(lesson)
         return lessons
 
@@ -42,6 +40,7 @@ class TestCourseCompletion:
         est créé automatiquement.
         """
         from access.models import AccessRequest
+
         AccessRequest.objects.create(student=student, course=course, status='APPROVED', final_price=0)
         client.force_login(student)
 
@@ -51,10 +50,13 @@ class TestCourseCompletion:
         StudentProgress.objects.create(student=student, lesson=lessons[0])
 
         # Marquer la dernière leçon via la vue
-        url = reverse('mark_lesson_complete', kwargs={
-            'course_slug': course.slug,
-            'lesson_slug': lessons[1].slug,
-        })
+        url = reverse(
+            'mark_lesson_complete',
+            kwargs={
+                'course_slug': course.slug,
+                'lesson_slug': lessons[1].slug,
+            },
+        )
         client.post(url)
 
         assert CourseCompletion.objects.filter(student=student, course=course).exists()
@@ -62,16 +64,20 @@ class TestCourseCompletion:
     def test_no_completion_when_lessons_remain(self, client, student, course):
         """Pas de CourseCompletion si des leçons restent non terminées."""
         from access.models import AccessRequest
+
         AccessRequest.objects.create(student=student, course=course, status='APPROVED', final_price=0)
         client.force_login(student)
 
         lessons = self._setup_course_with_lessons(course, n=3)
 
         # Marquer uniquement la première leçon via la vue (2 restantes)
-        url = reverse('mark_lesson_complete', kwargs={
-            'course_slug': course.slug,
-            'lesson_slug': lessons[0].slug,
-        })
+        url = reverse(
+            'mark_lesson_complete',
+            kwargs={
+                'course_slug': course.slug,
+                'lesson_slug': lessons[0].slug,
+            },
+        )
         client.post(url)
 
         assert not CourseCompletion.objects.filter(student=student, course=course).exists()
@@ -82,16 +88,20 @@ class TestCourseCompletion:
         on ne crée pas de doublon.
         """
         from access.models import AccessRequest
+
         AccessRequest.objects.create(student=student, course=course, status='APPROVED', final_price=0)
         client.force_login(student)
 
         lessons = self._setup_course_with_lessons(course, n=1)
         CourseCompletion.objects.create(student=student, course=course)
 
-        url = reverse('mark_lesson_complete', kwargs={
-            'course_slug': course.slug,
-            'lesson_slug': lessons[0].slug,
-        })
+        url = reverse(
+            'mark_lesson_complete',
+            kwargs={
+                'course_slug': course.slug,
+                'lesson_slug': lessons[0].slug,
+            },
+        )
         client.post(url)
 
         assert CourseCompletion.objects.filter(student=student, course=course).count() == 1
@@ -129,6 +139,7 @@ class TestCourseCompletion:
     def test_download_certificate_returns_pdf(self, client, student, course, tmp_path):
         """Retourne un PDF si le fichier est présent."""
         from django.core.files.base import ContentFile
+
         client.force_login(student)
 
         completion = CourseCompletion.objects.create(student=student, course=course)
@@ -148,6 +159,7 @@ class TestCourseCompletion:
     def test_dashboard_shows_completed_course_ids(self, client, student, course):
         """Le dashboard passe les IDs des cours complétés en contexte."""
         from access.models import AccessRequest
+
         AccessRequest.objects.create(student=student, course=course, status='APPROVED', final_price=0)
         client.force_login(student)
 
@@ -159,11 +171,10 @@ class TestCourseCompletion:
         assert response.status_code == 200
         assert course.id in response.context['completed_course_ids']
 
-    def test_dashboard_empty_completed_ids_for_student_without_completion(
-        self, client, student, course
-    ):
+    def test_dashboard_empty_completed_ids_for_student_without_completion(self, client, student, course):
         """Pas de cours complétés → set vide."""
         from access.models import AccessRequest
+
         AccessRequest.objects.create(student=student, course=course, status='APPROVED', final_price=0)
         client.force_login(student)
 

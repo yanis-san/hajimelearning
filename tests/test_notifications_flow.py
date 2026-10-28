@@ -6,7 +6,6 @@ from notifications.models import Notification
 
 @pytest.mark.django_db
 class TestNotificationFlow:
-
     def test_htmx_mark_read_updates_db_and_returns_html(self, client, student):
         """
         Test Robuste du Flux HTMX :
@@ -32,9 +31,7 @@ class TestNotificationFlow:
 
         # 3. Vérification BDD
         notif.refresh_from_db()
-        assert (
-            notif.is_read is True
-        ), "La notification doit être marquée comme lue en base."
+        assert notif.is_read is True, "La notification doit être marquée comme lue en base."
 
         # 4. Analyse du HTML reçu
         html = response.content.decode()
@@ -55,15 +52,9 @@ class TestNotificationFlow:
         quand il reste d'autres notifications non lues.
         """
         # On crée 3 notifs : 2 non lues, 1 lue
-        n1 = Notification.objects.create(
-            recipient=student, title="N1", is_read=False
-        )
-        Notification.objects.create(
-            recipient=student, title="N2", is_read=False
-        )
-        Notification.objects.create(
-            recipient=student, title="N3", is_read=True
-        )
+        n1 = Notification.objects.create(recipient=student, title="N1", is_read=False)
+        Notification.objects.create(recipient=student, title="N2", is_read=False)
+        Notification.objects.create(recipient=student, title="N3", is_read=True)
 
         client.force_login(student)
 
@@ -96,14 +87,10 @@ class TestNotificationFlow:
         notif.refresh_from_db()
         assert notif.is_read is True
 
-    def test_security_cannot_read_others_notif(
-        self, client, student, django_user_model
-    ):
+    def test_security_cannot_read_others_notif(self, client, student, django_user_model):
         """Un étudiant ne peut pas marquer lue la notif d'un autre"""
         # Un autre utilisateur (Hacker)
-        hacker = django_user_model.objects.create_user(
-            email="hacker@test.com", password="password"
-        )
+        hacker = django_user_model.objects.create_user(email="hacker@test.com", password="password")
 
         # Une notif qui appartient à 'student'
         notif = Notification.objects.create(recipient=student, is_read=False)

@@ -6,6 +6,7 @@ from users.models import User
 
 # --- CELERY : exécution synchrone en tests (pas de broker requis) ---
 
+
 @pytest.fixture(autouse=True)
 def celery_eager():
     """Force Celery à exécuter les tâches en local sans broker."""
@@ -17,6 +18,7 @@ def celery_eager():
 
 # --- INSTRUCTEURS : inscription ouverte en tests (fermée en prod) ---
 
+
 @pytest.fixture(autouse=True)
 def instructor_signup_enabled(settings):
     settings.INSTRUCTOR_SIGNUP_ENABLED = True
@@ -24,29 +26,27 @@ def instructor_signup_enabled(settings):
 
 # --- UTILISATEURS ---
 
+
 @pytest.fixture
 def student():
-    """ Un étudiant lambda """
+    """Un étudiant lambda"""
     return User.objects.create_user(
-        email='etudiant@test.com',
-        password='password123',
-        first_name='Yanis',
-        last_name='Test'
+        email='etudiant@test.com', password='password123', first_name='Yanis', last_name='Test'
     )
+
 
 @pytest.fixture
 def admin_user():
-    """ Un super admin """
-    return User.objects.create_superuser(
-        email='admin@test.com',
-        password='password123'
-    )
+    """Un super admin"""
+    return User.objects.create_superuser(email='admin@test.com', password='password123')
+
 
 # --- CONTENU ---
 
+
 @pytest.fixture
 def course():
-    """ Un cours payant standard """
+    """Un cours payant standard"""
     return Course.objects.create(
         title="Formation Python",
         slug="formation-python",
@@ -54,12 +54,13 @@ def course():
         short_description="Apprenez Python rapidement",
         description="# Titre\nContenu markdown",
         price=5000,
-        is_published=True
+        is_published=True,
     )
+
 
 @pytest.fixture
 def free_course():
-    """ Un cours gratuit """
+    """Un cours gratuit"""
     return Course.objects.create(
         title="Intro Gratuite",
         slug="intro-gratuite",
@@ -67,8 +68,9 @@ def free_course():
         short_description="Introduction gratuite",
         description="# Titre\nContenu markdown",
         price=0,
-        is_published=True
+        is_published=True,
     )
+
 
 # --- MOCKS GLOBAUX ---
 @pytest.fixture(autouse=True)

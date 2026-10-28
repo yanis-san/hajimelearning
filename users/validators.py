@@ -8,6 +8,7 @@ class SpecialCharacterValidator:
     """
     Valide que le mot de passe contient au moins un caractère spécial.
     """
+
     def validate(self, password, user=None):
         # Regex qui cherche n'importe quel symbole
         if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):

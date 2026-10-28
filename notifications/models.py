@@ -10,19 +10,20 @@ class Notification(models.Model):
     - 'instructor' : concerne l'instructeur (nouvelle question dans son cours,
                      nouvelle inscription, nouvelle demande d'accès…)
     """
-    TYPE_STUDENT    = 'student'
+
+    TYPE_STUDENT = 'student'
     TYPE_INSTRUCTOR = 'instructor'
     TYPE_CHOICES = (
-        (TYPE_STUDENT,    'Étudiant'),
+        (TYPE_STUDENT, 'Étudiant'),
         (TYPE_INSTRUCTOR, 'Instructeur'),
     )
 
-    CATEGORY_PROGRESS   = 'progress'
-    CATEGORY_SUPPORT    = 'support'
+    CATEGORY_PROGRESS = 'progress'
+    CATEGORY_SUPPORT = 'support'
     CATEGORY_INSTRUCTOR = 'instructor'
     CATEGORY_CHOICES = (
-        (CATEGORY_PROGRESS,   'Progression'),
-        (CATEGORY_SUPPORT,    'Support'),
+        (CATEGORY_PROGRESS, 'Progression'),
+        (CATEGORY_SUPPORT, 'Support'),
         (CATEGORY_INSTRUCTOR, 'Instructeur'),
     )
 
@@ -43,14 +44,14 @@ class Notification(models.Model):
         default=CATEGORY_PROGRESS,
         db_index=True,
     )
-    title   = models.CharField(max_length=100, null=True, blank=True, verbose_name="Titre")
+    title = models.CharField(max_length=100, null=True, blank=True, verbose_name="Titre")
     message = models.CharField(max_length=255)
-    link    = models.CharField(max_length=255, help_text="Lien vers la discussion ou le cours")
+    link = models.CharField(max_length=255, help_text="Lien vers la discussion ou le cours")
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-created_at'] # Les plus récentes en premier
+        ordering = ['-created_at']  # Les plus récentes en premier
 
     def __str__(self):
         titre_aff = self.title if self.title else "Notification"

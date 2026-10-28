@@ -1,4 +1,5 @@
 """Filtres de template pour la progression et le sommaire des cours."""
+
 from django import template
 
 register = template.Library()

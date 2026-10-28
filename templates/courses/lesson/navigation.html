@@ -1,0 +1,47 @@
+{% load md progress_tags %}
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-6 mb-12 mt-12 pt-8 border-t-2 border-gray-100">
+      
+      <div>
+        {% if prev_lesson %}
+          <c-ui.btn href="{% url 'lesson_detail' course.slug prev_lesson.slug %}" variant="outline" size="md">
+            ← Précédent
+          </c-ui.btn>
+        {% endif %}
+      </div>
+
+      <div class="flex items-center gap-4 flex-wrap justify-center sm:justify-end"
+           x-data="lessonCompletion('{% if course.completion_sound %}{{ course.completion_sound.url }}{% endif %}')">
+        
+        {% if lesson.id in completed_lesson_ids %}
+          <div class="flex items-center gap-2 mr-2">
+            <span class="flex items-center gap-2 text-sm font-bold tracking-widest text-gray-900 bg-white border-2 border-gray-900 rounded-xl px-4 py-2 shadow-sm transform -rotate-1 manga-drawn">
+              <svg class="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Terminée
+            </span>
+            <form method="POST" action="{% url 'unmark_lesson_complete' course_slug=course.slug lesson_slug=lesson.slug %}">
+              {% csrf_token %}
+              <button type="submit" class="text-xs text-red-500 hover:text-red-700 underline px-2 py-1 font-semibold cursor-pointer">Annuler</button>
+            </form>
+          </div>
+        {% else %}
+          <form method="POST" action="{% url 'mark_lesson_complete' course_slug=course.slug lesson_slug=lesson.slug %}" class="mr-2">
+            {% csrf_token %}
+            <c-ui.btn type="submit" variant="secondary" size="md" x-on:click="playAndSubmit($event)">
+              Valider la leçon
+            </c-ui.btn>
+          </form>
+        {% endif %}
+
+        {% if next_lesson %}
+          <c-ui.btn href="{% url 'lesson_detail' course.slug next_lesson.slug %}" variant="primary" size="md">
+            Suivant →
+          </c-ui.btn>
+        {% else %}
+          <c-ui.btn href="{% url 'course_detail' course.slug %}" variant="primary" size="md">
+            Fin de la formation 🎓
+          </c-ui.btn>
+        {% endif %}
+      </div>
+    </div>

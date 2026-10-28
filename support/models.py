@@ -13,7 +13,9 @@ class Question(models.Model):
 
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='questions')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, null=True, blank=True, help_text="La leçon concernée (optionnel)")
+    lesson = models.ForeignKey(
+        Lesson, on_delete=models.SET_NULL, null=True, blank=True, help_text="La leçon concernée (optionnel)"
+    )
 
     title = models.CharField("Sujet", max_length=200)
     content = models.TextField("Votre question")
@@ -25,8 +27,10 @@ class Question(models.Model):
     def __str__(self):
         return f"{self.title} ({self.student.email})"
 
+
 class Response(models.Model):
-    """ Une réponse (de l'admin ou de l'élève) """
+    """Une réponse (de l'admin ou de l'élève)"""
+
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='responses')
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField("Réponse")

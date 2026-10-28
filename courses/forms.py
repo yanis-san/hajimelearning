@@ -10,7 +10,7 @@ from .models import ContentBlock, Course, LandingSection, Lesson, Module, QuizQu
 class ContentBlockForm(forms.ModelForm):
     class Meta:
         model = ContentBlock
-        fields = ['title','text_content', 'video_id', 'file_content','related_file', 'quiz_title']
+        fields = ['title', 'text_content', 'video_id', 'file_content', 'related_file', 'quiz_title']
 
     def clean_title(self):
         return self.cleaned_data.get('title') or None
@@ -19,30 +19,46 @@ class ContentBlockForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Styling Tailwind
         for field in self.fields:
-            self.fields[field].widget.attrs.update({
-                'class': 'w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition'
-            })
+            self.fields[field].widget.attrs.update(
+                {
+                    'class': 'w-full px-4 py-2.5 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition'
+                }
+            )
         self.fields['title'].widget.attrs.update({'placeholder': 'Titre du bloc'})
-        self.fields['text_content'].widget.attrs.update({
-            'rows': 12,
-            'placeholder': 'Votre texte (Markdown)...',
-            'class': 'w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition font-mono text-sm resize-y',
-        })
+        self.fields['text_content'].widget.attrs.update(
+            {
+                'rows': 12,
+                'placeholder': 'Votre texte (Markdown)...',
+                'class': 'w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent transition font-mono text-sm resize-y',
+            }
+        )
         self.fields['video_id'].widget.attrs.update({'placeholder': 'Ex: dQw4w9WgXcQ'})
         self.fields['quiz_title'].widget.attrs.update({'placeholder': 'Ex: Test de connaissances'})
-        self.fields['file_content'].widget.attrs.update({'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100'})
+        self.fields['file_content'].widget.attrs.update(
+            {
+                'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100'
+            }
+        )
+
 
 class QuizQuestionForm(forms.ModelForm):
     class Meta:
         model = QuizQuestion
-        fields = ['question_text', 'duration', 'choice_a', 'choice_b', 'choice_c', 'choice_d', 'correct_answer', 'explanation']
+        fields = [
+            'question_text',
+            'duration',
+            'choice_a',
+            'choice_b',
+            'choice_c',
+            'choice_d',
+            'correct_answer',
+            'explanation',
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields:
-            self.fields[field].widget.attrs.update({
-                'class': 'w-full p-2 border border-gray-300 rounded mb-2 text-sm'
-            })
+            self.fields[field].widget.attrs.update({'class': 'w-full p-2 border border-gray-300 rounded mb-2 text-sm'})
         # Petit style pour le temps
         self.fields['duration'].widget.attrs.update({'placeholder': 'Ex: 15'})
 
@@ -59,7 +75,9 @@ TAILWIND_TEXTAREA = (
     'placeholder-gray-400 focus:bg-white focus:outline-none focus:border-gray-900 '
     'focus:ring-2 focus:ring-gray-900/10 transition-all text-sm resize-y shadow-2xs hover:border-gray-400'
 )
-TAILWIND_CHECKBOX = 'w-5 h-5 rounded-md border-2 border-gray-300 text-gray-900 focus:ring-gray-900/20 transition cursor-pointer'
+TAILWIND_CHECKBOX = (
+    'w-5 h-5 rounded-md border-2 border-gray-300 text-gray-900 focus:ring-gray-900/20 transition cursor-pointer'
+)
 TAILWIND_FILE = (
     'block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-2 '
     'file:border-gray-900 file:text-xs file:font-bold file:bg-yellow-300 file:text-gray-950 '
@@ -78,20 +96,24 @@ class CourseForm(forms.ModelForm):
             'placeholder': "Courte phrase d'accroche (visible sur la carte du cours en page d'accueil)...",
         },
         'description': {
-            'class': MONO, 'rows': 12,
+            'class': MONO,
+            'rows': 12,
             'placeholder': 'Description complète et détaillée de la formation (Markdown supporté)...',
         },
         'what_you_will_learn': {
-            'class': MONO, 'rows': 6,
+            'class': MONO,
+            'rows': 6,
             'placeholder': '- Première compétence ou acquis\n- Deuxième compétence\n- Troisième point fort...',
         },
         'prerequisites': {
-            'class': MONO, 'rows': 4,
+            'class': MONO,
+            'rows': 4,
             'placeholder': 'Ex: Aucun prérequis, idéal pour débutant complet.',
         },
         'trailer_video_id': {'class': 'font-mono text-sm', 'placeholder': 'Ex: dQw4w9WgXcQ (ID YouTube ou lien)'},
         'meta_description': {
-            'rows': 3, 'maxlength': '160',
+            'rows': 3,
+            'maxlength': '160',
             'placeholder': 'Résumé percutant pour Google et les moteurs de recherche (max 160 caractères)...',
         },
         'keywords': {'placeholder': 'japonais, n5, jlpt, vocabulaire, kanji, cours'},
@@ -100,10 +122,21 @@ class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = [
-            'title', 'slug', 'short_description', 'description',
-            'what_you_will_learn', 'prerequisites', 'trailer_video_id',
-            'meta_description', 'keywords', 'price', 'thumbnail', 'cover_image',
-            'is_published', 'is_featured', 'hide_title_on_card',
+            'title',
+            'slug',
+            'short_description',
+            'description',
+            'what_you_will_learn',
+            'prerequisites',
+            'trailer_video_id',
+            'meta_description',
+            'keywords',
+            'price',
+            'thumbnail',
+            'cover_image',
+            'is_published',
+            'is_featured',
+            'hide_title_on_card',
         ]
         widgets = {
             'description': forms.Textarea(),
@@ -125,10 +158,12 @@ class CourseForm(forms.ModelForm):
             elif isinstance(widget, forms.FileInput):
                 widget.attrs['class'] = TAILWIND_FILE
             elif isinstance(widget, forms.Textarea):
-                widget.attrs.update({
-                    'class': TAILWIND_TEXTAREA,
-                    'rows': 6,
-                })
+                widget.attrs.update(
+                    {
+                        'class': TAILWIND_TEXTAREA,
+                        'rows': 6,
+                    }
+                )
             else:
                 widget.attrs['class'] = TAILWIND_INPUT
 
@@ -160,11 +195,21 @@ class CourseForm(forms.ModelForm):
 
 class InstructorCourseForm(CourseForm):
     """Formulaire cours pour instructeurs : pas de mise en avant ni d'options admin."""
+
     class Meta(CourseForm.Meta):
         fields = [
-            'title', 'slug', 'short_description', 'description',
-            'what_you_will_learn', 'prerequisites', 'trailer_video_id',
-            'meta_description', 'keywords', 'price', 'thumbnail', 'cover_image',
+            'title',
+            'slug',
+            'short_description',
+            'description',
+            'what_you_will_learn',
+            'prerequisites',
+            'trailer_video_id',
+            'meta_description',
+            'keywords',
+            'price',
+            'thumbnail',
+            'cover_image',
             'is_published',
         ]
         widgets = {
@@ -183,10 +228,12 @@ class ModuleForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['title'].widget.attrs.update({
-            'class': TAILWIND_INPUT,
-            'placeholder': 'Nom du module',
-        })
+        self.fields['title'].widget.attrs.update(
+            {
+                'class': TAILWIND_INPUT,
+                'placeholder': 'Nom du module',
+            }
+        )
 
 
 class LessonForm(forms.ModelForm):
@@ -196,14 +243,18 @@ class LessonForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['title'].widget.attrs.update({
-            'class': TAILWIND_INPUT,
-            'placeholder': 'Titre de la leçon',
-        })
-        self.fields['slug'].widget.attrs.update({
-            'class': TAILWIND_INPUT,
-            'placeholder': 'slug-de-la-lecon',
-        })
+        self.fields['title'].widget.attrs.update(
+            {
+                'class': TAILWIND_INPUT,
+                'placeholder': 'Titre de la leçon',
+            }
+        )
+        self.fields['slug'].widget.attrs.update(
+            {
+                'class': TAILWIND_INPUT,
+                'placeholder': 'slug-de-la-lecon',
+            }
+        )
         self.fields['slug'].required = False
         self.fields['slug'].help_text = 'Généré automatiquement si vide.'
         self.fields['is_free'].widget.attrs['class'] = TAILWIND_CHECKBOX
@@ -218,8 +269,18 @@ class LessonForm(forms.ModelForm):
 class LandingSectionForm(forms.ModelForm):
     class Meta:
         model = LandingSection
-        fields = ['title', 'body', 'image', 'video_id', 'subtitle',
-                  'cta_text', 'cta_url', 'image_position', 'css_class', 'background']
+        fields = [
+            'title',
+            'body',
+            'image',
+            'video_id',
+            'subtitle',
+            'cta_text',
+            'cta_url',
+            'image_position',
+            'css_class',
+            'background',
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -241,8 +302,10 @@ class LandingSectionForm(forms.ModelForm):
         self.fields['cta_text'].widget.attrs['placeholder'] = 'Ex: S\'inscrire maintenant'
         self.fields['cta_url'].widget.attrs['placeholder'] = 'Ex: #inscription ou https://...'
         self.fields['image_position'].required = False
-        self.fields['body'].widget.attrs.update({
-            'rows': 10,
-            'placeholder': 'Contenu Markdown…',
-            'class': TAILWIND_TEXTAREA + ' font-mono text-sm',
-        })
+        self.fields['body'].widget.attrs.update(
+            {
+                'rows': 10,
+                'placeholder': 'Contenu Markdown…',
+                'class': TAILWIND_TEXTAREA + ' font-mono text-sm',
+            }
+        )

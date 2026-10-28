@@ -1,0 +1,85 @@
+      {# ========================================================================= #}
+      {# ── ONGLET 3 : SEO & RÉFÉRENCEMENT (GOOGLE) ── #}
+      {# ========================================================================= #}
+      <div x-show="tab === 'seo'" x-cloak class="space-y-6">
+
+        {# Carte 1 : Meta Description & Google SERP Preview #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-6">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>🔍</span> Optimisation Google & Référencement (SEO)
+            </h2>
+            <span class="text-xs font-bold px-2.5 py-1 bg-blue-100 text-blue-800 rounded-lg border border-blue-200">
+              Moteurs de recherche
+            </span>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="id_meta_description" class="block text-xs font-black uppercase tracking-wider text-gray-800">
+                Meta Description (Google Snippet)
+              </label>
+              <div class="text-xs font-mono font-bold"
+                   :class="metaDescLength > 160 ? 'text-red-600' : (metaDescLength >= 120 ? 'text-emerald-600' : 'text-gray-400')">
+                <span x-text="metaDescLength">0</span> / 160 caractères
+              </div>
+            </div>
+            {{ form.meta_description }}
+            {% if form.meta_description.errors %}
+              <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                <span>⚠️</span> {{ form.meta_description.errors.0 }}
+              </p>
+            {% else %}
+              <p class="text-xs text-gray-500 font-medium mt-1.5">
+                Court résumé qui s'affiche sous le lien bleu dans les résultats de recherche Google. Idéal : 120 à 160 caractères.
+              </p>
+            {% endif %}
+          </div>
+
+          {# Mockup réaliste du résultat Google #}
+          <div class="p-5 rounded-xl border-2 border-gray-200 bg-stone-50/70 space-y-2">
+            <span class="text-xs font-black uppercase tracking-wider text-gray-600 flex items-center gap-1.5">
+              <span>👁️</span> Simulation du résultat dans Google :
+            </span>
+            <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-xs max-w-2xl font-sans">
+              <div class="flex items-center gap-2 text-xs text-gray-600 mb-1">
+                <span class="w-4 h-4 rounded-full bg-orange-500 text-white font-black text-[9px] flex items-center justify-center">H</span>
+                <span class="font-medium text-gray-700">Hajime Learning</span>
+                <span class="text-gray-400">› course › <span x-text="courseSlug || '{{ course.slug|default:'mon-cours' }}'"></span></span>
+              </div>
+              <h3 class="text-base text-blue-700 font-medium hover:underline cursor-pointer truncate leading-snug">
+                <span x-text="courseTitle || '{{ course.title|default:'Titre de la formation' }}'"></span> — Hajime Learning
+              </h3>
+              <p class="text-xs text-gray-600 mt-1 leading-relaxed line-clamp-2">
+                <span x-text="document.getElementById('id_meta_description')?.value || 'Découvrez cette formation en ligne sur Hajime Learning et progressez pas à pas avec nos modules interactifs.'"></span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {# Carte 2 : Mots-clés (Keywords) #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-4">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>🏷️</span> Mots-clés ciblés (Meta Keywords)
+            </h2>
+          </div>
+
+          <div>
+            <label for="id_keywords" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5">
+              Mots-clés de recherche
+            </label>
+            {{ form.keywords }}
+            {% if form.keywords.errors %}
+              <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                <span>⚠️</span> {{ form.keywords.errors.0 }}
+              </p>
+            {% else %}
+              <p class="text-xs text-gray-500 font-medium mt-1.5">
+                Séparez les mots-clés par des virgules (ex: <code>japonais, n5, débutant, jlpt, kanji, cours en ligne</code>).
+              </p>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>

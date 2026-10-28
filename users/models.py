@@ -2,14 +2,12 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import FileExtensionValidator
 from django.db import models
 
-# Assure-toi que le fichier validators.py existe bien dans l'app courses
 from courses.validators import IMAGE_EXTENSIONS, FileSizeValidator, get_upload_path
 
 from .managers import CustomUserManager
 
 
 class User(AbstractUser):
-
     # --- LISTE DES PAYS ---
     class Country(models.TextChoices):
         # Afrique du Nord & Moyen-Orient
@@ -61,12 +59,13 @@ class User(AbstractUser):
     # --- PHOTO DE PROFIL (AVATAR) ---
     avatar = models.ImageField(
         "Photo de profil",
-        upload_to=get_upload_path, # Renommage sécurisé
-        blank=True, null=True,
+        upload_to=get_upload_path,  # Renommage sécurisé
+        blank=True,
+        null=True,
         validators=[
             FileExtensionValidator(allowed_extensions=IMAGE_EXTENSIONS),
-            FileSizeValidator(max_mb=2) # Max 2 Mo
-        ]
+            FileSizeValidator(max_mb=2),  # Max 2 Mo
+        ],
     )
 
     # --- INFOS ---
@@ -74,12 +73,7 @@ class User(AbstractUser):
     address = models.CharField("Adresse", max_length=255, blank=True)
     city = models.CharField("Ville", max_length=100, blank=True)
 
-    country = models.CharField(
-        "Pays",
-        max_length=5,
-        choices=Country.choices,
-        default=Country.ALGERIA
-    )
+    country = models.CharField("Pays", max_length=5, choices=Country.choices, default=Country.ALGERIA)
 
     # --- INFOS DÉMOGRAPHIQUES ---
     gender = models.CharField("Sexe", max_length=1, choices=Gender.choices, blank=True, null=True)

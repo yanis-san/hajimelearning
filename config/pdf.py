@@ -1,4 +1,5 @@
 """Rendu PDF (xhtml2pdf) des templates HTML, feuilles de style statiques comprises."""
+
 import logging
 from io import BytesIO
 
@@ -13,7 +14,7 @@ def _resolve_static(uri, rel):
     from django.conf import settings
 
     if uri.startswith(settings.STATIC_URL):
-        return finders.find(uri[len(settings.STATIC_URL):]) or uri
+        return finders.find(uri[len(settings.STATIC_URL) :]) or uri
     return uri
 
 

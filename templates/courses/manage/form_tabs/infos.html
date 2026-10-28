@@ -1,0 +1,229 @@
+      {# ========================================================================= #}
+      {# ── ONGLET 1 : INFORMATIONS GÉNÉRALES ── #}
+      {# ========================================================================= #}
+      <div x-show="tab === 'infos'" x-cloak class="space-y-6">
+
+        {# Carte 1 : Identité & Description courte #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-6">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>📌</span> Identité de la formation
+            </h2>
+            <span class="text-xs font-bold px-2.5 py-1 bg-orange-100 text-orange-800 rounded-lg border border-orange-200">
+              Essentiel
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {# Titre #}
+            <div>
+              <label for="id_title" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between">
+                <span>Titre du cours</span>
+                <span class="text-red-500 font-bold">*</span>
+              </label>
+              {{ form.title }}
+              {% if form.title.errors %}
+                <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                  <span>⚠️</span> {{ form.title.errors.0 }}
+                </p>
+              {% else %}
+                <p class="text-xs text-gray-500 font-medium mt-1">Nom complet affiché aux apprenants.</p>
+              {% endif %}
+            </div>
+
+            {# Slug #}
+            <div>
+              <label for="id_slug" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between">
+                <span>Identifiant URL (Slug)</span>
+                <span class="text-gray-400 font-semibold lowercase">automatique si vide</span>
+              </label>
+              <div class="relative flex items-center">
+                <span class="absolute left-3 text-xs font-mono text-gray-400 pointer-events-none select-none">/course/</span>
+                <div class="w-full [&_input]:pl-20">
+                  {{ form.slug }}
+                </div>
+              </div>
+              {% if form.slug.errors %}
+                <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                  <span>⚠️</span> {{ form.slug.errors.0 }}
+                </p>
+              {% else %}
+                <p class="text-xs text-gray-500 font-medium mt-1">Adresse web unique du cours (ex: <code>japonais-n5</code>).</p>
+              {% endif %}
+            </div>
+          </div>
+
+          {# Accroche courte (short_description) #}
+          <div>
+            <label for="id_short_description" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between">
+              <span>Phrase d'accroche (Jaquette & Catalogue)</span>
+              <span class="text-xs font-semibold text-gray-400">Court (1-2 phrases)</span>
+            </label>
+            {{ form.short_description }}
+            {% if form.short_description.errors %}
+              <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                <span>⚠️</span> {{ form.short_description.errors.0 }}
+              </p>
+            {% else %}
+              <p class="text-xs text-gray-500 font-medium mt-1">
+                Texte d'impact qui résume la formation sur la carte d'accueil et le catalogue.
+              </p>
+            {% endif %}
+          </div>
+        </div>
+
+        {# Carte 2 : Tarification #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-4">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>💰</span> Tarification
+            </h2>
+            <span class="text-xs font-bold px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-lg border border-emerald-200">
+              Dinars Algériens
+            </span>
+          </div>
+
+          <div class="max-w-md">
+            <label for="id_price" class="block text-xs font-black uppercase tracking-wider text-gray-800 mb-1.5 flex items-center justify-between">
+              <span>Prix d'accès au cours</span>
+              <span class="text-xs text-emerald-700 font-bold">0 = Gratuit</span>
+            </label>
+            <div class="relative flex items-center">
+              {{ form.price }}
+              <div class="absolute right-3.5 px-2 py-0.5 bg-gray-200 text-gray-800 text-xs font-black rounded-md pointer-events-none">
+                DA
+              </div>
+            </div>
+            {% if form.price.errors %}
+              <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                <span>⚠️</span> {{ form.price.errors.0 }}
+              </p>
+            {% else %}
+              <p class="text-xs text-gray-500 font-medium mt-1">Indiquez 0 pour rendre cette formation accessible gratuitement.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        {# Carte 3 : Visuels & Jaquettes #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-6">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>🖼️</span> Visuels & Jaquettes de présentation
+            </h2>
+            <span class="text-xs font-bold px-2.5 py-1 bg-purple-100 text-purple-800 rounded-lg border border-purple-200">
+              Images HD
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {# Image Carte (thumbnail) #}
+            <div class="bg-stone-50/70 border-2 border-dashed border-gray-300 rounded-2xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-black uppercase tracking-wider text-gray-800">
+                  🃏 Jaquette Carte (Catalogue / Accueil)
+                </label>
+              </div>
+
+              {% if is_edit and course.thumbnail %}
+                <div class="relative rounded-xl overflow-hidden border-2 border-gray-900 bg-white shadow-xs max-w-[220px]">
+                  <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="w-full h-32 object-cover">
+                  <span class="absolute bottom-1 right-1 px-1.5 py-0.5 text-[10px] font-bold bg-gray-900/80 text-white rounded">
+                    Actuelle
+                  </span>
+                </div>
+              {% endif %}
+
+              <div>
+                {{ form.thumbnail }}
+                {% if form.thumbnail.errors %}
+                  <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                    <span>⚠️</span> {{ form.thumbnail.errors.0 }}
+                  </p>
+                {% else %}
+                  <p class="text-xs text-gray-500 font-medium mt-1.5">
+                    Format recommandé : 16:9 ou carré (ex: 800×450px).
+                  </p>
+                {% endif %}
+              </div>
+            </div>
+
+            {# Image Vitrine (cover_image) #}
+            <div class="bg-stone-50/70 border-2 border-dashed border-gray-300 rounded-2xl p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-black uppercase tracking-wider text-gray-800">
+                  🖼️ Image Vitrine (Page de vente)
+                </label>
+              </div>
+
+              {% if is_edit and course.cover_image %}
+                <div class="relative rounded-xl overflow-hidden border-2 border-gray-900 bg-white shadow-xs max-w-[220px]">
+                  <img src="{{ course.cover_image.url }}" alt="{{ course.title }}" class="w-full h-32 object-cover">
+                  <span class="absolute bottom-1 right-1 px-1.5 py-0.5 text-[10px] font-bold bg-gray-900/80 text-white rounded">
+                    Actuelle
+                  </span>
+                </div>
+              {% endif %}
+
+              <div>
+                {{ form.cover_image }}
+                {% if form.cover_image.errors %}
+                  <p class="text-xs font-bold text-red-600 mt-1.5 flex items-center gap-1">
+                    <span>⚠️</span> {{ form.cover_image.errors.0 }}
+                  </p>
+                {% else %}
+                  <p class="text-xs text-gray-500 font-medium mt-1.5">
+                    Bannière principale affichée sur la page vitrine/sidebar.
+                  </p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {# Carte 4 : Visibilité & Publication #}
+        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-[4px_4px_0_0_#111827] p-6 sm:p-7 space-y-4">
+          <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
+            <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+              <span>⚙️</span> Visibilité & Diffusion
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {# is_published #}
+            <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-gray-900 bg-stone-50/50 hover:bg-white transition cursor-pointer">
+              <div class="pt-0.5">
+                {{ form.is_published }}
+              </div>
+              <div class="space-y-0.5">
+                <span class="block text-sm font-bold text-gray-900">Publier cette formation</span>
+                <span class="block text-xs text-gray-500">Accessible aux étudiants selon son tarif (sinon brouillon).</span>
+              </div>
+            </label>
+
+            {% if request.user.is_superuser %}
+              {# is_featured #}
+              <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-gray-900 bg-stone-50/50 hover:bg-white transition cursor-pointer">
+                <div class="pt-0.5">
+                  {{ form.is_featured }}
+                </div>
+                <div class="space-y-0.5">
+                  <span class="block text-sm font-bold text-gray-900">Mettre en avant à l'accueil</span>
+                  <span class="block text-xs text-gray-500">Affiche ce cours sur la vitrine d'accueil du site.</span>
+                </div>
+              </label>
+
+              {# hide_title_on_card #}
+              <label class="flex items-start gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-gray-900 bg-stone-50/50 hover:bg-white transition cursor-pointer md:col-span-2">
+                <div class="pt-0.5">
+                  {{ form.hide_title_on_card }}
+                </div>
+                <div class="space-y-0.5">
+                  <span class="block text-sm font-bold text-gray-900">Masquer le titre sur la jaquette</span>
+                  <span class="block text-xs text-gray-500">Pratique si votre image de jaquette contient déjà le nom du cours en typographie.</span>
+                </div>
+              </label>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>

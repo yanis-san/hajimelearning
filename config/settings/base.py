@@ -1,4 +1,3 @@
-
 import os
 import sys
 from pathlib import Path
@@ -12,7 +11,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 INSTALLED_APPS = [
     # Whitenoise runserver must be first in INSTALLED_APPS for functionality in dev
     'whitenoise.runserver_nostatic',
-
     "unfold",
     'django.contrib.admin',
     'django.contrib.auth',
@@ -20,17 +18,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     # 3rd Party
     'django_cotton',
     'django_htmx',
     'tailwind',
-
     # Local
     'theme',
-
-    #myapps
-
+    # myapps
     'markdownx',
     'allauth',
     'allauth.account',
@@ -49,18 +43,15 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     # Whitenoise 2nd
     'whitenoise.middleware.WhiteNoiseMiddleware',
-
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
     # HTMX Middleware
     'django_htmx.middleware.HtmxMiddleware',
-
-    #allauth
+    # allauth
     'allauth.account.middleware.AccountMiddleware',
 ]
 
@@ -73,11 +64,11 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',           # Pour t'aider au développement
+                'django.template.context_processors.debug',  # Pour t'aider au développement
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'notifications.context_processors.user_notifications', # Pour les alertes globales du site
+                'notifications.context_processors.user_notifications',  # Pour les alertes globales du site
             ],
         },
     },
@@ -132,11 +123,11 @@ ACCOUNT_FORMS = {
     'signup': 'users.forms.CustomSignupForm',
     'login': 'users.forms.CustomLoginForm',
     'reset_password': 'users.forms.CustomResetPasswordForm',
-    'reset_password_from_key': 'users.forms.CustomResetPasswordKeyForm'
+    'reset_password_from_key': 'users.forms.CustomResetPasswordKeyForm',
 }
 
 # 2. Méthodes de Connexion (Nouvelle Syntaxe)
-ACCOUNT_LOGIN_METHODS = {'email'} # Remplace ACCOUNT_AUTHENTICATION_METHOD
+ACCOUNT_LOGIN_METHODS = {'email'}  # Remplace ACCOUNT_AUTHENTICATION_METHOD
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 
 # 3. Champs requis à l'inscription (Nouvelle Syntaxe)
@@ -225,9 +216,10 @@ if 'test' in sys.argv or 'pytest' in sys.argv[0]:
 TAILWIND_APP_NAME = 'theme'
 TAILWIND_CSS_PATH = 'css/dist/styles.css'
 # --watch=always uses built-in polling instead of watchman
-TAILWIND_STANDALONE_START_COMMAND_ARGS = (
-    '-i static_src/src/styles.css -o static/css/dist/styles.css --watch=always'
-)
+TAILWIND_STANDALONE_START_COMMAND_ARGS = '-i static_src/src/styles.css -o static/css/dist/styles.css --watch=always'
+
+# Markdownx — l'aperçu passe par le même rendu nettoyé que le site
+MARKDOWNX_MARKDOWNIFY_FUNCTION = 'courses.markdown.render_markdown'
 
 # Markdownx — extensions pour le rendu (tables, code fencé, etc.)
 MARKDOWNX_MARKDOWN_EXTENSIONS = [

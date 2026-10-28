@@ -8,9 +8,8 @@ from users.models import User
 
 @pytest.mark.django_db
 class TestAuthFlow:
-
     def test_signup_sends_email(self, client):
-        """ Vérifie que l'inscription envoie un email de confirmation """
+        """Vérifie que l'inscription envoie un email de confirmation"""
         url = reverse('account_signup')
         data = {
             'email': 'nouveau@test.com',
@@ -21,7 +20,7 @@ class TestAuthFlow:
             'phone_number': '0550000000',
             'country': 'DZ',
             'city': 'Alger',
-            'password1': 'Password123!Secure', # Mot de passe + complexe
+            'password1': 'Password123!Secure',  # Mot de passe + complexe
         }
 
         # On poste le formulaire
@@ -38,15 +37,10 @@ class TestAuthFlow:
         assert user.email in mail.outbox[0].to
 
     def test_unverified_user_is_not_verified(self, student):
-        """ Vérifie qu'un user créé manuellement n'est pas vérifié par défaut """
+        """Vérifie qu'un user créé manuellement n'est pas vérifié par défaut"""
         # student est créé via la fixture, mais sans EmailAddress lié
         # On crée l'entrée EmailAddress pour dire "Non vérifié"
-        email_address = EmailAddress.objects.create(
-            user=student,
-            email=student.email,
-            verified=False,
-            primary=True
-        )
+        email_address = EmailAddress.objects.create(user=student, email=student.email, verified=False, primary=True)
 
         assert email_address.verified is False
         # Note: Le test de "Login bloqué" dépend de ta config settings 'mandatory'

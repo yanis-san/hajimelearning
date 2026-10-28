@@ -17,13 +17,14 @@ from .validators import (
 
 class Category(models.Model):
     """Catégorie d'une formation — gérable depuis l'admin."""
-    name  = models.CharField("Étiquette", max_length=80, unique=True)
-    slug  = models.SlugField(unique=True)
+
+    name = models.CharField("Étiquette", max_length=80, unique=True)
+    slug = models.SlugField(unique=True)
     order = models.PositiveSmallIntegerField("Ordre", default=0)
 
     class Meta:
-        ordering            = ['order', 'name']
-        verbose_name        = "Catégorie"
+        ordering = ['order', 'name']
+        verbose_name = "Catégorie"
         verbose_name_plural = "Catégories"
 
     def __str__(self):
@@ -36,7 +37,8 @@ class Course(models.Model):
     instructor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         related_name='courses_as_instructor',
         verbose_name="Instructeur",
         help_text="L'instructeur propriétaire de cette formation (vide = plateforme)",
@@ -44,26 +46,35 @@ class Course(models.Model):
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         related_name='courses',
         verbose_name="Catégorie",
     )
 
     # 1. POUR LA CARTE (ACCUEIL)
     # On renomme l'ancien usage en "short_description" pour être clair
-    short_description = models.TextField("Phrase d'accroche (Carte)", help_text="Ce texte s'affiche sur la page d'accueil (court).")
+    short_description = models.TextField(
+        "Phrase d'accroche (Carte)", help_text="Ce texte s'affiche sur la page d'accueil (court)."
+    )
 
     # 2. POUR LA PAGE DE VENTE (LANDING PAGE)
     # On utilise Markdown pour pouvoir mettre du gras, des titres, des listes...
-    description = MarkdownxField("Page de Vente (Détails)", help_text="Description longue et détaillée pour convaincre.")
+    description = MarkdownxField(
+        "Page de Vente (Détails)", help_text="Description longue et détaillée pour convaincre."
+    )
 
     # 3. ARGUMENTS MARKETING
     what_you_will_learn = MarkdownxField("Ce que vous allez apprendre", help_text="Liste à puces", blank=True)
     prerequisites = MarkdownxField("Pré-requis", help_text="Matériel nécessaire", blank=True, default="Aucun.")
     trailer_video_id = models.CharField("ID Vidéo Trailer (YouTube)", max_length=100, blank=True)
 
-    meta_description = models.CharField("Meta Description (Google)", max_length=160, blank=True, help_text="Résumé pour Google (160 caractères max).")
-    keywords = models.CharField("Mots-clés", max_length=255, blank=True, help_text="Séparés par des virgules (ex: python, django, code)")
+    meta_description = models.CharField(
+        "Meta Description (Google)", max_length=160, blank=True, help_text="Résumé pour Google (160 caractères max)."
+    )
+    keywords = models.CharField(
+        "Mots-clés", max_length=255, blank=True, help_text="Séparés par des virgules (ex: python, django, code)"
+    )
 
     # Pour le sitemap (date de dernière modif)
     updated_at = models.DateTimeField(auto_now=True)
@@ -74,35 +85,36 @@ class Course(models.Model):
     thumbnail = models.ImageField(
         "Image carte (catalogue / accueil)",
         upload_to=get_upload_path,
-        blank=True, null=True,
+        blank=True,
+        null=True,
         validators=[FileExtensionValidator(allowed_extensions=IMAGE_EXTENSIONS)],
-        help_text="Utilisée sur les cartes (catalogue, page d'accueil)."
+        help_text="Utilisée sur les cartes (catalogue, page d'accueil).",
     )
     cover_image = models.ImageField(
         "Image de couverture (vitrine)",
         upload_to=get_upload_path,
-        blank=True, null=True,
+        blank=True,
+        null=True,
         validators=[FileExtensionValidator(allowed_extensions=IMAGE_EXTENSIONS)],
-        help_text="Grande image affichée sur la page de vente (vitrine)."
+        help_text="Grande image affichée sur la page de vente (vitrine).",
     )
 
     is_published = models.BooleanField("Publié ?", default=False)
     is_featured = models.BooleanField(
-        "Afficher sur l'accueil",
-        default=False,
-        help_text="Si coché, ce cours apparaît sur la page d'accueil."
+        "Afficher sur l'accueil", default=False, help_text="Si coché, ce cours apparaît sur la page d'accueil."
     )
     hide_title_on_card = models.BooleanField(
         "Masquer le titre sur la carte",
         default=False,
-        help_text="Si coché, le titre n'apparaît pas sur la carte (utile si la jaquette contient déjà le titre)."
+        help_text="Si coché, le titre n'apparaît pas sur la carte (utile si la jaquette contient déjà le titre).",
     )
     completion_sound = models.FileField(
         "Son de complétion",
         upload_to=get_upload_path,
-        blank=True, null=True,
+        blank=True,
+        null=True,
         help_text="MP3 joué quand l'étudiant termine une leçon (optionnel).",
-        validators=[FileExtensionValidator(allowed_extensions=AUDIO_EXTENSIONS)]
+        validators=[FileExtensionValidator(allowed_extensions=AUDIO_EXTENSIONS)],
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -111,6 +123,7 @@ class Course(models.Model):
 
     def get_absolute_url(self):
         return reverse('course_detail', args=[self.slug])
+
 
 class Module(models.Model):
     course = models.ForeignKey(Course, related_name='modules', on_delete=models.CASCADE)
@@ -125,6 +138,7 @@ class Module(models.Model):
     def __str__(self):
         return f"{self.course.title} - {self.title}"
 
+
 class Lesson(models.Model):
     module = models.ForeignKey(Module, related_name='lessons', on_delete=models.CASCADE)
     title = models.CharField("Titre de la leçon", max_length=200)
@@ -133,7 +147,9 @@ class Lesson(models.Model):
     is_free = models.BooleanField("Gratuit (Aperçu)", default=False)
     is_published = models.BooleanField("Publié", default=True)
     duration_minutes = models.PositiveSmallIntegerField(
-        "Durée estimée (min)", null=True, blank=True,
+        "Durée estimée (min)",
+        null=True,
+        blank=True,
         help_text="Affichée à l'étudiant dans le sommaire (optionnel).",
     )
 
@@ -156,6 +172,7 @@ class Lesson(models.Model):
             if t in types:
                 return t
         return 'text'
+
 
 class ContentBlock(models.Model):
     CONTENT_TYPES = (
@@ -183,11 +200,12 @@ class ContentBlock(models.Model):
         "Fichier Principal",
         upload_to=get_upload_path,
         storage=protected_storage,
-        blank=True, null=True,
+        blank=True,
+        null=True,
         validators=[
             FileExtensionValidator(allowed_extensions=AUDIO_EXTENSIONS + DOC_EXTENSIONS + ANKI_EXTENSIONS),
-            FileSizeValidator(max_mb=100)
-        ]
+            FileSizeValidator(max_mb=100),
+        ],
     )
 
     # Fichier correction (Caché) - PROTÉGÉ
@@ -195,11 +213,9 @@ class ContentBlock(models.Model):
         "Fichier associé (Correction)",
         upload_to=get_upload_path,
         storage=protected_storage,
-        blank=True, null=True,
-        validators=[
-            FileExtensionValidator(allowed_extensions=DOC_EXTENSIONS),
-            FileSizeValidator(max_mb=10)
-        ]
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=DOC_EXTENSIONS), FileSizeValidator(max_mb=10)],
     )
 
     # Deck Anki : nombre de cartes (calculé automatiquement à l'upload, modifiable)
@@ -208,7 +224,8 @@ class ContentBlock(models.Model):
     # Titre du Quiz
     quiz_title = models.CharField("Titre du Quiz", max_length=200, blank=True, null=True)
     pass_percent = models.PositiveSmallIntegerField(
-        "Seuil de réussite (%)", default=70,
+        "Seuil de réussite (%)",
+        default=70,
         help_text="Score minimum pour considérer le quiz comme réussi.",
     )
 
@@ -218,6 +235,7 @@ class ContentBlock(models.Model):
 
     def __str__(self):
         return f"Bloc {self.type} - {self.lesson.title}"
+
 
 class QuizQuestion(models.Model):
     block = models.ForeignKey(ContentBlock, related_name='questions', on_delete=models.CASCADE)
@@ -239,8 +257,10 @@ class QuizQuestion(models.Model):
     class Meta:
         ordering = ['order']
 
+
 class QuizResult(models.Model):
     """Dernier résultat d'un étudiant à un quiz (une ligne par étudiant/quiz)."""
+
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='quiz_results')
     block = models.ForeignKey(ContentBlock, on_delete=models.CASCADE)
     score = models.IntegerField()
@@ -256,6 +276,7 @@ class QuizResult(models.Model):
 
 class QuizAttempt(models.Model):
     """Historique de chaque tentative d'un étudiant à un quiz."""
+
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='quiz_attempts')
     block = models.ForeignKey(ContentBlock, on_delete=models.CASCADE, related_name='attempts')
     score = models.PositiveIntegerField()
@@ -269,6 +290,7 @@ class QuizAttempt(models.Model):
 
     def __str__(self):
         return f"{self.student.email} - Quiz {self.block_id}: {self.score}/{self.total_questions}"
+
 
 class LandingSection(models.Model):
     """Section libre pour la page vitrine d'un cours (page-builder léger)."""
@@ -307,28 +329,24 @@ class LandingSection(models.Model):
     image = models.ImageField(
         "Image",
         upload_to=get_upload_path,
-        blank=True, null=True,
-        validators=[FileExtensionValidator(allowed_extensions=IMAGE_EXTENSIONS)]
+        blank=True,
+        null=True,
+        validators=[FileExtensionValidator(allowed_extensions=IMAGE_EXTENSIONS)],
     )
     video_id = models.CharField("ID YouTube", max_length=100, blank=True)
 
     subtitle = models.CharField("Sous-titre", max_length=300, blank=True)
-    cta_text = models.CharField("Texte du bouton", max_length=100, blank=True,
-                                help_text="Ex : S'inscrire maintenant")
-    cta_url = models.CharField("Lien du bouton", max_length=500, blank=True,
-                               help_text="URL ou ancre (#inscription)")
-    image_position = models.CharField(
-        "Position image", max_length=10,
-        choices=IMAGE_POSITION_CHOICES, default='right'
-    )
+    cta_text = models.CharField("Texte du bouton", max_length=100, blank=True, help_text="Ex : S'inscrire maintenant")
+    cta_url = models.CharField("Lien du bouton", max_length=500, blank=True, help_text="URL ou ancre (#inscription)")
+    image_position = models.CharField("Position image", max_length=10, choices=IMAGE_POSITION_CHOICES, default='right')
 
     css_class = models.CharField(
-        "Classes CSS", max_length=500, blank=True,
-        help_text="Classes Tailwind personnalisées (ex: py-12 text-center)"
+        "Classes CSS", max_length=500, blank=True, help_text="Classes Tailwind personnalisées (ex: py-12 text-center)"
     )
     background = models.CharField("Fond", max_length=20, choices=BG_CHOICES, default='none')
-    is_visible = models.BooleanField("Visible", default=True,
-                                     help_text="Décochez pour masquer cette section sans la supprimer")
+    is_visible = models.BooleanField(
+        "Visible", default=True, help_text="Décochez pour masquer cette section sans la supprimer"
+    )
 
     class Meta:
         ordering = ['order']
@@ -354,6 +372,7 @@ class StudentProgress(models.Model):
 
 class CourseActivity(models.Model):
     """Dernière leçon consultée par un étudiant dans un cours (bouton « Continuer »)."""
+
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='course_activities')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='activities')
     last_lesson = models.ForeignKey(Lesson, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
@@ -371,6 +390,7 @@ class CourseActivity(models.Model):
 
 class CourseCompletion(models.Model):
     """Enregistrement unique quand un étudiant termine toutes les leçons d'un cours."""
+
     student = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -399,8 +419,10 @@ class CourseCompletion(models.Model):
     def __str__(self):
         return f"{self.student.email} — {self.course.title}"
 
+
 class StudentNote(models.Model):
     """Notes personnelles de l'étudiant pour un bloc de contenu."""
+
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notes')
     block = models.ForeignKey(ContentBlock, on_delete=models.CASCADE, related_name='student_notes')
     content = models.TextField("Mes notes", blank=True)
