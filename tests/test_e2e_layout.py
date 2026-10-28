@@ -14,6 +14,8 @@ from tests.test_e2e import login_as  # noqa: E402
 pytestmark = [pytest.mark.e2e, pytest.mark.django_db(transaction=True)]
 
 MOBILE_WIDTH = 390
+# Police large (pire cas) et identique partout : le résultat ne dépend plus des polices installées.
+WIDE_FONT_CSS = "*{font-family: Verdana, 'DejaVu Sans', sans-serif !important}"
 
 
 def test_no_horizontal_overflow_on_mobile(world, live_server):  # noqa: F811
@@ -29,10 +31,12 @@ def test_no_horizontal_overflow_on_mobile(world, live_server):  # noqa: F811
             context = browser.new_context(viewport={'width': MOBILE_WIDTH, 'height': 844})
             page = context.new_page()
             page.live_server_url = live_server.url
+            page.route('**/fonts.g*/**', lambda route: route.abort())
             if users[who] is not None:
                 login_as(page, users[who])
             for name, path in items:
                 page.goto(live_server.url + path, wait_until='networkidle')
+                page.add_style_tag(content=WIDE_FONT_CSS)
                 width = page.evaluate('document.documentElement.scrollWidth')
                 if width > MOBILE_WIDTH:
                     overflowing.append(f'{name} ({width}px)')

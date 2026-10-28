@@ -19,3 +19,10 @@
     99% 95%, 96% 100%, 92% 93%, 88% 98%, 12% 96%, 8% 100%, 4% 93%, 0% 98%
   );
 }
+
+/* Les champs ne dépassent jamais leur conteneur (textarea à largeur intrinsèque, mobile) */
+input,
+select,
+textarea {
+  max-width: 100%;
+}

@@ -34,7 +34,7 @@
   line-height: 1.25;
   text-align: center;
   text-decoration: none;
-  white-space: nowrap;
+  white-space: normal;
   color: var(--btn-fg);
   background-color: var(--btn-bg);
   border: 2px solid var(--btn-border);
@@ -68,6 +68,13 @@
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+/* Une seule ligne dès que la place le permet ; sur mobile le libellé peut passer à la ligne */
+@media (min-width: 640px) {
+  .btn {
+    white-space: nowrap;
+  }
 }
 
 /* ── Variantes ── */
