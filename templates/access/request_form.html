@@ -27,7 +27,7 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
     {# ── OPTION A : Paiement par virement ── #}
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+    <c-ui.card variant="soft">
       <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
         <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary-dark text-sm font-bold">A</span>
         Payer par Virement
@@ -71,10 +71,10 @@
           Envoyer la demande
         </c-ui.btn>
       </form>
-    </div>
+    </c-ui.card>
 
     {# ── OPTION B : Code d'activation ── #}
-    <div class="bg-gray-50 rounded-xl border border-gray-200 shadow-sm p-6">
+    <c-ui.card variant="muted">
       <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
         <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-green-100 text-green-600 text-sm font-bold">B</span>
         J'ai un Code d'Activation
@@ -91,7 +91,7 @@
           Activer mon accès
         </c-ui.btn>
       </form>
-    </div>
+    </c-ui.card>
 
   </div>
 </div>

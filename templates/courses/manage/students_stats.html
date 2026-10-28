@@ -16,17 +16,16 @@
       <div class="text-2xl font-black text-blue-600">{{ modules_structure|length }}</div>
       <div class="text-xs text-gray-500 mt-1">Modules</div>
     </div>
-    <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
+    <c-ui.card variant="muted" padding="sm" class="text-center">
       <div class="text-2xl font-black text-gray-700">{{ total_lessons }}</div>
       <div class="text-xs text-gray-500 mt-1">Leçons</div>
-    </div>
+    </c-ui.card>
   </div>
 
   {# ── Liste étudiants dépliables ── #}
   <div class="space-y-3">
     {% for stat in student_stats %}
-    <div x-data="{ open: false }"
-         class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+    <c-ui.card variant="soft" padding="none" class="overflow-hidden" x-data="{ open: false }">
 
       {# Ligne principale cliquable #}
       <button x-on:click="open = !open"
@@ -154,7 +153,7 @@
 
         </div>
       </div>
-    </div>
+    </c-ui.card>
     {% endfor %}
   </div>
 

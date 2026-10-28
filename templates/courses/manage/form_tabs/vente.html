@@ -4,7 +4,7 @@
       <div x-show="tab === 'vente'" x-cloak class="space-y-6">
 
         {# Carte 1 : Description détaillée avec éditeur Markdown / Split / Preview #}
-        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-brutal-md p-6 sm:p-7 space-y-5">
+        <c-ui.card class="space-y-5">
           <div class="flex items-center justify-between flex-wrap gap-3 border-b-2 border-gray-100 pb-4">
             <div>
               <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
@@ -92,10 +92,10 @@
               <p class="text-gray-500 italic text-sm">L'aperçu apparaîtra ici…</p>
             </div>
           </div>
-        </div>
+        </c-ui.card>
 
         {# Carte 2 : Points forts & Pré-requis #}
-        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-brutal-md p-6 sm:p-7 space-y-6">
+        <c-ui.card class="space-y-6">
           <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
             <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
               <span>🎯</span> Arguments marketing & Pré-requis
@@ -142,10 +142,10 @@
               {% endif %}
             </div>
           </div>
-        </div>
+        </c-ui.card>
 
         {# Carte 3 : Trailer Vidéo YouTube #}
-        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-brutal-md p-6 sm:p-7 space-y-4">
+        <c-ui.card class="space-y-4">
           <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
             <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
               <span>🎬</span> Vidéo de présentation (Trailer YouTube)
@@ -187,6 +187,6 @@
                       allowfullscreen></iframe>
             </div>
           </div>
-        </div>
+        </c-ui.card>
 
       </div>

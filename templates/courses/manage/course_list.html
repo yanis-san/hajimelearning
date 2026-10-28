@@ -46,7 +46,7 @@
 
   {# ── Tableau avec tri ── #}
   {% if courses or search_query %}
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    <c-ui.card variant="soft" padding="none" class="overflow-hidden">
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead>
@@ -75,7 +75,7 @@
           </tbody>
         </table>
       </div>
-    </div>
+    </c-ui.card>
   {% else %}
     <c-ui.empty-state
       icon="📚"

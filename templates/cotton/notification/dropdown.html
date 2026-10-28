@@ -12,17 +12,7 @@
  </c-ui.btn>
 
   {# Dropdown panel #}
-  <div x-show="notifOpen"
-       @click.outside="notifOpen = false"
-       x-transition:enter="transition ease-out duration-150"
-       x-transition:enter-start="opacity-0 scale-95 translate-y-2"
-       x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-       x-transition:leave="transition ease-in duration-100"
-       x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-       x-transition:leave-end="opacity-0 scale-95 translate-y-2"
-       x-cloak
-       class="absolute right-0 mt-3 w-80 bg-white border-2 border-gray-900 rounded-xl shadow-brutal-md z-50 origin-top-right overflow-hidden"
-       id="notification-dropdown-panel">
+  <c-ui.card padding="none" class="absolute right-0 mt-3 w-80 z-50 origin-top-right overflow-hidden" x-show="notifOpen" @click.outside="notifOpen = false" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 scale-95 translate-y-2" x-transition:enter-end="opacity-100 scale-100 translate-y-0" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 scale-100 translate-y-0" x-transition:leave-end="opacity-0 scale-95 translate-y-2" x-cloak id="notification-dropdown-panel">
 
     {# En-tête #}
     <div class="bg-gray-50 border-b-2 border-gray-200 px-4 py-3 flex justify-between items-center">
@@ -40,12 +30,12 @@
         {% endfor %}
       {% else %}
         <div class="px-4 py-10 text-center bg-white border-b-2 border-gray-100">
-          <div class="w-12 h-12 border-2 border-gray-200 rounded-xl mx-auto mb-3 flex items-center justify-center bg-gray-50 text-gray-500">
+          <c-ui.card variant="muted" padding="none" class="w-12 h-12 mx-auto mb-3 flex items-center justify-center text-gray-500">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
             </svg>
-          </div>
+          </c-ui.card>
           <p class="text-sm font-bold text-gray-500">Aucune notification</p>
         </div>
       {% endif %}
@@ -64,5 +54,5 @@
         </button>
       </div>
     {% endif %}
-  </div>
+  </c-ui.card>
 </div>

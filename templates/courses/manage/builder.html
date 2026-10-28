@@ -42,8 +42,7 @@
   </c-slot>
 
   {# ── Toolbar: palette de blocs + autosave status ── #}
-  <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 sticky top-20 z-10 flex flex-wrap gap-3 justify-between items-center"
-       x-data="builderStatus">
+  <c-ui.card variant="soft" padding="sm" class="mb-8 sticky top-20 z-10 flex flex-wrap gap-3 justify-between items-center" x-data="builderStatus">
     <div class="flex flex-wrap items-center gap-2">
       <span class="text-sm font-medium text-gray-500">Ajouter :</span>
 
@@ -117,7 +116,7 @@
       </span>
     </template>
   </div>
-</div>
+</c-ui.card>
 
   {# ── Form container (filled via HTMX) ── #}
   <div id="block-form-container" class="mb-8"></div>

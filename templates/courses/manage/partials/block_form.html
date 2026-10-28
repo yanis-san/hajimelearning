@@ -1,5 +1,4 @@
-<div class="bg-white border border-primary/30 rounded-xl p-6 shadow-sm"
-     x-data="blockEditor">
+<c-ui.card variant="soft" class="border-primary/30" x-data="blockEditor">
 
   <div class="flex items-center justify-between flex-wrap gap-2 mb-4 pb-3 border-b border-gray-100">
     <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -86,18 +85,16 @@
                       placeholder="Votre texte (Markdown)..."
                       class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-transparent transition font-mono text-sm resize-y"></textarea>
           </div>
-          <div id="md-live-preview"
-               class="border border-gray-200 rounded-xl p-4 bg-gray-50 overflow-y-auto max-h-[28rem]">
+          <c-ui.card variant="muted" padding="sm" class="overflow-y-auto max-h-[28rem]" id="md-live-preview">
             <p class="text-gray-500 italic text-sm">L'aperçu apparaîtra ici…</p>
-          </div>
+          </c-ui.card>
         </div>
 
         {# Preview-only mode — rendu instantané via marked.js #}
         <div x-show="tab === 'preview'" x-transition>
-          <div id="md-full-preview"
-               class="border border-gray-200 rounded-xl p-6 bg-gray-50 min-h-[12rem] overflow-y-auto">
+          <c-ui.card variant="muted" class="min-h-[12rem] overflow-y-auto" id="md-full-preview">
             <p class="text-gray-500 italic text-sm">L'aperçu apparaîtra ici…</p>
-          </div>
+          </c-ui.card>
         </div>
       </div>
     {% endif %}
@@ -183,5 +180,5 @@
     </div>
 
   </form>
-</div>
+</c-ui.card>
 

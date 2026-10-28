@@ -28,7 +28,7 @@
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
 
     {# Formations #}
-    <div class="bg-white rounded-xl border border-gray-200 p-4">
+    <c-ui.card variant="flat" padding="sm">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Formations</span>
         <span class="text-xs text-gray-500">
@@ -49,19 +49,19 @@
       {% else %}
         <p class="text-xs text-gray-500 mt-2">Illimité</p>
       {% endif %}
-    </div>
+    </c-ui.card>
 
     {# Étudiants #}
-    <div class="bg-white rounded-xl border border-gray-200 p-4">
+    <c-ui.card variant="flat" padding="sm">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Étudiants</span>
       </div>
       <p class="text-2xl font-bold text-gray-900">{{ total_students }}</p>
       <p class="text-xs text-gray-500 mt-2">Toutes formations</p>
-    </div>
+    </c-ui.card>
 
     {# Modules totaux #}
-    <div class="bg-white rounded-xl border border-gray-200 p-4">
+    <c-ui.card variant="flat" padding="sm">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Modules</span>
         <span class="text-xs text-gray-500">
@@ -70,10 +70,10 @@
       </div>
       <p class="text-2xl font-bold text-gray-900">{{ total_modules }}</p>
       <p class="text-xs text-gray-500 mt-2">Total créés</p>
-    </div>
+    </c-ui.card>
 
     {# Leçons totales #}
-    <div class="bg-white rounded-xl border border-gray-200 p-4">
+    <c-ui.card variant="flat" padding="sm">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">Leçons</span>
         <span class="text-xs text-gray-500">
@@ -82,7 +82,7 @@
       </div>
       <p class="text-2xl font-bold text-gray-900">{{ total_lessons }}</p>
       <p class="text-xs text-gray-500 mt-2">Total créées</p>
-    </div>
+    </c-ui.card>
   </div>
 
   {# ── Liste des formations avec compteurs inline ── #}

@@ -4,7 +4,7 @@
       <div x-show="tab === 'infos'" x-cloak class="space-y-6">
 
         {# Carte 1 : Identité & Description courte #}
-        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-brutal-md p-6 sm:p-7 space-y-6">
+        <c-ui.card class="space-y-6">
           <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
             <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
               <span>📌</span> Identité de la formation
@@ -70,10 +70,10 @@
               </p>
             {% endif %}
           </div>
-        </div>
+        </c-ui.card>
 
         {# Carte 2 : Tarification #}
-        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-brutal-md p-6 sm:p-7 space-y-4">
+        <c-ui.card class="space-y-4">
           <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
             <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
               <span>💰</span> Tarification
@@ -102,10 +102,10 @@
               <p class="text-xs text-gray-500 font-medium mt-1">Indiquez 0 pour rendre cette formation accessible gratuitement.</p>
             {% endif %}
           </div>
-        </div>
+        </c-ui.card>
 
         {# Carte 3 : Visuels & Jaquettes #}
-        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-brutal-md p-6 sm:p-7 space-y-6">
+        <c-ui.card class="space-y-6">
           <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
             <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
               <span>🖼️</span> Visuels & Jaquettes de présentation
@@ -125,12 +125,12 @@
               </div>
 
               {% if is_edit and course.thumbnail %}
-                <div class="relative rounded-xl overflow-hidden border-2 border-gray-900 bg-white shadow-xs max-w-[220px]">
+                <c-ui.card padding="none" class="relative overflow-hidden max-w-[220px]">
                   <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="w-full h-32 object-cover">
                   <span class="absolute bottom-1 right-1 px-1.5 py-0.5 text-[10px] font-bold bg-gray-900/80 text-white rounded">
                     Actuelle
                   </span>
-                </div>
+                </c-ui.card>
               {% endif %}
 
               <div>
@@ -156,12 +156,12 @@
               </div>
 
               {% if is_edit and course.cover_image %}
-                <div class="relative rounded-xl overflow-hidden border-2 border-gray-900 bg-white shadow-xs max-w-[220px]">
+                <c-ui.card padding="none" class="relative overflow-hidden max-w-[220px]">
                   <img src="{{ course.cover_image.url }}" alt="{{ course.title }}" class="w-full h-32 object-cover">
                   <span class="absolute bottom-1 right-1 px-1.5 py-0.5 text-[10px] font-bold bg-gray-900/80 text-white rounded">
                     Actuelle
                   </span>
-                </div>
+                </c-ui.card>
               {% endif %}
 
               <div>
@@ -178,10 +178,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </c-ui.card>
 
         {# Carte 4 : Visibilité & Publication #}
-        <div class="bg-white rounded-2xl border-2 border-gray-900 shadow-brutal-md p-6 sm:p-7 space-y-4">
+        <c-ui.card class="space-y-4">
           <div class="flex items-center justify-between border-b-2 border-gray-100 pb-3">
             <h2 class="text-base font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
               <span>⚙️</span> Visibilité & Diffusion
@@ -224,6 +224,6 @@
               </label>
             {% endif %}
           </div>
-        </div>
+        </c-ui.card>
 
       </div>

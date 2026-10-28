@@ -5,7 +5,7 @@
 <c-course.block-frame icon="📎" tone="purple">
   <c-slot name="title">{{ block.title|furigana|default:"Fichier" }}</c-slot>
     <div class="p-6 bg-white space-y-4">
-      <div class="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+      <c-ui.card variant="muted" padding="sm" class="flex items-center justify-between gap-4">
         <div class="min-w-0">
           <p class="text-sm font-bold text-gray-900 truncate">{{ block.file_content.name }}</p>
           <span class="text-xs text-gray-500">Document ressource à télécharger</span>
@@ -16,7 +16,7 @@
           </svg>
           Télécharger
         </c-ui.btn>
-      </div>
+      </c-ui.card>
 
       {% if slot %}
         <div class="mt-6 pt-4 border-t border-gray-100">

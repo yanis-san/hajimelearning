@@ -10,7 +10,7 @@
 <c-layout.course_builder :course="course" active_tab="modules">
 
   {# ── Add module form ── #}
-  <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-8">
+  <c-ui.card variant="soft" padding="sm" class="mb-8">
     <form hx-post="{% url 'manage_course_modules' course.slug %}"
           hx-target="#module-list"
           hx-swap="innerHTML"
@@ -24,7 +24,7 @@
         ➕ Ajouter un module
       </c-ui.btn>
     </form>
-  </div>
+  </c-ui.card>
 
   {# ── Module list (sortable) ── #}
   <div class="sortable-list space-y-3" id="module-list"

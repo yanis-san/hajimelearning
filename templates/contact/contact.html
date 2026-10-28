@@ -11,7 +11,7 @@
 
   {# ── Carte formulaire ── #}
   <div class="relative group">
-    <c-ui.card border="soft" padding="lg" drawn="true" class="relative z-10 transition-transform duration-300">
+    <c-ui.card padding="lg" drawn="true" class="relative z-10 transition-transform duration-300">
 
       {% if is_prefilled %}
         <div class="flex items-center gap-3 mb-8 px-4 py-3 bg-primary text-white border-2 border-primary rounded-xl shadow-sm transform -rotate-1 manga-drawn-alt">
@@ -78,13 +78,12 @@
       </c-form.select>
 
       {# Message automatique Cours Particulier #}
-      <div x-show="reasonText.toLowerCase().includes('cours particulier')" x-cloak
-           class="flex items-start gap-3 p-4 bg-gray-50 border-2 border-gray-900 rounded-xl shadow-brutal manga-drawn">
+      <c-ui.card padding="sm" drawn="true" class="flex items-start gap-3" x-show="reasonText.toLowerCase().includes('cours particulier')" x-cloak>
         <span class="text-xl shrink-0 mt-0.5">ℹ️</span>
         <p class="text-sm font-bold text-gray-800 leading-relaxed">
           Pour toute demande de cours particulier, vous recevrez automatiquement un email avec toutes les informations nécessaires (tarifs, disponibilités, modalités) une fois votre demande envoyée.
         </p>
-      </div>
+      </c-ui.card>
 
       {# ── Message ── #}
       <c-form.textarea

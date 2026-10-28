@@ -13,7 +13,7 @@
 <c-layout.course_builder :course="course" active_tab="landing">
 
   {# ── Toolbar : palette de sections ── #}
-  <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8 sticky top-20 z-10 flex flex-wrap gap-3 justify-center items-center">
+  <c-ui.card variant="soft" padding="sm" class="mb-8 sticky top-20 z-10 flex flex-wrap gap-3 justify-center items-center">
     <span class="text-sm font-medium text-gray-500">Ajouter :</span>
 
     <c-ui.btn variant="ghost" size="sm"
@@ -63,7 +63,7 @@
               hx-target="#section-form-container" hx-swap="innerHTML">
       💬 Témoignages
     </c-ui.btn>
-  </div>
+  </c-ui.card>
 
   {# ── Form container (rempli via HTMX) ── #}
   <div id="section-form-container" class="mb-8"></div>
